@@ -36,7 +36,9 @@ export async function GET() {
     
     // Najpierw spróbuj WTL API (prawdziwe dane)
     const wtlResponse = await wtlClient.getProjects()
-    if (wtlResponse.success && wtlResponse.data && wtlResponse.data.length > 0) {
+    console.log('WTL Response:', wtlResponse)
+    
+    if (wtlResponse.success && wtlResponse.data) {
       console.log('Successfully fetched from WTL API:', wtlResponse.data.length, 'projects')
       
       // Opcjonalnie cache w Supabase

@@ -86,23 +86,37 @@ class WTLClient {
 
   async getProjects(): Promise<WTLResponse<any[]>> {
     try {
-      // Próbuj różne endpointy WTL
-      const endpoints = ['/projects', '/api/projects', '/v1/projects']
+      console.log('Attempting to fetch projects from WTL API...')
+      console.log('Base URL:', this.client.defaults.baseURL)
+      console.log('Headers:', this.client.defaults.headers)
       
-      for (const endpoint of endpoints) {
-        try {
-          const response = await this.client.get(endpoint)
-          console.log(`WTL Projects fetched from ${endpoint}:`, response.data)
-          return { success: true, data: response.data }
-        } catch (error) {
-          console.log(`Failed to fetch from ${endpoint}:`, error)
-          continue
-        }
+      // Próbuj główny endpoint projektów
+      const endpoint = '/projects'
+      
+      try {
+        console.log(`Trying endpoint: ${endpoint}`)
+        const response = await this.client.get(endpoint)
+        console.log(`✅ SUCCESS: WTL Projects fetched from ${endpoint}`)
+        console.log('Response status:', response.status)
+        console.log('Response data:', response.data)
+        
+        // Sprawdź czy dane są w oczekiwanym formacie
+        const projects = Array.isArray(response.data) ? response.data : 
+                        response.data?.projects || 
+                        response.data?.data || 
+                        [response.data]
+        
+        return { success: true, data: projects }
+      } catch (error: any) {
+        console.error(`❌ FAILED: ${endpoint}`)
+        console.error('Error status:', error.response?.status)
+        console.error('Error data:', error.response?.data)
+        console.error('Error message:', error.message)
+        
+        return { success: false, data: [], error: `WTL API Error: ${error.response?.status || error.message}` }
       }
-      
-      throw new Error('All WTL endpoints failed')
     } catch (error: any) {
-      console.error('WTL Projects error:', error.message)
+      console.error('WTL Projects critical error:', error.message)
       return { success: false, data: [], error: error.message }
     }
   }
