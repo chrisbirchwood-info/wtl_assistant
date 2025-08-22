@@ -212,6 +212,57 @@ class WTLClient {
       return { success: false, data: [], error: error.message }
     }
   }
+
+  async getLessons(trainingId?: string): Promise<WTLResponse<any[]>> {
+    try {
+      console.log('🔍 Attempting to fetch lessons from WTL API...')
+      
+      // Endpointy dla lekcji zgodnie z dokumentacją
+      const endpoints = trainingId 
+        ? [`/training/${trainingId}/lesson/list`, `/lesson/list?filter=[{"field": "training_id", "type": "equals", "value": "${trainingId}"}]`]
+        : ['/lesson/list', '/lessons', '/lesson']
+      
+      for (const endpoint of endpoints) {
+        try {
+          console.log(`🌐 Trying lessons endpoint: ${endpoint}`)
+          const response = await this.client.get(endpoint)
+          
+          console.log(`✅ SUCCESS: Lessons fetched from ${endpoint}`)
+          console.log('Response status:', response.status)
+          console.log('Response data sample:', JSON.stringify(response.data).substring(0, 200))
+          
+          // Sprawdź czy dane są w oczekiwanym formacie
+          let lessons = response.data
+          
+          // Obsłuż różne formaty odpowiedzi
+          if (response.data?.data) {
+            lessons = response.data.data
+          } else if (response.data?.lessons) {
+            lessons = response.data.lessons
+          } else if (response.data?.items) {
+            lessons = response.data.items
+          }
+          
+          // Upewnij się że to jest array
+          if (!Array.isArray(lessons)) {
+            lessons = [lessons]
+          }
+          
+          console.log(`📚 Processed ${lessons.length} lessons from WTL API`)
+          return { success: true, data: lessons }
+          
+        } catch (error: any) {
+          console.log(`❌ Failed ${endpoint}: ${error.response?.status || error.message}`)
+          continue
+        }
+      }
+      
+      throw new Error('All WTL lesson endpoints failed')
+    } catch (error: any) {
+      console.error('🚫 WTL Lessons critical error:', error.message)
+      return { success: false, data: [], error: error.message }
+    }
+  }
 }
 
 export const wtlClient = new WTLClient()
