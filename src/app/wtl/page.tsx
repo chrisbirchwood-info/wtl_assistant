@@ -109,11 +109,13 @@ export default function WTLPage() {
           if (!courseId) {
             const lessonName = lesson.name?.toLowerCase() || ''
             
-            // Przypisz na podstawie poziomu (A1, A2, B1, B2, C1)
-            if (lessonName.includes('a1.') || lessonName.includes('a2.')) {
-              courseId = '2' // Przełam barierę językową w 5 tygodni
-            } else if (lessonName.includes('b1.') || lessonName.includes('b2.') || lessonName.includes('c1.')) {
+            // Przypisz na podstawie poziomu - wszystkie A1, A2, B1, B2, C1 to Angielski XXI wieku
+            if (lessonName.includes('a1.') || lessonName.includes('a2.') || 
+                lessonName.includes('b1.') || lessonName.includes('b2.') || 
+                lessonName.includes('c1.')) {
               courseId = '3' // Angielski XXI wieku
+            } else if (lessonName.includes('przełam') || lessonName.includes('barierę')) {
+              courseId = '2' // Przełam barierę językową w 5 tygodni
             } else {
               courseId = '1' // Przykładowe Szkolenie
             }
@@ -419,7 +421,7 @@ export default function WTLPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {selectedProject ? 'Lekcje kursu' : 'Wszystkie lekcje'}
+                  {selectedProject ? 'Lekcje kursu' : 'Wybierz kurs'}
                 </h2>
                 <span className="text-sm text-gray-500">
                   {lessons.length} lekcji
@@ -430,8 +432,8 @@ export default function WTLPage() {
                 <div className="text-center py-8">
                   <p className="text-gray-500">
                     {selectedProject 
-                      ? 'Brak lekcji w wybranym kursie' 
-                      : 'Brak lekcji do wyświetlenia'
+                      ? 'Ten kurs nie ma jeszcze lekcji' 
+                      : 'Kliknij na kurs aby zobaczyć jego lekcje'
                     }
                   </p>
                 </div>
