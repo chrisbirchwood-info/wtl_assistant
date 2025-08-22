@@ -42,12 +42,14 @@ interface Lesson {
 export default function WTLPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [tasks, setTasks] = useState<Task[]>([])
-  const [lessons, setLessons] = useState<Lesson[]>([])
+  const [allLessons, setAllLessons] = useState<Lesson[]>([]) // Wszystkie lekcje z API
+  const [lessons, setLessons] = useState<Lesson[]>([]) // Lekcje dla wybranego kursu
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [lessonsLoading, setLessonsLoading] = useState(false)
   const [dataSource, setDataSource] = useState<string>('loading')
   const [statusMessage, setStatusMessage] = useState<string>('')
+  const [projectLessonsMap, setProjectLessonsMap] = useState<{[key: string]: Lesson[]}>({}) // Mapa lekcji per projekt
 
   useEffect(() => {
     fetchData()
@@ -70,10 +72,14 @@ export default function WTLPage() {
     try {
       console.log('Fetching data from WTL API...')
       
-      // Pobierz tylko projekty na start, zadania i lekcje dopiero po wybraniu projektu
-      const projectsRes = await fetch('/api/wtl/projects')
+      // Pobierz projekty i wszystkie lekcje na start
+      const [projectsRes, lessonsRes] = await Promise.all([
+        fetch('/api/wtl/projects'),
+        fetch('/api/wtl/lessons') // Wszystkie lekcje
+      ])
 
       const projectsData: ApiResponse<Project[]> = await projectsRes.json()
+      const lessonsData: ApiResponse<Lesson[]> = await lessonsRes.json()
 
       if (projectsData.success) {
         setProjects(projectsData.data)
@@ -87,6 +93,40 @@ export default function WTLPage() {
         } else {
           toast.success('Używane dane demonstracyjne projektów')
         }
+      }
+
+      if (lessonsData.success) {
+        setAllLessons(lessonsData.data)
+        
+        // Stwórz mapę lekcji per projekt
+        const lessonsMap: {[key: string]: Lesson[]} = {}
+        
+        // Inteligentne przypisanie lekcji do kursów
+        lessonsData.data.forEach((lesson: any) => {
+          let courseId = lesson.training_id || lesson.course_id || lesson.project_id
+          
+          // Jeśli nie ma bezpośredniego ID, spróbuj dopasować po nazwie
+          if (!courseId) {
+            const lessonName = lesson.name?.toLowerCase() || ''
+            
+            // Przypisz na podstawie poziomu (A1, A2, B1, B2, C1)
+            if (lessonName.includes('a1.') || lessonName.includes('a2.')) {
+              courseId = '2' // Przełam barierę językową w 5 tygodni
+            } else if (lessonName.includes('b1.') || lessonName.includes('b2.') || lessonName.includes('c1.')) {
+              courseId = '3' // Angielski XXI wieku
+            } else {
+              courseId = '1' // Przykładowe Szkolenie
+            }
+          }
+          
+          if (!lessonsMap[courseId]) {
+            lessonsMap[courseId] = []
+          }
+          lessonsMap[courseId].push(lesson)
+        })
+        
+        setProjectLessonsMap(lessonsMap)
+        console.log('Created lessons map:', lessonsMap)
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -118,33 +158,30 @@ export default function WTLPage() {
         return
       }
 
-      console.log('Fetching lessons for training:', trainingId)
+      console.log('Filtering lessons for training:', trainingId)
       
-      // Znajdź wybrany projekt i użyj jego lekcji
-      const selectedProjectData = projects.find(p => p.id === trainingId)
-      if (selectedProjectData && (selectedProjectData as any).lessons) {
-        const projectLessons = (selectedProjectData as any).lessons
-        setLessons(projectLessons)
+      // Użyj mapy lekcji per projekt
+      const projectLessons = projectLessonsMap[trainingId] || []
+      setLessons(projectLessons)
+      
+      if (projectLessons.length > 0) {
         toast.success(`Załadowano ${projectLessons.length} lekcji z kursu! 📚`)
-        console.log(`Loaded ${projectLessons.length} lessons from project data`)
-        return
-      }
+        console.log(`Filtered ${projectLessons.length} lessons for training ${trainingId}`)
+      } else {
+        console.log(`No lessons found for training ${trainingId}`)
+        // Jeśli nie ma lekcji w mapie, spróbuj pobrać z API
+        const url = `/api/wtl/lessons?trainingId=${trainingId}`
+        const response = await fetch(url)
+        const data: ApiResponse<Lesson[]> = await response.json()
 
-      // Fallback - spróbuj API endpoint
-      const url = `/api/wtl/lessons?trainingId=${trainingId}`
-      const response = await fetch(url)
-      const data: ApiResponse<Lesson[]> = await response.json()
-
-      if (data.success) {
-        setLessons(data.data)
-        if (data.source === 'wtl') {
-          toast.success(`Załadowano ${data.data.length} lekcji z kursu! 📚`)
+        if (data.success && data.data.length > 0) {
+          setLessons(data.data)
+          toast.success(`Załadowano ${data.data.length} lekcji z API! 📚`)
         }
-        console.log(`Loaded ${data.data.length} lessons for training ${trainingId}`)
       }
     } catch (error) {
-      console.error('Error fetching lessons:', error)
-      toast.error('Błąd podczas ładowania lekcji')
+      console.error('Error filtering lessons:', error)
+      toast.error('Błąd podczas filtrowania lekcji')
     }
   }
 

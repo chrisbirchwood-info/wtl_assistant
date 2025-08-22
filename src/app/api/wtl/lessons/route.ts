@@ -109,6 +109,9 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Lessons API error:', error)
+    const { searchParams } = new URL(request.url)
+    const trainingId = searchParams.get('trainingId')
+    
     return NextResponse.json({
       success: true,
       data: trainingId ? mockLessonsData[trainingId] || [] : getAllMockLessons(),
