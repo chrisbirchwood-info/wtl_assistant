@@ -97,9 +97,9 @@ export default function WTLPage() {
     }
   }
 
-  const fetchTasks = async (projectId?: string) => {
+  const fetchTasks = async (trainingId?: string) => {
     try {
-      const url = projectId ? `/api/wtl/tasks?projectId=${projectId}` : '/api/wtl/tasks'
+      const url = trainingId ? `/api/wtl/tasks?trainingId=${trainingId}` : '/api/wtl/tasks'
       const response = await fetch(url)
       const data = await response.json()
 

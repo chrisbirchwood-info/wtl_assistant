@@ -51,19 +51,19 @@ const mockTasks = [
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const projectId = searchParams.get('projectId')
+    const trainingId = searchParams.get('trainingId') || searchParams.get('projectId')
 
-    console.log('Fetching tasks from WTL API...', projectId ? `for project ${projectId}` : 'all tasks')
+    console.log('Fetching tasks from WTL API...', trainingId ? `for training ${trainingId}` : 'all tasks')
 
     // Najpierw spróbuj WTL API (prawdziwe dane)
-    const wtlResponse = await wtlClient.getTasks(projectId || undefined)
+    const wtlResponse = await wtlClient.getTasks(trainingId || undefined)
     if (wtlResponse.success && wtlResponse.data && wtlResponse.data.length > 0) {
       console.log('Successfully fetched from WTL API:', wtlResponse.data.length, 'tasks')
       
       // Opcjonalnie cache w Supabase
       try {
         const tasksToCache = wtlResponse.data.map((task: any) => ({
-          project_id: task.project_id || task.projectId || projectId || '1',
+          project_id: task.project_id || task.projectId || task.training_id || trainingId || '1',
           title: task.title || task.name || 'Unnamed Task',
           description: task.description || task.summary,
           status: task.status || 'pending',
@@ -97,8 +97,8 @@ export async function GET(request: NextRequest) {
     // Jeśli WTL nie działa, spróbuj cache z Supabase
     let query = supabase.from('tasks').select('*').order('created_at', { ascending: false })
     
-    if (projectId) {
-      query = query.eq('project_id', projectId)
+    if (trainingId) {
+      query = query.eq('project_id', trainingId)
     }
 
     const { data: tasks } = await query
@@ -115,9 +115,9 @@ export async function GET(request: NextRequest) {
 
     console.log('No cached data, using mock data')
 
-    // Fallback do mock danych (filter by projectId if provided)
-    const filteredTasks = projectId 
-      ? mockTasks.filter(task => task.project_id === projectId)
+    // Fallback do mock danych (filter by trainingId if provided)
+    const filteredTasks = trainingId 
+      ? mockTasks.filter(task => task.project_id === trainingId)
       : mockTasks
 
     return NextResponse.json({
