@@ -39,11 +39,9 @@ class WTLClient {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'User-Agent': 'WTL-Assistant/1.0.0',
-        // Próbuj różne sposoby autoryzacji
+        // Autoryzacja WTL API zgodnie z dokumentacją
         ...(process.env.WTL_API_KEY && { 
-          'Authorization': `Bearer ${process.env.WTL_API_KEY}`,
-          'X-API-Key': process.env.WTL_API_KEY,
-          'Api-Key': process.env.WTL_API_KEY
+          'X-Auth-Token': process.env.WTL_API_KEY
         }),
       }
     })
