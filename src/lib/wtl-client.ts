@@ -38,8 +38,13 @@ class WTLClient {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        ...(process.env.WTL_API_KEY && { 'Authorization': `Bearer ${process.env.WTL_API_KEY}` }),
-        'User-Agent': 'WTL-Assistant/1.0.0'
+        'User-Agent': 'WTL-Assistant/1.0.0',
+        // Próbuj różne sposoby autoryzacji
+        ...(process.env.WTL_API_KEY && { 
+          'Authorization': `Bearer ${process.env.WTL_API_KEY}`,
+          'X-API-Key': process.env.WTL_API_KEY,
+          'Api-Key': process.env.WTL_API_KEY
+        }),
       }
     })
 
