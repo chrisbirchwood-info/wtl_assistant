@@ -113,14 +113,31 @@ export default function WTLPage() {
 
   const fetchLessons = async (trainingId?: string) => {
     try {
+      if (!trainingId) {
+        setLessons([])
+        return
+      }
+
       console.log('Fetching lessons for training:', trainingId)
-      const url = trainingId ? `/api/wtl/lessons?trainingId=${trainingId}` : '/api/wtl/lessons'
+      
+      // Znajdź wybrany projekt i użyj jego lekcji
+      const selectedProjectData = projects.find(p => p.id === trainingId)
+      if (selectedProjectData && (selectedProjectData as any).lessons) {
+        const projectLessons = (selectedProjectData as any).lessons
+        setLessons(projectLessons)
+        toast.success(`Załadowano ${projectLessons.length} lekcji z kursu! 📚`)
+        console.log(`Loaded ${projectLessons.length} lessons from project data`)
+        return
+      }
+
+      // Fallback - spróbuj API endpoint
+      const url = `/api/wtl/lessons?trainingId=${trainingId}`
       const response = await fetch(url)
       const data: ApiResponse<Lesson[]> = await response.json()
 
       if (data.success) {
         setLessons(data.data)
-        if (data.source === 'wtl' && trainingId) {
+        if (data.source === 'wtl') {
           toast.success(`Załadowano ${data.data.length} lekcji z kursu! 📚`)
         }
         console.log(`Loaded ${data.data.length} lessons for training ${trainingId}`)
@@ -230,7 +247,7 @@ export default function WTLPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Projects Panel */}
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
@@ -359,85 +376,7 @@ export default function WTLPage() {
               )}
             </div>
 
-            {/* Tasks Panel */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {selectedProject ? 'Zadania kursu' : 'Wybierz kurs'}
-                </h2>
-                {selectedProject && (
-                  <span className="text-sm text-gray-500">
-                    {tasks.length} zadań
-                  </span>
-                )}
-              </div>
-              
-              {tasks.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">
-                    {selectedProject 
-                      ? 'Brak zadań w wybranym kursie' 
-                      : 'Wybierz kurs aby zobaczyć zadania'
-                    }
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {tasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className="p-4 border border-gray-200 rounded-lg"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{task.title}</h4>
-                          {task.description && (
-                            <p className="text-sm text-gray-600 mt-1">
-                              {task.description}
-                            </p>
-                          )}
-                          {task.due_date && (
-                            <p className="text-xs text-gray-500 mt-2">
-                              Termin: {new Date(task.due_date).toLocaleDateString('pl-PL')}
-                            </p>
-                          )}
-                        </div>
-                        
-                        <div className="flex flex-col items-end space-y-1">
-                          <span
-                            className={`px-2 py-1 text-xs rounded-full ${
-                              task.status === 'completed'
-                                ? 'bg-green-100 text-green-800'
-                                : task.status === 'in_progress'
-                                ? 'bg-blue-100 text-blue-800'
-                                : task.status === 'cancelled'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}
-                          >
-                            {task.status}
-                          </span>
-                          
-                          <span
-                            className={`px-2 py-1 text-xs rounded-full ${
-                              task.priority === 'urgent'
-                                ? 'bg-red-100 text-red-800'
-                                : task.priority === 'high'
-                                ? 'bg-orange-100 text-orange-800'
-                                : task.priority === 'medium'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}
-                          >
-                            {task.priority}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+
 
             {/* Lessons Panel */}
             <div className="bg-white rounded-lg shadow p-6">
