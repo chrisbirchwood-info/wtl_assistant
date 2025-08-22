@@ -1,0 +1,4656 @@
+{
+	"info": {
+		"_postman_id": "c4c613cc-bfce-493b-935c-b13c5f5e056d",
+		"name": "WebToLearn API",
+		"description": "# Przegląd\nApi zostało napisane zgodnie z architekturą REST i pozwala na komunikację z systemem WebToLearn.pl. \nDostęp do API jest możliwy poprzez użycie `API Token` dostępnego w ustawieniach administracyjnych portalu (`Panel administracyjny -> Konfiguracja Platformy -> API`). \nWszystkie żądania API wykonywane są przez adres Twojej platformy w adresie *.elms.pl lub w Twojej własnej (jeśli masz podpiętą pod nasz system np. kursy.twojadomena.pl): \n`{platforma}.elms.pl/api/v1/` lub `{twojadomena}/api/v1/`. \nAPI zwraca odpowiedzi w postaci `application/json`\n\n\n# Autoryzacja\nAutoryzacją objęte są wszystkie endpointy opisane w niniejszej dokumentacji. Uwierzytelnianie wymaga użycia nagłówka `X-Auth-Token` oraz `API Token` jako wartości, który jest dostępny w `Panel administracyjny -> Konfiguracja Platformy -> API` w danej platformie. \n\n# Kody błędów\nAPI obsługuje standardowe kody błędów:\n\n`402` - wymagana płatność. Błąd pokazywany przy wygaśnięciu abonamentu (WebToLearn) oraz przy przekroczeniu limitu użytkowników platformy w tymże abonamencie\n\n`403` - brak dostępu - błędny `API Token`\n\n`404` - nie znaleziono zasobu\n\n`400` - błędne żądanie\n\n`429` - wykorzystany limit API.\n\n`201` - OK. Brak treści\n\n`200` - OK\n\n\nPrzy większości błędów dodatkowo dostaniesz szczegółową odpowiedź w postaci obiektu ze statusem oraz kodem odpowiedzi:\n```\n{\n  \"Status\": [ \"message\": \"You have reached your API call limit\"],\n  \"Code\" 429\n}\n```\n\n# Rate limit\nW celu zabezpieczenia API wykorzystujemy system API Rate Limiter w celu zapobiegania przeciążenia systemu. Domyślne wartości limitów to:\n- **3600** w ciągu godziny\n- **360** w ciągu minuty.\n\nFaktycznie przyznane limity oraz ilość pozostałych do wykorzystania requestów znajdziesz w nagłówkach odpowiedzi:\n`X-RateLimit-Remaining-Hour`,\n`X-RateLimit-Remaining-Minute`,\n`X-RateLimit-Limit-Hour`,\n`X-RateLimit-Limit-Minute`.\n\nJeśli potrzebujesz wyższych limitów skontaktuj się z obsługą klienta.\n\n# Zasada budowania adresów do pobierania list [GET]\nKażda lista posiada możliwość paginacji, sortowania oraz filtrowania. Wszystko odbywa się poprzez ustawienie odpowiedniego parametru w adresie. \n\n## Paginacja\nDo sortowania jest wykorzystywany parametr `range`, który jako wartość przyjmuje tablicę `limit,offset`\n\nW nagłówkach odpowiedzi znajdziesz `Content-Range`, który w wartości zwróci: `nazwę zasobu offset-limit/całkowita ilość` przykładowo:\n\n\n`Content-Range: trainings 0-11/2`\n\n## Sortowanie \nDo filtrowania wykorzystywany jest parametr `sort`, który przyjmuje tablicę:`[field, direction]`. Pola po których można sortować są opisane w poszczególnych endpointach. Możliwe są następujące sortowania: `ASC` oraz `DESC`\n\nPrzykład użycia:\n\n`sort=[\"id\", \"DESC\"]`\n\n## Filtrowanie\nDo filtrowania wykorzystywany jest parametr `filter`, który przyjmuje tablicę obiektów:\n\n```\n[\n  {\n    \"field\": \"nazwapola\",\n    \"type\": \"typ filtrowania\",\n    \"value\": \"wartość filtra\"\n  }\n]\n```\n\nWszystkie dostępne pola filtrowania są opisywane w poszczególnych endpointach. \n\n### Typy filtrów\nWyróżniamy następujące typy filtrów, które według nazwy odpowiadają składni SQL:\n- `equals` \n- `in` \n- `not in`\n- `exists`\n- `contains`\n- `less`\n- `more`\n- `more_equals`\n- `less_equals`\n- `is`\n\n### Przykład:\n`filter=[{\"field\": \"name\", \"type\": \"contains\", \"value\": \"drugie\"}]`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2903004"
+	},
+	"item": [
+		{
+			"name": "Training",
+			"item": [
+				{
+					"name": "Get training list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/training/list?range=[0,10]&sort=[\"name\", \"ASC\"]&filter=[{\"field\": \"name\", \"value\": \"test\", \"type\": \"contains\"}]",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"training",
+								"list"
+							],
+							"query": [
+								{
+									"key": "range",
+									"value": "[0,10]",
+									"description": "[offset,limit]"
+								},
+								{
+									"key": "sort",
+									"value": "[\"name\", \"ASC\"]",
+									"description": "Sortable: id, name"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"field\": \"name\", \"value\": \"test\", \"type\": \"contains\"}]",
+									"description": "Filterable: name"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/list?range=[0,10]&sort=[title.DESC]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "sort",
+											"value": "[title.DESC]"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 13 Aug 2021 16:06:53 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.3.27"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3599"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "trainings 0-11/2"
+								},
+								{
+									"key": "Content-Length",
+									"value": "90"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"1\",\n        \"name\": \"Przykładowe Szkolenie\"\n    },\n    {\n        \"id\": \"2\",\n        \"name\": \"Moje drugie szkolenie\"\n    }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/list?range=[0,10]&sort=[title.DESC]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "sort",
+											"value": "[title.DESC]",
+											"description": "[field.direction]"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 14 Aug 2021 08:19:17 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3598"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "53"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						}
+					]
+				},
+				{
+					"name": "Get training users list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/training/:trainingId/user/list",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"training",
+								":trainingId",
+								"user",
+								"list"
+							],
+							"query": [
+								{
+									"key": "range",
+									"value": "[0,10]",
+									"description": "[offset,limit]",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"field\": \"email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+									"description": "Filterable: email",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "[\"id\", \"DESC\"]",
+									"description": "Sortable: id",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "trainingId",
+									"value": "1",
+									"description": "Id of training"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 08:45:13 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3586"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "users 0-11/3"
+								},
+								{
+									"key": "Content-Length",
+									"value": "230"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"1\",\n        \"email\": \"test@gmail.com\",\n        \"expired_at\": \"2021-06-05UTC10:55:16.06\"\n    },\n    {\n        \"id\": \"1\",\n        \"email\": \"test@gmail.com\",\n        \"expired_at\": \"Forever\"\n    },\n    {\n        \"id\": \"1\",\n        \"email\": \"test2@gmail.com\",\n        \"expired_at\": \"2021-06-10UTC11:14:20.06\"\n    }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]&filter=[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]&sort=[\"id\", \"DESC\"]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"description": "Filterable: email"
+										},
+										{
+											"key": "sort",
+											"value": "[\"id\", \"DESC\"]",
+											"description": "Sortable: id"
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2999",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:48:15 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3581"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "68"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity training with id 2999 not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create training access for user by day",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 1,\n    \"expiry_days\": 15\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{domain}}/training/:trainingId/user-by-day",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"training",
+								":trainingId",
+								"user-by-day"
+							],
+							"variable": [
+								{
+									"key": "trainingId",
+									"value": "1",
+									"description": "Id of course"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_days\": 15\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user-by-day",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user-by-day"
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of course"
+										}
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:39:31 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3597"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"expired_at\": \"2021-09-01UTC01:39:31.09\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 199,\n    \"expiry_days\": 15\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user-by-day",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user-by-day"
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of course"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:47:48 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3582"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "63"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity user with id 199 not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create training access for user by date",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 1,\n    \"expiry_date\": \"2022-05-05\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{domain}}/training/:trainingId/user-by-date",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"training",
+								":trainingId",
+								"user-by-date"
+							],
+							"variable": [
+								{
+									"key": "trainingId",
+									"value": "1",
+									"description": "Id of course"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_date\": \"2022-05-05\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user-by-date",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user-by-date"
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of course"
+										}
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:39:31 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3597"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"expired_at\": \"2021-09-01UTC01:39:31.09\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 199,\n    \"expiry_date\": \"2022-05-05\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user-by-date",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user-by-date"
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of course"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:47:48 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3582"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "63"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity user with id 199 not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete training access for user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/training/:trainingId/user/:userId",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"training",
+								":trainingId",
+								"user",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "trainingId",
+									"value": "2",
+									"description": "Id of the course"
+								},
+								{
+									"key": "userId",
+									"value": "1",
+									"description": "Id of user"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/:userId",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of the course"
+										},
+										{
+											"key": "userId",
+											"value": "1",
+											"description": "Id of user"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:40:54 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3596"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "16"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/:userId",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of the course"
+										},
+										{
+											"key": "userId",
+											"value": "199",
+											"description": "Id of user"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:47:21 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3583"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "63"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity user with id 199 not found\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Lista zasobów treningów"
+		},
+		{
+			"name": "Abonament",
+			"item": [
+				{
+					"name": "Get abonament list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/abonament/list?range=[0,10]&sort=[\"name\", \"ASC\"]&filter=[{\"field\": \"email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"abonament",
+								"list"
+							],
+							"query": [
+								{
+									"key": "range",
+									"value": "[0,10]",
+									"description": "[offset,limit]"
+								},
+								{
+									"key": "sort",
+									"value": "[\"name\", \"ASC\"]",
+									"description": "Sortable: id, name"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"field\": \"email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+									"description": "Filterable:  name,  rescue_email"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/abonament/list?range=[0,10]&filter=[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 08:47:05 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3585"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "abonaments 0-11/1"
+								},
+								{
+									"key": "Content-Length",
+									"value": "48"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"2\",\n        \"name\": \"Abonament nowy płatny\"\n    }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						}
+					]
+				},
+				{
+					"name": "Get abonament users list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/abonament/:abonamentId/user/list?range=[0,10]&filter=[{\"field\": \"email\", \"type\": \"equals\", \"value\": \"1\"}]&sort=[\"id\": \"DESC\"]",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"abonament",
+								":abonamentId",
+								"user",
+								"list"
+							],
+							"query": [
+								{
+									"key": "range",
+									"value": "[0,10]",
+									"description": "[offset,limit]"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"field\": \"email\", \"type\": \"equals\", \"value\": \"1\"}]",
+									"description": "Filterable: email"
+								},
+								{
+									"key": "sort",
+									"value": "[\"id\": \"DESC\"]",
+									"description": "Sortable: id"
+								}
+							],
+							"variable": [
+								{
+									"key": "abonamentId",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/abonament/:abonamentId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										":abonamentId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "abonamentId",
+											"value": "2",
+											"description": "Id of abonament"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 08:47:19 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3584"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "users 0-11/1"
+								},
+								{
+									"key": "Content-Length",
+									"value": "83"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"1\",\n        \"email\": \"test@gmail.com\",\n        \"expired_at\": \"2021-06-10UTC01:49:51.06\"\n    }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/abonament/:abonamentId/user/list?range=[0,10]&filter=[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]&sort=[\"id\": \"DESC\"]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										":abonamentId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"description": "Filterable: email"
+										},
+										{
+											"key": "sort",
+											"value": "[\"id\": \"DESC\"]",
+											"description": "Sortable: id"
+										}
+									],
+									"variable": [
+										{
+											"key": "abonamentId",
+											"value": "299",
+											"description": "Id of abonament"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:50:05 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3578"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "68"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity abonament with id 299 not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create user abonament by day",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 1,\n    \"expiry_days\": 15\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{domain}}/abonament/:abonamentId/user-by-day",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"abonament",
+								":abonamentId",
+								"user-by-day"
+							],
+							"variable": [
+								{
+									"key": "abonamentId",
+									"value": "2",
+									"description": "Id of abonament"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_days\": 15\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/abonament/:abonamentId/user-by-day",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										":abonamentId",
+										"user-by-day"
+									],
+									"variable": [
+										{
+											"key": "abonamentId",
+											"value": "2",
+											"description": "Id of abonament"
+										}
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:41:08 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3595"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"expired_at\": \"2021-09-01UTC01:41:08.09\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_days\": 15\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/abonament/:abonamentId/user-by-day",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										":abonamentId",
+										"user-by-day"
+									],
+									"variable": [
+										{
+											"key": "abonamentId",
+											"value": "99",
+											"description": "Id of abonament"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:46:48 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3584"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "67"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity abonament with id 99 not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create user abonament by date",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 1,\n    \"expiry_date\": \"2022-05-10\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{domain}}/abonament/:abonamentId/user-by-date",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"abonament",
+								":abonamentId",
+								"user-by-date"
+							],
+							"variable": [
+								{
+									"key": "abonamentId",
+									"value": "2",
+									"description": "Id of abonament"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_date\": \"2022-05-10\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/abonament/:abonamentId/user-by-date",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										":abonamentId",
+										"user-by-date"
+									],
+									"variable": [
+										{
+											"key": "abonamentId",
+											"value": "2",
+											"description": "Id of abonament"
+										}
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:41:08 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3595"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"expired_at\": \"2022-05-10UTC23:59:59.09\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_days\": 15\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/abonament/:abonamentId/user-by-date",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										":abonamentId",
+										"user-by-date"
+									],
+									"variable": [
+										{
+											"key": "abonamentId",
+											"value": "99",
+											"description": "Id of abonament"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:46:48 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3584"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "67"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity abonament with id 99 not found\"\n}"
+						},
+						{
+							"name": "400 Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_date\": \"2020-05-10\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/abonament/:abonamentId/user-by-date",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										":abonamentId",
+										"user-by-date"
+									],
+									"variable": [
+										{
+											"key": "abonamentId",
+											"value": "2",
+											"description": "Id of abonament"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 18 Aug 2021 10:09:31 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.3.27"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3597"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "67"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Błędna data w expiry_date\\n\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete user abonament",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/abonament/:abonamentId/user/:userId",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"abonament",
+								":abonamentId",
+								"user",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "abonamentId",
+									"value": "2",
+									"description": "Id of abonament"
+								},
+								{
+									"key": "userId",
+									"value": "1",
+									"description": "Id of user"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/abonament/:abonamentId/user/:userId",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										":abonamentId",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "abonamentId",
+											"value": "2",
+											"description": "Id of abonament"
+										},
+										{
+											"key": "userId",
+											"value": "1",
+											"description": "Id of user"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:41:31 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3594"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "357"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "16"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/abonament/:abonamentId/user/:userId",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"abonament",
+										":abonamentId",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "abonamentId",
+											"value": "99",
+											"description": "Id of abonament"
+										},
+										{
+											"key": "userId",
+											"value": "1",
+											"description": "Id of user"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:45:04 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3585"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "75"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity abonamentUser with id (99,1) not found\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Lista zasobów dotycząca abonamentu"
+		},
+		{
+			"name": "Lesson",
+			"item": [
+				{
+					"name": "Get lesson list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/lesson/list?range=[0,10]&sort=[\"name\", \"ASC\"]&filter=[{\"field\": \"name\", \"value\": \"lekcja\", \"type\": \"contains\"}]",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"lesson",
+								"list"
+							],
+							"query": [
+								{
+									"key": "range",
+									"value": "[0,10]",
+									"description": "[offset,limit]"
+								},
+								{
+									"key": "sort",
+									"value": "[\"name\", \"ASC\"]",
+									"description": "Sortable: id, name"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"field\": \"name\", \"value\": \"lekcja\", \"type\": \"contains\"}]",
+									"description": "Filterable: name"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/lesson/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"lesson",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 08:47:29 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3583"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "357"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "lessons 0-11/2"
+								},
+								{
+									"key": "Content-Length",
+									"value": "86"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"1\",\n        \"name\": \"Przykładowa lekcja\"\n    },\n    {\n        \"id\": \"2\",\n        \"name\": \"Nowa lekcja - fajnie\"\n    }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						}
+					]
+				},
+				{
+					"name": "Get lesson users list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/lesson/:lessonId/user/list?range=[0,10]&filter=[{\"field\": \"email\", \"type\": \"equals\", \"value\": \"yes\"}]&sort=[\"name\", \"ASC\"]",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"lesson",
+								":lessonId",
+								"user",
+								"list"
+							],
+							"query": [
+								{
+									"key": "range",
+									"value": "[0,10]",
+									"description": "[offset,limit]"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"field\": \"email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+									"description": "Filterable: email"
+								},
+								{
+									"key": "sort",
+									"value": "[\"name\", \"ASC\"]",
+									"description": "Sortable: id"
+								}
+							],
+							"variable": [
+								{
+									"key": "lessonId",
+									"value": "2",
+									"description": "Id of lesson"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/lesson/:lessonId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"lesson",
+										":lessonId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "2",
+											"description": "Id of lesson"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 08:47:40 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3582"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "356"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "users 0-11/1"
+								},
+								{
+									"key": "Content-Length",
+									"value": "83"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"1\",\n        \"email\": \"test@gmail.com\",\n        \"expired_at\": \"2021-06-10UTC11:56:33.06\"\n    }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/lesson/:lessonId/user/list?range=[0,10]&filter=[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]&sort=[\"name\", \"ASC\"]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"lesson",
+										":lessonId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"description": "Filterable: email"
+										},
+										{
+											"key": "sort",
+											"value": "[\"name\", \"ASC\"]",
+											"description": "Sortable: id"
+										}
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "299",
+											"description": "Id of lesson"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:50:30 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3577"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "65"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity lesson with id 299 not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create lesson access for user by days",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 1,\n    \"expiry_days\": 15\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{domain}}/lesson/:lessonId/user-by-day",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"lesson",
+								":lessonId",
+								"user-by-day"
+							],
+							"variable": [
+								{
+									"key": "lessonId",
+									"value": "1",
+									"description": "Id of lesson where user is added"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_days\": 15\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/lesson/:lessonId/user-by-day",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"lesson",
+										":lessonId",
+										"user-by-day"
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "2",
+											"description": "Id of lesson where user is added"
+										}
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:42:05 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3593"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"expired_at\": \"2021-09-01UTC01:42:05.09\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 99,\n    \"expiry_days\": 15\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/lesson/:lessonId/user-by-day",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"lesson",
+										":lessonId",
+										"user-by-day"
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "2222",
+											"description": "Id of lesson where user is added"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:43:42 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3587"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "357"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity user with id 99 not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create lesson access for user by date",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 1,\n    \"expiry_date\": \"2022-05-05\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{domain}}/lesson/:lessonId/user-by-date",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"lesson",
+								":lessonId",
+								"user-by-date"
+							],
+							"variable": [
+								{
+									"key": "lessonId",
+									"value": "1",
+									"description": "Id of lesson where user is added"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_date\": \"2022-05-05\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/lesson/:lessonId/user-by-date",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"lesson",
+										":lessonId",
+										"user-by-date"
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "2",
+											"description": "Id of lesson where user is added"
+										}
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:42:05 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3593"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"expired_at\": \"2021-09-01UTC01:42:05.09\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"expiry_date\": \"2022-05-05\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/lesson/:lessonId/user-by-day",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"lesson",
+										":lessonId",
+										"user-by-day"
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "2222",
+											"description": "Id of lesson where user is added"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:43:42 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3587"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "357"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity user with id 99 not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete lesson access for user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/lesson/:lessonId/user/:userId",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"lesson",
+								":lessonId",
+								"user",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "lessonId",
+									"value": "2",
+									"description": "Lesson id"
+								},
+								{
+									"key": "userId",
+									"value": "1",
+									"description": "Id of user"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/lesson/:lessonId/user/:userId",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"lesson",
+										":lessonId",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "2",
+											"description": "Lesson id"
+										},
+										{
+											"key": "userId",
+											"value": "1",
+											"description": "Id of user"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:42:19 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3592"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "16"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/lesson/:lessonId/user/:userId",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"lesson",
+										":lessonId",
+										"user",
+										":userId"
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "2",
+											"description": "Lesson id"
+										},
+										{
+											"key": "userId",
+											"value": "99",
+											"description": "Id of user"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:44:18 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3586"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "356"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity user with id 99 not found\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Lista zasobów dotycząca lekcji"
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get user list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/user/list?range=[0,10]&sort=[\"id\", \"DESC\"]&filter=[{\"field\": \"email\", \"value\": \"test\", \"type\": \"contains\"}]",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"user",
+								"list"
+							],
+							"query": [
+								{
+									"key": "range",
+									"value": "[0,10]",
+									"description": "[offset,limit]"
+								},
+								{
+									"key": "sort",
+									"value": "[\"id\", \"DESC\"]",
+									"description": "Sortable: id, email"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"field\": \"email\", \"value\": \"test\", \"type\": \"contains\"}]",
+									"description": "Filterable:  email"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 08:47:53 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3581"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "355"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "users 0-11/5"
+								},
+								{
+									"key": "Content-Length",
+									"value": "184"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"1\",\n        \"email\": \"ziemniaki@gmail.com\"\n    },\n    {\n        \"id\": \"2\",\n        \"email\": \"test@test.pl\"\n    },\n    {\n        \"id\": \"3\",\n        \"email\": \"test3@test.pl\"\n    },\n    {\n        \"id\": \"4\",\n        \"email\": \"test4@test.pl\"\n    },\n    {\n        \"id\": \"5\",\n        \"email\": \"test5@gmail.com\"\n    }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						}
+					]
+				},
+				{
+					"name": "Get limit users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/user/limits",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"user",
+								"limits"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/user/limits",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"user",
+										"limits"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 20 Aug 2021 14:23:52 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.3.27"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3584"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "22"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"used\": 4,\n    \"limit\": 300\n}"
+						}
+					]
+				},
+				{
+					"name": "Get user by e-mail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/user/by-email/:email?range=[0,10]&filter=[{\"field\": \"email\", \"type\": \"equals\", \"value\": \"yes\"}]&sort=[\"name\", \"ASC\"]",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"user",
+								"by-email",
+								":email"
+							],
+							"query": [
+								{
+									"key": "range",
+									"value": "[0,10]",
+									"description": "[offset,limit]"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"field\": \"email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+									"description": "Filterable: emailc"
+								},
+								{
+									"key": "sort",
+									"value": "[\"name\", \"ASC\"]",
+									"description": "Sortable: id"
+								}
+							],
+							"variable": [
+								{
+									"key": "email",
+									"value": "botzbotowa%40gmail.com",
+									"description": "Email of user to find"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/user/by-email/:email",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"user",
+										"by-email",
+										":email"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "testy%40gmail.com",
+											"description": "Email of user to find"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 08:48:03 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3580"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "354"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "41"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"1\",\n    \"email\": \"testy@gmail.com\"\n}"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/user/by-email/:email?range=[0,10]&filter=[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]&sort=[\"name\", \"ASC\"]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"user",
+										"by-email",
+										":email"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"description": "Filterable: emailc"
+										},
+										{
+											"key": "sort",
+											"value": "[\"name\", \"ASC\"]",
+											"description": "Sortable: id"
+										}
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "testy77777%40gmail.com",
+											"description": "Email of user to find"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:50:58 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3576"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "357"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "83"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"There is no user with e-mail testy77777@gmail.com\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create new user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testy@gmail.com\",\n    \"username\": \"kolejny_test-emaila\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{domain}}/user",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"boteusz.mailertest1@gmail.com\",\n    \"username\": \"boteusz_drugi\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/user",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:42:40 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3591"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "357"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "28"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"user_id\": 6\n}"
+						},
+						{
+							"name": "400 Bad request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"ziemniaki.mailertest1@gmail.com\",\n    \"username\": \"testy_drugi\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/user",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:43:00 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3590"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "356"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "125"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"The email field must contain a unique value.\\nThe username field must contain a unique value.\\n\"\n}"
+						},
+						{
+							"name": "402 Limit reached",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"ziemniaki.mailertest1@gmail.com\",\n    \"username\": \"testy_drugi\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{domain}}/user",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:43:00 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3590"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "356"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "125"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"Status\": [{\"message\":\"The user limit has been reached\"}]\n    \"Code\": 402\n}"
+						}
+					]
+				}
+			],
+			"description": "Lista zasobów dotycząca użytkowników"
+		},
+		{
+			"name": "Fast Selling",
+			"item": [
+				{
+					"name": "Get fast selling list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/fast-selling/list?range=[0,10]&sort=[\"title\", \"DESC\"]&filter=[{\"field\": \"title\", \"value\": \"a\", \"type\": \"contains\"}]",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"fast-selling",
+								"list"
+							],
+							"query": [
+								{
+									"key": "range",
+									"value": "[0,10]",
+									"description": "[offset,limit]"
+								},
+								{
+									"key": "sort",
+									"value": "[\"title\", \"DESC\"]",
+									"description": "Sortable: id, name, title, price"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"field\": \"title\", \"value\": \"a\", \"type\": \"contains\"}]",
+									"description": "Filterable:  name, title, seo,  active"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200ok",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/fast-selling/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"fast-selling",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 13 Aug 2021 09:22:01 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3598"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "359"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "fastSellings 0-11/1"
+								},
+								{
+									"key": "Content-Length",
+									"value": "187"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"1\",\n        \"name\": \"Przykładowa Szybka Sprzedaż\",\n        \"title\": \"Przykładowa Szybka Sprzedaż\",\n        \"seo\": \"przykladowa-sprzedaz\",\n        \"price\": \"8.00\",\n        \"price_trial\": \"5.00\",\n        \"active\": \"yes\",\n        \"abonaments\": [],\n        \"trainings\": [],\n        \"lessons\": [\n            {\n                \"id\": \"1\",\n                \"name\": \"Przykładowa lekcja\"\n            }\n        ]\n    },\n    {\n        \"id\": \"2\",\n        \"name\": \"aaaaaa\",\n        \"title\": \"aaaaaa\",\n        \"seo\": \"601\",\n        \"price\": \"0.00\",\n        \"price_trial\": \"0.00\",\n        \"active\": \"yes\",\n        \"abonaments\": [\n            {\n                \"id\": \"1\",\n                \"name\": \"Abonament Podstawowy\"\n            }\n        ],\n        \"trainings\": [],\n        \"lessons\": []\n    }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/training/:trainingId/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"training",
+										":trainingId",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										},
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "trainingId",
+											"value": "2",
+											"description": "Id of training"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Exam",
+			"item": [
+				{
+					"name": "Get exam list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/exam/list",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"exam",
+								"list"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/user/list?range=[0,10]",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "range",
+											"value": "[0,10]",
+											"description": "[offset,limit]"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 08:47:53 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3581"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "355"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "users 0-11/5"
+								},
+								{
+									"key": "Content-Length",
+									"value": "184"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"id\": \"13\",\n    \"name\": \"EGZAMIN DO NOWEJ LEKCJI\"\n  }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/exam/list",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"exam",
+										"list"
+									],
+									"query": [
+										{
+											"key": "filter",
+											"value": "[{\"field\": \"rescue_email\", \"type\": \"equals\", \"value\": \"yes\"}]",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						}
+					]
+				},
+				{
+					"name": "Get exam users list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/exam/:examID/user/list",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"exam",
+								":examID",
+								"user",
+								"list"
+							],
+							"variable": [
+								{
+									"key": "examID",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/exam/:examID/user/list",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"exam",
+										":examID",
+										"user",
+										"list"
+									],
+									"query": [
+										{
+											"key": "filter",
+											"value": "",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "examID",
+											"value": ""
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 08:47:40 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3582"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "356"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Range",
+									"value": "users 0-11/1"
+								},
+								{
+									"key": "Content-Length",
+									"value": "83"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"id\": \"1\",\n    \"user_id\": \"9\",\n    \"exam_id\": \"4\",\n    \"status\": \"passed\",\n    \"start_time\": \"1731583732\"\n  },\n  {\n    \"id\": \"2\",\n    \"user_id\": \"9\",\n    \"exam_id\": \"4\",\n    \"status\": \"notpassed\",\n    \"start_time\": \"1731591405\"\n  }\n]"
+						},
+						{
+							"name": "403 Not authenticated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/exam/:examID/user/list",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"exam",
+										":examID",
+										"user",
+										"list"
+									],
+									"variable": [
+										{
+											"key": "examID",
+											"value": ""
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"Status\": {\n        \"message\": \"Not authenticated\"\n    },\n    \"Code\": 403\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/exam/:examID/user/list",
+									"host": [
+										"{{domain}}"
+									],
+									"path": [
+										"exam",
+										":examID",
+										"user",
+										"list"
+									],
+									"variable": [
+										{
+											"key": "examID",
+											"value": ""
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 17 Aug 2021 13:50:30 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.33 (Unix)"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.7"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Hour",
+									"value": "3577"
+								},
+								{
+									"key": "X-RateLimit-Remaining-Minute",
+									"value": "358"
+								},
+								{
+									"key": "X-RateLimit-Limit-Hour",
+									"value": "3600"
+								},
+								{
+									"key": "X-RateLimit-Limit-Minute",
+									"value": "360"
+								},
+								{
+									"key": "Content-Length",
+									"value": "65"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"message\": \"Entity exam with id 299 not found\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Lista zasobów dotyczące egzaminów"
+		},
+		{
+			"name": "test 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{domain}}/sdsdada",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"sdsdada"
+					]
+				},
+				"description": "Przykładowe wywołanie błędu 404"
+			},
+			"response": [
+				{
+					"name": "200ok",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{domain}}/sdsdada",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"sdsdada"
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"body": ""
+				}
+			]
+		},
+		{
+			"name": "Test Api",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{domain}}",
+					"host": [
+						"{{domain}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "X-Auth-Token",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "domain",
+			"value": "http://localhost:8080/api/v1"
+		},
+		{
+			"key": "key",
+			"value": "a1443f5d2a5892023a3bdbca304e7287"
+		}
+	]
+}

@@ -89,16 +89,13 @@ class WTLClient {
       console.log('🔍 Attempting to fetch projects from WTL API...')
       console.log('Base URL:', this.client.defaults.baseURL)
       
-      // Próbuj różne możliwe endpointy dla projektów/kursów
+      // Endpointy zgodnie z dokumentacją WTL API
       const endpoints = [
+        '/training/list',
+        '/course/list',
+        '/user/list',
         '/projects',
-        '/courses', 
-        '/api/projects',
-        '/api/courses',
-        '/v1/projects',
-        '/v1/courses',
-        '/course',
-        '/project'
+        '/courses'
       ]
       
       for (const endpoint of endpoints) {
@@ -147,10 +144,12 @@ class WTLClient {
 
   async getTasks(projectId?: string): Promise<WTLResponse<any[]>> {
     try {
-      // Próbuj różne endpointy WTL dla zadań
+      console.log('🔍 Attempting to fetch tasks from WTL API...')
+      
+      // Endpointy zgodnie z dokumentacją WTL API
       const endpoints = projectId 
-        ? [`/projects/${projectId}/tasks`, `/api/projects/${projectId}/tasks`, `/v1/projects/${projectId}/tasks`]
-        : ['/tasks', '/api/tasks', '/v1/tasks']
+        ? [`/training/${projectId}/task/list`, `/course/${projectId}/task/list`]
+        : ['/task/list', '/training/task/list', '/assignment/list']
       
       for (const endpoint of endpoints) {
         try {
