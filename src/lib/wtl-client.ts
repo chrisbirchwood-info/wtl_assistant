@@ -86,37 +86,61 @@ class WTLClient {
 
   async getProjects(): Promise<WTLResponse<any[]>> {
     try {
-      console.log('Attempting to fetch projects from WTL API...')
+      console.log('🔍 Attempting to fetch projects from WTL API...')
       console.log('Base URL:', this.client.defaults.baseURL)
-      console.log('Headers:', this.client.defaults.headers)
       
-      // Próbuj główny endpoint projektów
-      const endpoint = '/projects'
+      // Próbuj różne możliwe endpointy dla projektów/kursów
+      const endpoints = [
+        '/projects',
+        '/courses', 
+        '/api/projects',
+        '/api/courses',
+        '/v1/projects',
+        '/v1/courses',
+        '/course',
+        '/project'
+      ]
       
-      try {
-        console.log(`Trying endpoint: ${endpoint}`)
-        const response = await this.client.get(endpoint)
-        console.log(`✅ SUCCESS: WTL Projects fetched from ${endpoint}`)
-        console.log('Response status:', response.status)
-        console.log('Response data:', response.data)
-        
-        // Sprawdź czy dane są w oczekiwanym formacie
-        const projects = Array.isArray(response.data) ? response.data : 
-                        response.data?.projects || 
-                        response.data?.data || 
-                        [response.data]
-        
-        return { success: true, data: projects }
-      } catch (error: any) {
-        console.error(`❌ FAILED: ${endpoint}`)
-        console.error('Error status:', error.response?.status)
-        console.error('Error data:', error.response?.data)
-        console.error('Error message:', error.message)
-        
-        return { success: false, data: [], error: `WTL API Error: ${error.response?.status || error.message}` }
+      for (const endpoint of endpoints) {
+        try {
+          console.log(`🌐 Trying endpoint: ${endpoint}`)
+          const response = await this.client.get(endpoint)
+          
+          console.log(`✅ SUCCESS: Data fetched from ${endpoint}`)
+          console.log('Response status:', response.status)
+          console.log('Response data sample:', JSON.stringify(response.data).substring(0, 200))
+          
+          // Sprawdź czy dane są w oczekiwanym formacie
+          let projects = response.data
+          
+          // Obsłuż różne formaty odpowiedzi
+          if (response.data?.data) {
+            projects = response.data.data
+          } else if (response.data?.projects) {
+            projects = response.data.projects
+          } else if (response.data?.courses) {
+            projects = response.data.courses
+          } else if (response.data?.items) {
+            projects = response.data.items
+          }
+          
+          // Upewnij się że to jest array
+          if (!Array.isArray(projects)) {
+            projects = [projects]
+          }
+          
+          console.log(`📊 Processed ${projects.length} items from WTL API`)
+          return { success: true, data: projects }
+          
+        } catch (error: any) {
+          console.log(`❌ Failed ${endpoint}: ${error.response?.status || error.message}`)
+          continue
+        }
       }
+      
+      throw new Error('All WTL endpoints failed')
     } catch (error: any) {
-      console.error('WTL Projects critical error:', error.message)
+      console.error('🚫 WTL Projects critical error:', error.message)
       return { success: false, data: [], error: error.message }
     }
   }
