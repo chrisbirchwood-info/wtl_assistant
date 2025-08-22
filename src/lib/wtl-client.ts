@@ -27,16 +27,8 @@ class WTLClient {
   private client: AxiosInstance
 
   constructor() {
-    // Próbuj różne możliwe base URL dla WTL
-    const possibleBaseUrls = [
-      process.env.WTL_API_URL,
-      'https://api.webtolearn.com',
-      'https://webtolearn.com/api',
-      'https://wtl.com/api',
-      'https://api.wtl.com'
-    ].filter(Boolean)
-
-    const baseURL = possibleBaseUrls[0] || 'https://api.webtolearn.com'
+    // Prawdziwy URL WTL API
+    const baseURL = process.env.WTL_API_URL || 'https://teachm3.elms.pl/api/v1'
     
     console.log('WTL Client initialized with baseURL:', baseURL)
     

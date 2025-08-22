@@ -43,7 +43,7 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      baseURL: process.env.WTL_API_URL || 'https://api.webtolearn.com',
+      baseURL: process.env.WTL_API_URL || 'https://teachm3.elms.pl/api/v1',
       hasApiKey: !!process.env.WTL_API_KEY,
       results,
       message: 'WTL API connection test completed'
@@ -54,7 +54,7 @@ export async function GET() {
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
-      baseURL: process.env.WTL_API_URL || 'https://api.webtolearn.com',
+      baseURL: process.env.WTL_API_URL || 'https://teachm3.elms.pl/api/v1',
       hasApiKey: !!process.env.WTL_API_KEY
     })
   }
