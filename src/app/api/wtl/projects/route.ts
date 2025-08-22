@@ -32,35 +32,67 @@ const mockProjects = [
 
 export async function GET() {
   try {
-    // Try to get from Supabase first
+    console.log('Fetching projects from WTL API...')
+    
+    // Najpierw spróbuj WTL API (prawdziwe dane)
+    const wtlResponse = await wtlClient.getProjects()
+    if (wtlResponse.success && wtlResponse.data && wtlResponse.data.length > 0) {
+      console.log('Successfully fetched from WTL API:', wtlResponse.data.length, 'projects')
+      
+      // Opcjonalnie cache w Supabase
+      try {
+        const projectsToCache = wtlResponse.data.map((project: any) => ({
+          name: project.name || project.title || 'Unnamed Project',
+          description: project.description || project.summary,
+          status: project.status || 'active',
+          wtl_project_id: project.id || project.project_id,
+          created_at: project.created_at || project.createdAt || new Date().toISOString(),
+          updated_at: project.updated_at || project.updatedAt || new Date().toISOString()
+        }))
+
+        await supabase
+          .from('projects')
+          .upsert(projectsToCache, { onConflict: 'wtl_project_id' })
+        
+        console.log('Cached projects in Supabase')
+      } catch (cacheError) {
+        console.log('Failed to cache in Supabase:', cacheError)
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: wtlResponse.data,
+        source: 'wtl',
+        message: 'Data loaded from Web To Learn API'
+      })
+    }
+
+    console.log('WTL API failed, trying Supabase cache...')
+    
+    // Jeśli WTL nie działa, spróbuj cache z Supabase
     const { data: projects, error } = await supabase
       .from('projects')
       .select('*')
       .order('created_at', { ascending: false })
 
     if (projects && projects.length > 0) {
+      console.log('Using cached data from Supabase:', projects.length, 'projects')
       return NextResponse.json({
         success: true,
         data: projects,
-        source: 'supabase'
+        source: 'supabase',
+        message: 'Data loaded from cache'
       })
     }
 
-    // Try WTL API
-    const wtlResponse = await wtlClient.getProjects()
-    if (wtlResponse.success) {
-      return NextResponse.json({
-        success: true,
-        data: wtlResponse.data,
-        source: 'wtl'
-      })
-    }
-
-    // Fallback to mock data
+    console.log('No cached data, using mock data')
+    
+    // Fallback do mock danych
     return NextResponse.json({
       success: true,
       data: mockProjects,
-      source: 'mock'
+      source: 'mock',
+      message: 'Using demo data - WTL API not available'
     })
 
   } catch (error) {
@@ -68,7 +100,8 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: mockProjects,
-      source: 'mock'
+      source: 'mock',
+      message: 'Error occurred, using demo data'
     })
   }
 }

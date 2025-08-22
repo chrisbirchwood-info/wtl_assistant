@@ -53,34 +53,69 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const projectId = searchParams.get('projectId')
 
-    // Try to get from Supabase first
+    console.log('Fetching tasks from WTL API...', projectId ? `for project ${projectId}` : 'all tasks')
+
+    // Najpierw spróbuj WTL API (prawdziwe dane)
+    const wtlResponse = await wtlClient.getTasks(projectId || undefined)
+    if (wtlResponse.success && wtlResponse.data && wtlResponse.data.length > 0) {
+      console.log('Successfully fetched from WTL API:', wtlResponse.data.length, 'tasks')
+      
+      // Opcjonalnie cache w Supabase
+      try {
+        const tasksToCache = wtlResponse.data.map((task: any) => ({
+          project_id: task.project_id || task.projectId || projectId || '1',
+          title: task.title || task.name || 'Unnamed Task',
+          description: task.description || task.summary,
+          status: task.status || 'pending',
+          priority: task.priority || 'medium',
+          wtl_task_id: task.id || task.task_id,
+          assigned_to: task.assigned_to || task.assignedTo,
+          due_date: task.due_date || task.dueDate,
+          created_at: task.created_at || task.createdAt || new Date().toISOString(),
+          updated_at: task.updated_at || task.updatedAt || new Date().toISOString()
+        }))
+
+        await supabase
+          .from('tasks')
+          .upsert(tasksToCache, { onConflict: 'wtl_task_id' })
+        
+        console.log('Cached tasks in Supabase')
+      } catch (cacheError) {
+        console.log('Failed to cache in Supabase:', cacheError)
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: wtlResponse.data,
+        source: 'wtl',
+        message: 'Data loaded from Web To Learn API'
+      })
+    }
+
+    console.log('WTL API failed, trying Supabase cache...')
+
+    // Jeśli WTL nie działa, spróbuj cache z Supabase
     let query = supabase.from('tasks').select('*').order('created_at', { ascending: false })
     
     if (projectId) {
       query = query.eq('project_id', projectId)
     }
 
-    const { data: tasks, error } = await query
+    const { data: tasks } = await query
 
     if (tasks && tasks.length > 0) {
+      console.log('Using cached data from Supabase:', tasks.length, 'tasks')
       return NextResponse.json({
         success: true,
         data: tasks,
-        source: 'supabase'
+        source: 'supabase',
+        message: 'Data loaded from cache'
       })
     }
 
-    // Try WTL API
-    const wtlResponse = await wtlClient.getTasks(projectId || undefined)
-    if (wtlResponse.success) {
-      return NextResponse.json({
-        success: true,
-        data: wtlResponse.data,
-        source: 'wtl'
-      })
-    }
+    console.log('No cached data, using mock data')
 
-    // Fallback to mock data (filter by projectId if provided)
+    // Fallback do mock danych (filter by projectId if provided)
     const filteredTasks = projectId 
       ? mockTasks.filter(task => task.project_id === projectId)
       : mockTasks
@@ -88,7 +123,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: filteredTasks,
-      source: 'mock'
+      source: 'mock',
+      message: 'Using demo data - WTL API not available'
     })
 
   } catch (error) {
@@ -96,7 +132,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: mockTasks,
-      source: 'mock'
+      source: 'mock',
+      message: 'Error occurred, using demo data'
     })
   }
 }

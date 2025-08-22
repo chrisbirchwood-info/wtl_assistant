@@ -4,6 +4,13 @@ import { useState, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  source?: string
+  message?: string
+}
+
 interface Project {
   id: string
   name: string
@@ -26,6 +33,8 @@ export default function WTLPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [dataSource, setDataSource] = useState<string>('loading')
+  const [statusMessage, setStatusMessage] = useState<string>('')
 
   useEffect(() => {
     fetchData()
@@ -41,16 +50,28 @@ export default function WTLPage() {
 
   const fetchData = async () => {
     try {
+      console.log('Fetching data from WTL API...')
+      
       const [projectsRes, tasksRes] = await Promise.all([
         fetch('/api/wtl/projects'),
         fetch('/api/wtl/tasks')
       ])
 
-      const projectsData = await projectsRes.json()
-      const tasksData = await tasksRes.json()
+      const projectsData: ApiResponse<Project[]> = await projectsRes.json()
+      const tasksData: ApiResponse<Task[]> = await tasksRes.json()
 
       if (projectsData.success) {
         setProjects(projectsData.data)
+        setDataSource(projectsData.source || 'unknown')
+        setStatusMessage(projectsData.message || '')
+        
+        if (projectsData.source === 'wtl') {
+          toast.success('Dane załadowane z Web To Learn API! 🎉')
+        } else if (projectsData.source === 'supabase') {
+          toast.success('Dane załadowane z cache (Supabase)')
+        } else {
+          toast.success('Używane dane demonstracyjne')
+        }
       }
 
       if (tasksData.success) {
@@ -59,6 +80,7 @@ export default function WTLPage() {
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error('Błąd podczas ładowania danych')
+      setDataSource('error')
     } finally {
       setLoading(false)
     }
@@ -98,17 +120,37 @@ export default function WTLPage() {
                 <p className="text-gray-600 mt-2">
                   Zarządzaj projektami i zadaniami WTL
                 </p>
-                <div className="mt-2 inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">
-                  📋 Tryb demo - dane przykładowe
+                <div className={`mt-2 inline-block px-3 py-1 text-sm rounded-full ${
+                  dataSource === 'wtl' 
+                    ? 'bg-green-100 text-green-800' 
+                    : dataSource === 'supabase'
+                    ? 'bg-blue-100 text-blue-800'
+                    : dataSource === 'error'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {dataSource === 'wtl' && '🌐 Połączono z Web To Learn API'}
+                  {dataSource === 'supabase' && '💾 Dane z cache (Supabase)'}
+                  {dataSource === 'mock' && '📋 Tryb demo - dane przykładowe'}
+                  {dataSource === 'error' && '❌ Błąd połączenia'}
+                  {dataSource === 'loading' && '⏳ Ładowanie...'}
                 </div>
+                {statusMessage && (
+                  <p className="text-xs text-gray-500 mt-1">{statusMessage}</p>
+                )}
               </div>
               
               <div className="flex space-x-4">
                 <button
-                  onClick={() => toast.success('Synchronizacja zakończona')}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  onClick={() => {
+                    setLoading(true)
+                    setDataSource('loading')
+                    fetchData()
+                  }}
+                  disabled={loading}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                 >
-                  🔄 Synchronizuj
+                  {loading ? '⏳ Ładowanie...' : '🔄 Odśwież dane'}
                 </button>
                 <button 
                   onClick={() => toast.success('Funkcja w przygotowaniu')}
