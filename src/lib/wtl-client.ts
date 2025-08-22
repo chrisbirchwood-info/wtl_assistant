@@ -27,8 +27,21 @@ class WTLClient {
   private client: AxiosInstance
 
   constructor() {
+    // Próbuj różne możliwe base URL dla WTL
+    const possibleBaseUrls = [
+      process.env.WTL_API_URL,
+      'https://api.webtolearn.com',
+      'https://webtolearn.com/api',
+      'https://wtl.com/api',
+      'https://api.wtl.com'
+    ].filter(Boolean)
+
+    const baseURL = possibleBaseUrls[0] || 'https://api.webtolearn.com'
+    
+    console.log('WTL Client initialized with baseURL:', baseURL)
+    
     this.client = axios.create({
-      baseURL: process.env.WTL_API_URL || 'https://api.webtolearn.com',
+      baseURL,
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
