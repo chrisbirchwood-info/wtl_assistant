@@ -45,6 +45,7 @@ export default function WTLPage() {
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [lessonsLoading, setLessonsLoading] = useState(false)
   const [dataSource, setDataSource] = useState<string>('loading')
   const [statusMessage, setStatusMessage] = useState<string>('')
 
@@ -54,12 +55,14 @@ export default function WTLPage() {
 
   useEffect(() => {
     if (selectedProject) {
+      setLessonsLoading(true)
       fetchTasks(selectedProject)
-      fetchLessons(selectedProject)
+      fetchLessons(selectedProject).finally(() => setLessonsLoading(false))
     } else {
       // Wyczyść zadania i lekcje gdy nie ma wybranego projektu
       setTasks([])
       setLessons([])
+      setLessonsLoading(false)
     }
   }, [selectedProject])
 
@@ -110,18 +113,21 @@ export default function WTLPage() {
 
   const fetchLessons = async (trainingId?: string) => {
     try {
+      console.log('Fetching lessons for training:', trainingId)
       const url = trainingId ? `/api/wtl/lessons?trainingId=${trainingId}` : '/api/wtl/lessons'
       const response = await fetch(url)
-      const data = await response.json()
+      const data: ApiResponse<Lesson[]> = await response.json()
 
       if (data.success) {
         setLessons(data.data)
-        if (data.source === 'wtl') {
-          toast.success(`Załadowano ${data.data.length} lekcji z WTL API! 📚`)
+        if (data.source === 'wtl' && trainingId) {
+          toast.success(`Załadowano ${data.data.length} lekcji z kursu! 📚`)
         }
+        console.log(`Loaded ${data.data.length} lessons for training ${trainingId}`)
       }
     } catch (error) {
       console.error('Error fetching lessons:', error)
+      toast.error('Błąd podczas ładowania lekcji')
     }
   }
 
@@ -188,7 +194,7 @@ export default function WTLPage() {
           </div>
 
           {/* Analytics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-sm font-medium text-gray-600">
                 Łączna liczba projektów
@@ -216,19 +222,10 @@ export default function WTLPage() {
             
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-sm font-medium text-gray-600">
-                Zadania pilne
-              </h3>
-              <p className="text-3xl font-bold mt-2 text-red-600">
-                {tasks.filter(task => task.priority === 'urgent').length}
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-600">
-                Lekcje opublikowane
+                {selectedProject ? 'Lekcje w kursie' : 'Lekcje łącznie'}
               </h3>
               <p className="text-3xl font-bold mt-2 text-blue-600">
-                {lessons.filter(lesson => lesson.status === 'published').length}
+                {lessons.length}
               </p>
             </div>
           </div>
@@ -286,14 +283,22 @@ export default function WTLPage() {
                 <h2 className="text-xl font-semibold text-gray-900">
                   {selectedProject ? 'Lekcje kursu' : 'Wybierz kurs'}
                 </h2>
-                {selectedProject && (
-                  <span className="text-sm text-gray-500">
-                    {lessons.length} lekcji
-                  </span>
-                )}
+                <div className="flex items-center space-x-2">
+                  {lessonsLoading && <LoadingSpinner size="sm" />}
+                  {selectedProject && !lessonsLoading && (
+                    <span className="text-sm text-gray-500">
+                      {lessons.length} lekcji
+                    </span>
+                  )}
+                </div>
               </div>
               
-              {lessons.length === 0 ? (
+              {lessonsLoading ? (
+                <div className="text-center py-8">
+                  <LoadingSpinner size="md" />
+                  <p className="text-gray-500 mt-4">Ładowanie lekcji kursu...</p>
+                </div>
+              ) : lessons.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500">
                     {selectedProject 
