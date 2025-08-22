@@ -2,42 +2,31 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import wtlClient from '@/lib/wtl-client'
 
-// Mock data for development
-const mockLessons = [
-  { 
-    id: '1', 
-    training_id: '1',
-    name: 'Wprowadzenie do kursu', 
-    description: 'Pierwsza lekcja wprowadzająca do tematyki kursu',
-    order: 1,
-    duration: '15 min',
-    type: 'video',
-    status: 'published',
-    created_at: '2024-01-01T00:00:00Z'
-  },
-  { 
-    id: '2', 
-    training_id: '1',
-    name: 'Podstawy teoretyczne', 
-    description: 'Omówienie podstawowych zagadnień teoretycznych',
-    order: 2,
-    duration: '25 min',
-    type: 'text',
-    status: 'published',
-    created_at: '2024-01-02T00:00:00Z'
-  },
-  { 
-    id: '3', 
-    training_id: '2',
-    name: 'Ćwiczenia praktyczne', 
-    description: 'Zadania praktyczne do wykonania',
-    order: 1,
-    duration: '30 min',
-    type: 'exercise',
-    status: 'published',
-    created_at: '2024-01-10T00:00:00Z'
-  }
-]
+// Mock data for development - różne lekcje dla różnych kursów
+const mockLessonsData: { [key: string]: any[] } = {
+  '1': [
+    { id: '1', training_id: '1', name: 'Wprowadzenie do przykładowego szkolenia', order: 1, duration: '15 min', type: 'video', status: 'published' },
+    { id: '2', training_id: '1', name: 'Podstawy teoretyczne', order: 2, duration: '25 min', type: 'text', status: 'published' },
+    { id: '3', training_id: '1', name: 'Test końcowy', order: 3, duration: '10 min', type: 'quiz', status: 'published' }
+  ],
+  '2': [
+    { id: '4', training_id: '2', name: 'Dzień 1: Przełamywanie barier mentalnych', order: 1, duration: '20 min', type: 'video', status: 'published' },
+    { id: '5', training_id: '2', name: 'Dzień 2: Techniki mówienia', order: 2, duration: '30 min', type: 'video', status: 'published' },
+    { id: '6', training_id: '2', name: 'Dzień 3: Praktyczne ćwiczenia', order: 3, duration: '25 min', type: 'exercise', status: 'published' },
+    { id: '7', training_id: '2', name: 'Dzień 4: Konwersacje', order: 4, duration: '35 min', type: 'video', status: 'published' },
+    { id: '8', training_id: '2', name: 'Dzień 5: Podsumowanie i test', order: 5, duration: '15 min', type: 'quiz', status: 'published' }
+  ],
+  '3': [
+    { id: '9', training_id: '3', name: 'AI w nauce języków', order: 1, duration: '40 min', type: 'video', status: 'published' },
+    { id: '10', training_id: '3', name: 'Techniki pamięciowe', order: 2, duration: '35 min', type: 'video', status: 'published' },
+    { id: '11', training_id: '3', name: 'Praktyczne zastosowanie AI', order: 3, duration: '45 min', type: 'exercise', status: 'published' },
+    { id: '12', training_id: '3', name: 'Budowanie pewności siebie', order: 4, duration: '30 min', type: 'video', status: 'published' }
+  ]
+}
+
+const getAllMockLessons = () => {
+  return Object.values(mockLessonsData).flat()
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -108,21 +97,21 @@ export async function GET(request: NextRequest) {
 
     // Fallback do mock danych (filter by trainingId if provided)
     const filteredLessons = trainingId 
-      ? mockLessons.filter(lesson => lesson.training_id === trainingId)
-      : mockLessons
+      ? mockLessonsData[trainingId] || []
+      : getAllMockLessons()
 
     return NextResponse.json({
       success: true,
       data: filteredLessons,
       source: 'mock',
-      message: 'Using demo lessons - WTL API not available'
+      message: `Using demo lessons for training ${trainingId || 'all'} - WTL API not available`
     })
 
   } catch (error) {
     console.error('Lessons API error:', error)
     return NextResponse.json({
       success: true,
-      data: mockLessons,
+      data: trainingId ? mockLessonsData[trainingId] || [] : getAllMockLessons(),
       source: 'mock',
       message: 'Error occurred, using demo lessons'
     })
