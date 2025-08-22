@@ -57,8 +57,9 @@ export default function WTLPage() {
       fetchTasks(selectedProject)
       fetchLessons(selectedProject)
     } else {
-      fetchTasks()
-      fetchLessons()
+      // Wyczyść zadania i lekcje gdy nie ma wybranego projektu
+      setTasks([])
+      setLessons([])
     }
   }, [selectedProject])
 
@@ -66,13 +67,10 @@ export default function WTLPage() {
     try {
       console.log('Fetching data from WTL API...')
       
-      const [projectsRes, tasksRes] = await Promise.all([
-        fetch('/api/wtl/projects'),
-        fetch('/api/wtl/tasks')
-      ])
+      // Pobierz tylko projekty na start, zadania i lekcje dopiero po wybraniu projektu
+      const projectsRes = await fetch('/api/wtl/projects')
 
       const projectsData: ApiResponse<Project[]> = await projectsRes.json()
-      const tasksData: ApiResponse<Task[]> = await tasksRes.json()
 
       if (projectsData.success) {
         setProjects(projectsData.data)
@@ -80,16 +78,12 @@ export default function WTLPage() {
         setStatusMessage(projectsData.message || '')
         
         if (projectsData.source === 'wtl') {
-          toast.success('Dane załadowane z Web To Learn API! 🎉')
+          toast.success('Projekty załadowane z Web To Learn API! 🎉')
         } else if (projectsData.source === 'supabase') {
-          toast.success('Dane załadowane z cache (Supabase)')
+          toast.success('Projekty załadowane z cache (Supabase)')
         } else {
-          toast.success('Używane dane demonstracyjne')
+          toast.success('Używane dane demonstracyjne projektów')
         }
-      }
-
-      if (tasksData.success) {
-        setTasks(tasksData.data)
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -243,9 +237,9 @@ export default function WTLPage() {
             {/* Projects Panel */}
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Projekty WTL</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Kursy WTL</h2>
                 <span className="text-sm text-gray-500">
-                  {projects.length} projektów
+                  {projects.length} kursów
                 </span>
               </div>
               
@@ -286,20 +280,99 @@ export default function WTLPage() {
               </div>
             </div>
 
+            {/* Lessons Panel */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {selectedProject ? 'Lekcje kursu' : 'Wybierz kurs'}
+                </h2>
+                {selectedProject && (
+                  <span className="text-sm text-gray-500">
+                    {lessons.length} lekcji
+                  </span>
+                )}
+              </div>
+              
+              {lessons.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">
+                    {selectedProject 
+                      ? 'Ten kurs nie ma jeszcze lekcji' 
+                      : 'Kliknij na kurs aby zobaczyć jego lekcje'
+                    }
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {lessons.map((lesson) => (
+                    <div
+                      key={lesson.id}
+                      className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                              #{lesson.order}
+                            </span>
+                            <h4 className="font-medium text-gray-900">{lesson.name}</h4>
+                          </div>
+                          {lesson.description && (
+                            <p className="text-sm text-gray-600 mt-1">
+                              {lesson.description}
+                            </p>
+                          )}
+                          <div className="flex items-center space-x-4 mt-2">
+                            {lesson.duration && (
+                              <span className="text-xs text-gray-500">
+                                ⏱️ {lesson.duration}
+                              </span>
+                            )}
+                            <span className="text-xs text-gray-500">
+                              📄 {lesson.type}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col items-end">
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              lesson.status === 'published'
+                                ? 'bg-green-100 text-green-800'
+                                : lesson.status === 'draft'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {lesson.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Tasks Panel */}
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {selectedProject ? 'Zadania projektu' : 'Wszystkie zadania'}
+                  {selectedProject ? 'Zadania kursu' : 'Wybierz kurs'}
                 </h2>
+                {selectedProject && (
+                  <span className="text-sm text-gray-500">
+                    {tasks.length} zadań
+                  </span>
+                )}
               </div>
               
               {tasks.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500">
                     {selectedProject 
-                      ? 'Brak zadań w wybranym projekcie' 
-                      : 'Brak zadań do wyświetlenia'
+                      ? 'Brak zadań w wybranym kursie' 
+                      : 'Wybierz kurs aby zobaczyć zadania'
                     }
                   </p>
                 </div>

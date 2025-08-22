@@ -89,11 +89,12 @@ class WTLClient {
       console.log('🔍 Attempting to fetch projects from WTL API...')
       console.log('Base URL:', this.client.defaults.baseURL)
       
-      // Endpointy zgodnie z dokumentacją WTL API
+      // Endpointy zgodnie z dokumentacją WTL API - pobierz wszystkie (range=[0,1000])
       const endpoints = [
+        '/training/list?range=[0,1000]&sort=["name", "ASC"]',
+        '/course/list?range=[0,1000]&sort=["name", "ASC"]',
         '/training/list',
         '/course/list',
-        '/user/list',
         '/projects',
         '/courses'
       ]
@@ -146,10 +147,13 @@ class WTLClient {
     try {
       console.log('🔍 Attempting to fetch tasks from WTL API...')
       
-      // Endpointy zgodnie z dokumentacją WTL API
+      // Endpointy zgodnie z dokumentacją WTL API - pobierz wszystkie zadania
       const endpoints = projectId 
-        ? [`/training/${projectId}/task/list`, `/course/${projectId}/task/list`]
-        : ['/task/list', '/training/task/list', '/assignment/list']
+        ? [
+            `/task/list?range=[0,1000]&filter=[{"field": "training_id", "type": "equals", "value": "${projectId}"}]&sort=["id", "ASC"]`,
+            `/training/${projectId}/task/list?range=[0,1000]&sort=["id", "ASC"]`
+          ]
+        : [`/task/list?range=[0,1000]&sort=["id", "ASC"]`, '/assignment/list?range=[0,1000]']
       
       for (const endpoint of endpoints) {
         try {
@@ -217,10 +221,13 @@ class WTLClient {
     try {
       console.log('🔍 Attempting to fetch lessons from WTL API...')
       
-      // Endpointy dla lekcji zgodnie z dokumentacją
+      // Endpointy dla lekcji zgodnie z dokumentacją - pobierz wszystkie (range=[0,1000])
       const endpoints = trainingId 
-        ? [`/training/${trainingId}/lesson/list`, `/lesson/list?filter=[{"field": "training_id", "type": "equals", "value": "${trainingId}"}]`]
-        : ['/lesson/list', '/lessons', '/lesson']
+        ? [
+            `/lesson/list?range=[0,1000]&filter=[{"field": "training_id", "type": "equals", "value": "${trainingId}"}]&sort=["order", "ASC"]`,
+            `/training/${trainingId}/lesson/list?range=[0,1000]&sort=["order", "ASC"]`
+          ]
+        : [`/lesson/list?range=[0,1000]&sort=["order", "ASC"]`, '/lessons', '/lesson']
       
       for (const endpoint of endpoints) {
         try {
