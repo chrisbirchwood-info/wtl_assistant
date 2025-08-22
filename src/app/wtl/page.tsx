@@ -414,10 +414,7 @@ export default function WTLPage() {
                 </div>
               )}
             </div>
-
-
-
-
+          </div>
 
           {/* Quick Actions */}
           <div className="bg-white rounded-lg shadow p-6">
