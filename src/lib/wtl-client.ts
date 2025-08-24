@@ -270,6 +270,47 @@ class WTLClient {
       return { success: false, data: [], error: error.message }
     }
   }
+
+  /**
+   * Weryfikuje czy użytkownik istnieje w systemie WebToLearn
+   * Zgodnie z dokumentacją API: GET /user/by-email/:email
+   */
+  async verifyUserByEmail(email: string): Promise<WTLResponse<any>> {
+    try {
+      console.log(`🔍 Verifying user by email: ${email}`)
+      
+      // Endpoint zgodny z dokumentacją WTL API
+      const endpoint = `/user/by-email/${encodeURIComponent(email)}`
+      
+      const response = await this.client.get(endpoint)
+      
+      console.log(`✅ User verified: ${email}`)
+      console.log('User data:', response.data)
+      
+      return { 
+        success: true, 
+        data: response.data 
+      }
+      
+    } catch (error: any) {
+      console.log(`❌ User verification failed for ${email}: ${error.response?.status || error.message}`)
+      
+      // Jeśli użytkownik nie istnieje (404), zwróć odpowiedni błąd
+      if (error.response?.status === 404) {
+        return { 
+          success: false, 
+          data: null, 
+          error: 'User not found in WebToLearn system' 
+        }
+      }
+      
+      return { 
+        success: false, 
+        data: null, 
+        error: error.message || 'Failed to verify user' 
+      }
+    }
+  }
 }
 
 export const wtlClient = new WTLClient()

@@ -5,17 +5,17 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/auth-store'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
-export default function HomePage() {
+interface ProtectedRouteProps {
+  children: React.ReactNode
+}
+
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const { isAuthenticated, user, isLoading } = useAuthStore()
   const router = useRouter()
-  const { isAuthenticated, isLoading } = useAuthStore()
   
   useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        router.push('/wtl')
-      } else {
-        router.push('/auth/login')
-      }
+    if (!isLoading && !isAuthenticated) {
+      router.push('/auth/login')
     }
   }, [isAuthenticated, isLoading, router])
   
@@ -24,11 +24,16 @@ export default function HomePage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-600">Ładowanie...</p>
+          <p className="mt-4 text-gray-600">Sprawdzanie autoryzacji...</p>
         </div>
       </div>
     )
   }
   
-  return null
+  if (!isAuthenticated) {
+    return null
+  }
+  
+  return <>{children}</>
 }
+
