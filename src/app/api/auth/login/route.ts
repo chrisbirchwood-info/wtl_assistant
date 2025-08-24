@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyOTP, generateUserSession } from '@/lib/auth'
 import { wtlClient } from '@/lib/wtl-client'
+import { createUser, getUserByEmail, saveUserSession } from '@/lib/supabase'
+import { UserSyncService } from '@/lib/user-sync-service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,31 +39,86 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Weryfikuj użytkownika w systemie WebToLearn
-    const userVerification = await wtlClient.verifyUserByEmail(email)
+    console.log(`🔐 Login attempt for: ${email}`)
     
-    if (!userVerification.success) {
-      return NextResponse.json(
-        { error: 'Użytkownik nie istnieje w systemie WebToLearn' },
-        { status: 404 }
-      )
+    // 1. Sprawdź czy użytkownik istnieje w Supabase
+    let supabaseUser = await getUserByEmail(email)
+    
+    if (!supabaseUser) {
+      console.log(`👤 User not found in Supabase, creating new user: ${email}`)
+      
+      // 2. Weryfikuj użytkownika w systemie WebToLearn
+      const userVerification = await wtlClient.verifyUserByEmail(email)
+      
+      if (!userVerification.success) {
+        return NextResponse.json(
+          { error: 'Użytkownik nie istnieje w systemie WebToLearn' },
+          { status: 404 }
+        )
+      }
+      
+      // 3. Utwórz użytkownika w Supabase z domyślną rolą 'student'
+      try {
+        supabaseUser = await createUser({
+          email: userVerification.data.email,
+          username: userVerification.data.name || userVerification.data.username,
+          role: 'student' // Domyślnie ustaw jako kursanta
+        })
+        
+        console.log(`✅ User created in Supabase: ${supabaseUser.id}`)
+        
+        // 4. Uruchom synchronizację z WTL w tle (nie blokuj logowania)
+        const syncService = new UserSyncService()
+        syncService.syncUser(email).catch(error => {
+          console.error(`⚠️ Background sync failed for ${email}:`, error)
+        })
+        
+      } catch (error) {
+        console.error(`❌ Failed to create user in Supabase: ${email}`, error)
+        return NextResponse.json(
+          { error: 'Błąd podczas tworzenia użytkownika' },
+          { status: 500 }
+        )
+      }
+    } else {
+      console.log(`👤 User found in Supabase: ${supabaseUser.id}`)
+      
+      // 5. Uruchom synchronizację z WTL w tle dla istniejącego użytkownika
+      const syncService = new UserSyncService()
+      syncService.syncUser(email).catch(error => {
+        console.error(`⚠️ Background sync failed for ${email}:`, error)
+      })
     }
     
-    // Generuj sesję użytkownika
-    const userData = userVerification.data
+    // 6. Generuj sesję użytkownika
     const userSession = generateUserSession({
-      id: userData.id,
-      email: userData.email,
-      username: userData.username
+      id: supabaseUser.id,
+      email: supabaseUser.email,
+      username: supabaseUser.username
     })
+    
+    // 7. Zapisz sesję w bazie danych
+    try {
+      await saveUserSession({
+        user_id: supabaseUser.id,
+        session_token: userSession,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dni
+      })
+    } catch (error) {
+      console.error('⚠️ Failed to save user session:', error)
+      // Nie blokuj logowania jeśli zapisanie sesji się nie powiedzie
+    }
+    
+    console.log(`✅ Login successful for: ${email}`)
     
     return NextResponse.json({
       success: true,
       message: 'Logowanie udane',
       user: {
-        id: userData.id,
-        email: userData.email,
-        username: userData.username
+        id: supabaseUser.id,
+        email: supabaseUser.email,
+        username: supabaseUser.username,
+        role: supabaseUser.role || 'student'
       },
       session: userSession
     })

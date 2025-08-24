@@ -182,6 +182,8 @@ export async function createUser(userData: { email: string; username?: string; r
     role: userData.role || 'student'
   }
 
+  console.log(`🔄 Creating user in Supabase:`, userDataWithRole)
+
   const { data, error } = await supabase
     .from('users')
     .insert([userDataWithRole])
@@ -193,15 +195,34 @@ export async function createUser(userData: { email: string; username?: string; r
     throw error
   }
 
+  console.log(`✅ User created successfully: ${data.id}`)
+
   // Utwórz profil odpowiedni dla roli
-  if (userDataWithRole.role === 'teacher') {
-    await supabase
-      .from('teacher_profiles')
-      .insert([{ user_id: data.id }])
-  } else {
-    await supabase
-      .from('student_profiles')
-      .insert([{ user_id: data.id }])
+  try {
+    if (userDataWithRole.role === 'teacher') {
+      const { data: profileData, error: profileError } = await supabase
+        .from('teacher_profiles')
+        .insert([{ user_id: data.id }])
+      
+      if (profileError) {
+        console.error('Error creating teacher profile:', profileError)
+      } else {
+        console.log(`✅ Teacher profile created for user: ${data.id}`)
+      }
+    } else {
+      const { data: profileData, error: profileError } = await supabase
+        .from('student_profiles')
+        .insert([{ user_id: data.id }])
+      
+      if (profileError) {
+        console.error('Error creating student profile:', profileError)
+      } else {
+        console.log(`✅ Student profile created for user: ${data.id}`)
+      }
+    }
+  } catch (error) {
+    console.error('Error creating user profile:', error)
+    // Nie rzucaj błędu - profil może zostać utworzony później
   }
 
   return data

@@ -21,27 +21,36 @@ export class UserSyncService {
    */
   async syncUser(email: string): Promise<SyncResult> {
     try {
-      console.log(`🔄 Syncing user: ${email}`)
+      console.log(`🔄 Starting sync for user: ${email}`)
       
       // 1. Sprawdź użytkownika w WTL z rolą
+      console.log(`🔍 Verifying user in WTL: ${email}`)
       const wtlUser = await wtlClient.verifyUserWithRole(email)
       
       if (wtlUser.success && wtlUser.data) {
+        console.log(`✅ User verified in WTL: ${email}, role: ${wtlUser.data.role}`)
+        
         // 2. Zaktualizuj/utwórz użytkownika w Supabase
+        console.log(`🔄 Upserting user in Supabase: ${email}`)
         const supabaseUser = await this.upsertUserFromWTL(wtlUser.data)
         
         // 3. Zaktualizuj profil odpowiedni dla roli
+        console.log(`🔄 Updating user profile: ${email}`)
         await this.updateUserProfile(supabaseUser.id, wtlUser.data)
         
         // 4. Zaloguj synchronizację
+        console.log(`📝 Logging sync event: ${email}`)
         await this.logSyncEvent(supabaseUser.id, 'update', 'success', wtlUser.data.role)
         
+        console.log(`✅ Sync completed successfully for: ${email}`)
         return { 
           success: true, 
           action: 'synced', 
           user: supabaseUser 
         }
       } else {
+        console.log(`❌ User not found in WTL: ${email}`)
+        
         // 5. Użytkownik nie istnieje w WTL
         await this.markUserAsUnsynced(email)
         await this.logSyncEvent(null, 'verify', 'failed', 'student', `User not found: ${email}`)
@@ -52,7 +61,7 @@ export class UserSyncService {
         }
       }
     } catch (error: any) {
-      console.error('Sync error:', error)
+      console.error(`❌ Sync error for ${email}:`, error)
       await this.logSyncEvent(null, 'sync', 'error', 'student', error.message)
       
       return { 

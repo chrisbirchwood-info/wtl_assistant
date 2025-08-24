@@ -1,0 +1,5 @@
+[33m2decbe4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m Migration
+[33m88bb05e[m Fix TypeScript build errors and add Supabase CLI configuration
+[33m22b8a1a[m Update deployment documentation and environment configuration for user synchronization system; enhance Supabase client with error handling and user role verification features.
+[33mdeb6003[m feat: implement OTP authentication system
+[33m81e4d3b[m Fix syntax error - add missing closing div after removing duplicate panel
