@@ -18,7 +18,13 @@
     "db:repair": "npx supabase migration repair",
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
-    "supabase:status": "npx supabase status"
+    "supabase:status": "npx supabase status",
+    "db:migrate": "node scripts/apply-migrations.js",
+    "db:check": "node scripts/check-users-structure.js",
+    "db:auto": "node scripts/auto-migrate.js",
+    "db:sql": "node scripts/run-sql-migration.js",
+    "prebuild": "npm run db:auto",
+    "postbuild": "npm run db:check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
