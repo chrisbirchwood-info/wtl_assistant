@@ -47,30 +47,20 @@ export async function POST(request: NextRequest) {
     if (!supabaseUser) {
       console.log(`👤 User not found in Supabase, creating new user: ${email}`)
       
-      // 2. Weryfikuj użytkownika w systemie WebToLearn
-      const userVerification = await wtlClient.verifyUserByEmail(email)
-      
-      if (!userVerification.success) {
-        return NextResponse.json(
-          { error: 'Użytkownik nie istnieje w systemie WebToLearn' },
-          { status: 404 }
-        )
-      }
-      
-      // 3. Utwórz użytkownika w Supabase z domyślną rolą 'student'
+      // 2. Utwórz użytkownika w Supabase z domyślną rolą 'student'
       try {
         supabaseUser = await createUser({
-          email: userVerification.data.email,
-          username: userVerification.data.name || userVerification.data.username,
+          email: email,
+          username: email.split('@')[0], // Użyj części przed @ jako username
           role: 'student' // Domyślnie ustaw jako kursanta
         })
         
         console.log(`✅ User created in Supabase: ${supabaseUser.id}`)
         
-        // 4. Uruchom synchronizację z WTL w tle (nie blokuj logowania)
+        // 3. Uruchom weryfikację WTL w tle (nie blokuj logowania)
         const syncService = new UserSyncService()
         syncService.syncUser(email).catch(error => {
-          console.error(`⚠️ Background sync failed for ${email}:`, error)
+          console.error(`⚠️ Background WTL sync failed for ${email}:`, error)
         })
         
       } catch (error) {
