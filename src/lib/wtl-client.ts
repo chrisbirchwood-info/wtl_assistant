@@ -23,6 +23,19 @@ function decodeUnicodeData(data: string): string {
     .replace(/\\t/g, '\t');
 }
 
+export interface WTLUser {
+  id: string
+  email: string
+  name?: string
+  role?: 'student' | 'teacher'
+  // Dodatkowe pola z WTL API
+}
+
+export interface WTLUserWithRole extends WTLUser {
+  role: 'student' | 'teacher'
+  // Pola specyficzne dla roli
+}
+
 class WTLClient {
   private client: AxiosInstance
 
@@ -308,6 +321,121 @@ class WTLClient {
         success: false, 
         data: null, 
         error: error.message || 'Failed to verify user' 
+      }
+    }
+  }
+
+  /**
+   * Weryfikuje użytkownika i określa jego rolę w systemie WTL
+   */
+  async verifyUserWithRole(email: string): Promise<WTLResponse<WTLUserWithRole>> {
+    try {
+      console.log(`🔍 Verifying user with role: ${email}`)
+      
+      // 1. Sprawdź podstawowe dane użytkownika
+      const userResponse = await this.verifyUserByEmail(email)
+      
+      if (!userResponse.success) {
+        return userResponse
+      }
+
+      const user = userResponse.data
+      
+      // 2. Określ rolę użytkownika na podstawie różnych endpointów
+      const role = await this.determineUserRole(user.id, email)
+      
+      return {
+        success: true,
+        data: {
+          ...user,
+          role
+        }
+      }
+      
+    } catch (error: any) {
+      console.error(`❌ User role verification failed for ${email}:`, error)
+      return {
+        success: false,
+        data: {} as WTLUserWithRole,
+        error: error.message || 'Failed to verify user role'
+      }
+    }
+  }
+
+  /**
+   * Określa rolę użytkownika na podstawie różnych endpointów WTL
+   */
+  private async determineUserRole(userId: string, email: string): Promise<'student' | 'teacher'> {
+    try {
+      // Sprawdź czy użytkownik jest nauczycielem (ma dostęp do panelu nauczyciela)
+      const teacherEndpoints = [
+        `/teacher/profile/${userId}`,
+        `/instructor/${userId}`,
+        `/user/${userId}/role`
+      ]
+
+      for (const endpoint of teacherEndpoints) {
+        try {
+          const response = await this.client.get(endpoint)
+          if (response.data && response.data.role === 'teacher') {
+            return 'teacher'
+          }
+        } catch (error) {
+          // Endpoint nie istnieje lub błąd - kontynuuj sprawdzanie
+          continue
+        }
+      }
+
+      // Sprawdź czy użytkownik ma przypisane kursy jako nauczyciel
+      try {
+        const teacherCourses = await this.client.get(`/training/list?filter=[{"field": "instructor_id", "type": "equals", "value": "${userId}"}]`)
+        if (teacherCourses.data && Array.isArray(teacherCourses.data) && teacherCourses.data.length > 0) {
+          return 'teacher'
+        }
+      } catch (error) {
+        // Błąd - kontynuuj sprawdzanie
+      }
+
+      // Domyślnie użytkownik jest kursantem
+      return 'student'
+      
+    } catch (error) {
+      console.error('Error determining user role:', error)
+      // W przypadku błędu, domyślnie ustaw jako kursanta
+      return 'student'
+    }
+  }
+
+  /**
+   * Pobiera listę użytkowników z określeniem roli
+   */
+  async getUsersWithRoles(): Promise<WTLResponse<WTLUserWithRole[]>> {
+    try {
+      const usersResponse = await this.getUsers()
+      
+      if (!usersResponse.success) {
+        return usersResponse
+      }
+
+      // Określ rolę dla każdego użytkownika
+      const usersWithRoles = await Promise.all(
+        usersResponse.data.map(async (user) => {
+          const role = await this.determineUserRole(user.id, user.email)
+          return { ...user, role }
+        })
+      )
+
+      return {
+        success: true,
+        data: usersWithRoles
+      }
+      
+    } catch (error: any) {
+      console.error('Error fetching users with roles:', error)
+      return {
+        success: false,
+        data: [],
+        error: error.message
       }
     }
   }

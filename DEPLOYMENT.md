@@ -1,127 +1,258 @@
-# 🚀 Deployment na Vercel
+# 🚀 Wdrożenie systemu synchronizacji użytkowników WTL
 
-## Wymagania
+## 📋 Wymagania wstępne
 
-- Konto na [Vercel](https://vercel.com)
-- Repozytorium na GitHub/GitLab/Bitbucket
-- Skonfigurowane zmienne środowiskowe
+- Node.js 18+
+- Docker Desktop (dla Supabase lokalnego)
+- Dostęp do API WebToLearn
+- Zmienne środowiskowe skonfigurowane
 
-## Krok 1: Przygotowanie repozytorium
+## 🔧 Konfiguracja
 
-1. **Zatwierdź zmiany** w repozytorium:
+### 1. Zmienne środowiskowe
+
 ```bash
-git add .
-git commit -m "feat: implement OTP authentication system"
-git push origin main
-```
-
-## Krok 2: Deployment na Vercel
-
-### Opcja A: Przez Dashboard Vercel (Zalecane)
-
-1. **Zaloguj się** na [vercel.com](https://vercel.com)
-2. **Kliknij** "New Project"
-3. **Wybierz** swoje repozytorium
-4. **Skonfiguruj** projekt:
-   - **Framework Preset**: Next.js
-   - **Root Directory**: `./` (domyślnie)
-   - **Build Command**: `npm run build` (domyślnie)
-   - **Output Directory**: `.next` (domyślnie)
-   - **Install Command**: `npm install` (domyślnie)
-
-### Opcja B: Przez CLI Vercel
-
-1. **Zainstaluj** Vercel CLI:
-```bash
-npm i -g vercel
-```
-
-2. **Zaloguj się**:
-```bash
-vercel login
-```
-
-3. **Deploy**:
-```bash
-vercel
-```
-
-## Krok 3: Konfiguracja zmiennych środowiskowych
-
-W dashboardzie Vercel, przejdź do **Settings → Environment Variables** i dodaj:
-
-### Wymagane zmienne:
-
-```env
-# WebToLearn API
-WTL_API_URL=https://teachm3.elms.pl/api/v1
-WTL_API_KEY=your_webtolearn_api_key_here
-
-# JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key-change-in-production
-
-# App Configuration
-NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
-```
-
-### Opcjonalne (jeśli używasz Supabase):
-
-```env
+# .env.local
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+WTL_API_URL=https://your-platform.elms.pl/api/v1
+WTL_API_KEY=your_wtl_api_key
 ```
 
-## Krok 4: Uruchomienie deploymentu
+### 2. Uruchomienie Supabase lokalnie
 
-1. **Kliknij** "Deploy" w dashboardzie Vercel
-2. **Poczekaj** na zakończenie builda
-3. **Sprawdź** czy aplikacja działa na wygenerowanym URL
+```bash
+# Uruchom Docker Desktop
+# Następnie w katalogu głównym:
+npx supabase start
 
-## Krok 5: Konfiguracja domeny (opcjonalnie)
+# Zastosuj migracje:
+npx supabase db push
+```
 
-1. **Przejdź** do **Settings → Domains**
-2. **Dodaj** swoją domenę
-3. **Skonfiguruj** DNS zgodnie z instrukcjami Vercel
+## 🗄️ Struktura bazy danych
 
-## Automatyczny deployment
+### Tabela `users` (rozszerzona)
+```sql
+- id: UUID (PK)
+- email: VARCHAR(255) UNIQUE
+- username: VARCHAR(255)
+- role: ENUM('student', 'teacher') DEFAULT 'student'
+- wtl_user_id: VARCHAR(255)
+- wtl_last_sync: TIMESTAMP
+- wtl_sync_status: VARCHAR(50) DEFAULT 'pending'
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
+```
 
-Po pierwszym deploymencie:
-- **Każdy push** do `main` branch automatycznie uruchomi nowy deployment
-- **Pull requests** będą miały preview deployments
-- **Możesz** skonfigurować branch protection rules
+### Tabela `teacher_profiles`
+```sql
+- id: UUID (PK)
+- user_id: UUID (FK -> users.id)
+- specialization: TEXT
+- experience_years: INTEGER
+- bio: TEXT
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
+```
 
-## Monitoring i logi
+### Tabela `student_profiles`
+```sql
+- id: UUID (PK)
+- user_id: UUID (FK -> users.id)
+- current_course_id: VARCHAR(255)
+- progress_percentage: DECIMAL(5,2) DEFAULT 0.00
+- enrollment_date: TIMESTAMP
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
+```
 
-- **Analytics**: Vercel Analytics (opcjonalnie)
-- **Logi**: Dashboard → Functions → View Function Logs
-- **Performance**: Core Web Vitals w dashboardzie
+### Tabela `user_sync_log`
+```sql
+- id: UUID (PK)
+- user_id: UUID (FK -> users.id)
+- wtl_user_id: VARCHAR(255)
+- sync_type: VARCHAR(50)
+- sync_status: VARCHAR(50)
+- user_role: ENUM('student', 'teacher')
+- last_sync_at: TIMESTAMP
+- error_message: TEXT
+- created_at: TIMESTAMP
+```
 
-## Troubleshooting
+## 🔄 Użycie systemu synchronizacji
 
-### Błąd builda
-- Sprawdź logi w dashboardzie Vercel
-- Upewnij się że wszystkie zależności są w `package.json`
-- Sprawdź czy `npm run build` działa lokalnie
+### 1. Synchronizacja pojedynczego użytkownika
 
-### Błąd runtime
-- Sprawdź logi funkcji w dashboardzie
-- Upewnij się że zmienne środowiskowe są ustawione
-- Sprawdź czy API endpoints działają
+```typescript
+import { UserSyncService } from '@/lib/user-sync-service'
 
-### Problemy z autoryzacją
-- Sprawdź `JWT_SECRET` w zmiennych środowiskowych
-- Upewnij się że `WTL_API_KEY` jest poprawny
-- Sprawdź czy `NEXT_PUBLIC_APP_URL` wskazuje na właściwy URL
+const syncService = new UserSyncService()
+const result = await syncService.syncUser('user@example.com')
+```
 
-## Koszty
+### 2. Synchronizacja masowa
 
-- **Hobby Plan**: Darmowy (100GB bandwidth/miesiąc)
-- **Pro Plan**: $20/miesiąc (1TB bandwidth/miesiąc)
-- **Enterprise**: Kontakt z Vercel
+```typescript
+// Wszyscy użytkownicy
+const result = await syncService.syncAllUsers()
 
-## Wsparcie
+// Użytkownicy określonej roli
+const result = await syncService.syncUsersByRole('teacher')
+```
 
-- [Vercel Documentation](https://vercel.com/docs)
-- [Vercel Community](https://github.com/vercel/vercel/discussions)
-- [Vercel Support](https://vercel.com/support)
+### 3. API Endpoints
+
+```bash
+# Synchronizacja pojedynczego użytkownika
+POST /api/wtl/sync
+{
+  "syncType": "single",
+  "email": "user@example.com"
+}
+
+# Synchronizacja masowa
+POST /api/wtl/sync
+{
+  "syncType": "bulk"
+}
+
+# Synchronizacja po roli
+POST /api/wtl/sync
+{
+  "syncType": "role",
+  "role": "teacher"
+}
+
+# Statystyki synchronizacji
+GET /api/wtl/sync
+
+# Statystyki dla określonej roli
+GET /api/wtl/sync?role=student
+```
+
+### 4. Skrypt CLI
+
+```bash
+# Synchronizacja masowa
+node scripts/sync-users.js
+
+# Synchronizacja pojedynczego użytkownika
+node scripts/sync-users.js single user@example.com
+
+# Synchronizacja po roli
+node scripts/sync-users.js role teacher
+```
+
+## 📊 Monitoring i logi
+
+### Statystyki synchronizacji
+- Liczba użytkowników zsynchronizowanych
+- Liczba błędów synchronizacji
+- Rozkład ról (kursanci vs nauczyciele)
+- Historia synchronizacji
+
+### Logi w tabeli `user_sync_log`
+- Typ operacji (create, update, delete)
+- Status (success, failed, pending)
+- Rola użytkownika
+- Komunikaty błędów
+- Timestamp operacji
+
+## 🚨 Obsługa błędów
+
+### Typowe błędy i rozwiązania
+
+1. **Błąd połączenia z WTL API**
+   - Sprawdź `WTL_API_URL` i `WTL_API_KEY`
+   - Sprawdź limity API (3600/godzinę, 360/minutę)
+
+2. **Błąd bazy danych**
+   - Sprawdź połączenie z Supabase
+   - Uruchom migracje: `npx supabase db push`
+
+3. **Użytkownik nie znaleziony w WTL**
+   - Użytkownik zostanie oznaczony jako `wtl_sync_status: 'failed'`
+   - Błąd zostanie zalogowany w `user_sync_log`
+
+## 🔄 Automatyzacja
+
+### Cron job (Vercel)
+
+```json
+// vercel.json
+{
+  "crons": [
+    {
+      "path": "/api/wtl/sync",
+      "schedule": "0 */6 * * *"
+    }
+  ]
+}
+```
+
+### Integracja z procesem logowania
+
+```typescript
+// src/lib/auth.ts
+export async function handleUserLogin(email: string) {
+  // 1. Sprawdź/utwórz użytkownika w Supabase
+  let user = await getUserByEmail(email)
+  
+  if (!user) {
+    user = await createUser({ email })
+  }
+  
+  // 2. Synchronizuj z WTL w tle
+  const syncService = new UserSyncService()
+  syncService.syncOnLogin(email).catch(console.error)
+  
+  return user
+}
+```
+
+## 🧪 Testowanie
+
+### 1. Test pojedynczego użytkownika
+
+```bash
+curl -X POST http://localhost:3000/api/wtl/sync \
+  -H "Content-Type: application/json" \
+  -d '{"syncType": "single", "email": "test@example.com"}'
+```
+
+### 2. Test synchronizacji masowej
+
+```bash
+curl -X POST http://localhost:3000/api/wtl/sync \
+  -H "Content-Type: application/json" \
+  -d '{"syncType": "bulk"}'
+```
+
+### 3. Sprawdzenie statystyk
+
+```bash
+curl http://localhost:3000/api/wtl/sync
+```
+
+## 📈 Metryki wydajności
+
+- **Czas synchronizacji pojedynczego użytkownika**: ~100-500ms
+- **Czas synchronizacji masowej**: zależy od liczby użytkowników
+- **Limit API WTL**: 3600 requestów/godzinę
+- **Zalecana częstotliwość**: co 6 godzin
+
+## 🔒 Bezpieczeństwo
+
+- Wszystkie endpointy wymagają autoryzacji
+- Logi synchronizacji nie zawierają wrażliwych danych
+- Rate limiting na poziomie API
+- Walidacja danych wejściowych
+
+## 🆘 Wsparcie
+
+W przypadku problemów:
+1. Sprawdź logi w konsoli przeglądarki
+2. Sprawdź logi synchronizacji w tabeli `user_sync_log`
+3. Sprawdź status połączenia z WTL API
+4. Sprawdź połączenie z bazą danych Supabase

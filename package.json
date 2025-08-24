@@ -3,16 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "supabase": "node scripts/supabase-cli.js",
+    "test-connection": "node scripts/test-connection.js",
+    "run-migration": "node scripts/run-migration.js",
+    "db:push": "npx supabase db push",
+    "db:pull": "npx supabase db pull",
+    "db:reset": "npx supabase db reset",
+    "db:new": "npx supabase migration new",
+    "db:list": "npx supabase migration list",
+    "db:repair": "npx supabase migration repair",
+    "supabase:start": "npx supabase start",
+    "supabase:stop": "npx supabase stop",
+    "supabase:status": "npx supabase status"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
     "@supabase/supabase-js": "^2.56.0",
     "axios": "^1.11.0",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.1",
     "jsonwebtoken": "^9.0.2",
     "next": "15.5.0",
     "react": "19.1.0",
@@ -31,6 +44,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
+    "supabase": "^2.34.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
