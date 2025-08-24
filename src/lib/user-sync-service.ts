@@ -3,7 +3,7 @@ import { wtlClient, WTLUserWithRole } from './wtl-client'
 
 export interface SyncResult {
   success: boolean
-  action: 'created' | 'updated' | 'synced' | 'error'
+  action: 'created' | 'updated' | 'synced' | 'error' | 'not_found_in_wtl'
   user?: any
   error?: string
 }
