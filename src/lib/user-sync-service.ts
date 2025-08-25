@@ -119,7 +119,7 @@ export class UserSyncService {
   /**
    * Synchronizacja użytkowników określonej roli
    */
-  async syncUsersByRole(role: 'student' | 'teacher'): Promise<BulkSyncResult> {
+  async syncUsersByRole(role: 'student' | 'teacher' | 'superadmin'): Promise<BulkSyncResult> {
     try {
       console.log(`🔄 Starting sync for role: ${role}`)
       
@@ -240,7 +240,7 @@ export class UserSyncService {
     userId: string | null,
     syncType: string,
     status: string,
-    userRole: 'student' | 'teacher',
+    userRole: 'student' | 'teacher' | 'superadmin',
     errorMessage?: string
   ) {
     await supabase
@@ -297,7 +297,7 @@ export class UserSyncService {
   /**
    * Pobiera statystyki synchronizacji dla określonej roli
    */
-  async getSyncStatsByRole(role: 'student' | 'teacher'): Promise<any> {
+  async getSyncStatsByRole(role: 'student' | 'teacher' | 'superadmin'): Promise<any> {
     const { data: syncLogs } = await supabase
       .from('user_sync_log')
       .select('*')

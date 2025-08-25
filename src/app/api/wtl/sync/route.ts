@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     
     const syncService = new UserSyncService()
     
-    if (role && (role === 'student' || role === 'teacher')) {
+    if (role && (role === 'student' || role === 'teacher' || role === 'superadmin')) {
       console.log(`📊 Sync stats requested for role: ${role}`)
       const stats = await syncService.getSyncStatsByRole(role)
       return NextResponse.json(stats)

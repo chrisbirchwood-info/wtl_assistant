@@ -39,6 +39,16 @@ export default function Navigation() {
     console.log('🔒 Navigation: User does NOT have teacher role, hiding "Moi studenci" link')
     console.log('🔒 Navigation: User role is:', user.role)
   }
+
+  // Dodaj link do panelu admina TYLKO dla superadminów
+  if (user.role && user.role === 'superadmin') {
+    console.log('🔒 Navigation: User has superadmin role, showing "Panel Admina" link')
+    navigation.push({ 
+      name: 'Panel Admina', 
+      href: '/admin', 
+      current: pathname === '/admin' 
+    })
+  }
   
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">

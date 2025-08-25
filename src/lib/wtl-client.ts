@@ -27,12 +27,12 @@ export interface WTLUser {
   id: string
   email: string
   name?: string
-  role?: 'student' | 'teacher'
+  role?: 'student' | 'teacher' | 'superadmin'
   // Dodatkowe pola z WTL API
 }
 
 export interface WTLUserWithRole extends WTLUser {
-  role: 'student' | 'teacher'
+  role: 'student' | 'teacher' | 'superadmin'
   // Pola specyficzne dla roli
 }
 
@@ -365,7 +365,7 @@ class WTLClient {
   /**
    * Określa rolę użytkownika na podstawie różnych endpointów WTL
    */
-  private async determineUserRole(userId: string, email: string): Promise<'student' | 'teacher'> {
+  private async determineUserRole(userId: string, email: string): Promise<'student' | 'teacher' | 'superadmin'> {
     try {
       // Sprawdź czy użytkownik jest nauczycielem (ma dostęp do panelu nauczyciela)
       const teacherEndpoints = [

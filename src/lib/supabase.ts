@@ -24,7 +24,7 @@ export interface Database {
           id: string
           email: string
           username?: string
-          role: 'student' | 'teacher'
+          role: 'student' | 'teacher' | 'superadmin'
           wtl_user_id?: string
           wtl_last_sync?: string
           wtl_sync_status?: string
@@ -35,7 +35,7 @@ export interface Database {
           id?: string
           email: string
           username?: string
-          role: 'student' | 'teacher'
+          role: 'student' | 'teacher' | 'superadmin'
           wtl_user_id?: string
           wtl_last_sync?: string
           wtl_sync_status?: string
@@ -46,7 +46,7 @@ export interface Database {
           id?: string
           email?: string
           username?: string
-          role?: 'student' | 'teacher'
+          role?: 'student' | 'teacher' | 'superadmin'
           wtl_user_id?: string
           wtl_last_sync?: string
           wtl_sync_status?: string
@@ -119,7 +119,7 @@ export interface Database {
           wtl_user_id?: string
           sync_type: string
           sync_status: string
-          user_role: 'student' | 'teacher'
+          user_role: 'student' | 'teacher' | 'superadmin'
           last_sync_at: string
           error_message?: string
           created_at: string
@@ -130,7 +130,7 @@ export interface Database {
           wtl_user_id?: string
           sync_type: string
           sync_status: string
-          user_role: 'student' | 'teacher'
+          user_role: 'student' | 'teacher' | 'superadmin'
           last_sync_at?: string
           error_message?: string
           created_at?: string
@@ -141,7 +141,7 @@ export interface Database {
           wtl_user_id?: string
           sync_type?: string
           sync_status?: string
-          user_role?: 'student' | 'teacher'
+          user_role?: 'student' | 'teacher' | 'superadmin'
           last_sync_at?: string
           error_message?: string
           created_at?: string
@@ -153,7 +153,7 @@ export interface Database {
 }
 
 // Funkcje pomocnicze
-export async function createUser(userData: { email: string; username?: string; role?: 'student' | 'teacher' }) {
+export async function createUser(userData: { email: string; username?: string; role?: 'student' | 'teacher' | 'superadmin' }) {
   // Domyślnie ustaw rolę jako student jeśli nie podano
   const userDataWithRole = {
     ...userData,
@@ -272,4 +272,21 @@ export async function getUserWithProfile(email: string) {
   }
 
   return user
+}
+
+export async function updateUserRole(userId: string, newRole: 'student' | 'teacher' | 'superadmin') {
+  const { data, error } = await supabase
+    .from('users')
+    .update({ role: newRole })
+    .eq('id', userId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating user role:', error)
+    throw error
+  }
+
+  console.log(`✅ User role updated to ${newRole} for user: ${userId}`)
+  return data
 }
