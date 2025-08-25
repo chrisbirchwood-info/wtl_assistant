@@ -3,10 +3,10 @@ import { wtlClient } from '@/lib/wtl-client'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { trainingId: string } }
+  context: { params: Promise<{ trainingId: string }> }
 ) {
   try {
-    const { trainingId } = params
+    const { trainingId } = await context.params
     console.log(`👥 Pobieranie studentów dla kursu ${trainingId} z WTL API...`)
 
     // Pobierz parametry z query string

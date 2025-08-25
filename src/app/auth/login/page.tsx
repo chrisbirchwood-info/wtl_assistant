@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -72,12 +72,20 @@ export default function LoginPage() {
       const result = await response.json()
       
       if (response.ok) {
+        // Debug: sprawdź odpowiedź z API
+        console.log('🔍 API response:', result)
+        console.log('🔍 User data from API:', result.user)
+        
         // Zaloguj użytkownika z pełnymi danymi
         const userData = {
           ...result.user,
           iat: Math.floor(Date.now() / 1000),
           exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 dni
         }
+        
+        // Debug: sprawdź dane użytkownika przed przekazaniem do store'a
+        console.log('🔍 User data for store:', userData)
+        
         login(userData)
         toast.success('Logowanie udane!')
         router.push('/wtl')
@@ -99,6 +107,18 @@ export default function LoginPage() {
     otpForm.reset()
   }
   
+  // Czyść pole OTP przy każdym renderowaniu kroku OTP
+  useEffect(() => {
+    if (step === 'otp') {
+      otpForm.reset()
+      // Dodatkowo wyczyść pole ręcznie
+      const otpInput = document.getElementById('otp') as HTMLInputElement
+      if (otpInput) {
+        otpInput.value = ''
+      }
+    }
+  }, [step, otpForm])
+  
   if (step === 'otp') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -115,7 +135,11 @@ export default function LoginPage() {
             </p>
           </div>
           
-          <form className="mt-8 space-y-6" onSubmit={otpForm.handleSubmit(onOTPSubmit)}>
+          <form 
+            key={`otp-form-${submittedEmail}`}
+            className="mt-8 space-y-6" 
+            onSubmit={otpForm.handleSubmit(onOTPSubmit)}
+          >
             <div>
               <label htmlFor="otp" className="sr-only">
                 Kod OTP
@@ -130,6 +154,12 @@ export default function LoginPage() {
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm text-center text-lg font-mono"
                 placeholder="000000"
                 autoComplete="one-time-code"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                data-form-type="other"
+                data-lpignore="true"
+                data-1p-ignore="true"
               />
               {otpForm.formState.errors.otp && (
                 <p className="mt-1 text-sm text-red-600">{otpForm.formState.errors.otp.message}</p>

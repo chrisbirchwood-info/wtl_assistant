@@ -17,13 +17,17 @@ export default function Navigation() {
   
   if (!user || !isAuthenticated) return null
   
+  // Debug: sprawdź rolę użytkownika
+  console.log('Navigation - User role:', user.role, 'User data:', user)
+  
   const navigation = [
     { name: 'Dashboard', href: '/wtl', current: pathname === '/wtl' },
     { name: 'Mój profil', href: '/profile', current: pathname === '/profile' },
   ]
 
-  // Dodaj link do zarządzania studentami dla nauczycieli
-  if (user.role === 'teacher') {
+  // Dodaj link do zarządzania studentami tylko dla nauczycieli
+  // Dodatkowe sprawdzenie czy rola jest zdefiniowana i równa 'teacher'
+  if (user.role && user.role === 'teacher') {
     navigation.push({ 
       name: 'Moi studenci', 
       href: '/teacher/students', 

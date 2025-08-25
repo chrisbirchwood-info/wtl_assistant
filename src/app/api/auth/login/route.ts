@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
         })
         
         console.log(`✅ User created in Supabase: ${supabaseUser.id}`)
+        console.log(`🔍 Created user role: ${supabaseUser.role}`)
         
         // 3. Uruchom weryfikację WTL w tle (nie blokuj logowania)
         const syncService = new UserSyncService()
@@ -72,12 +73,19 @@ export async function POST(request: NextRequest) {
       }
     } else {
       console.log(`👤 User found in Supabase: ${supabaseUser.id}`)
+      console.log(`🔍 Existing user role: ${supabaseUser.role}`)
       
       // 5. Uruchom synchronizację z WTL w tle dla istniejącego użytkownika
       const syncService = new UserSyncService()
       syncService.syncUser(email).catch(error => {
         console.error(`⚠️ Background sync failed for ${email}:`, error)
       })
+    }
+    
+    // Upewnij się, że użytkownik ma ustawioną rolę
+    if (!supabaseUser.role) {
+      console.log(`⚠️ User has no role, setting default role 'student'`)
+      supabaseUser.role = 'student'
     }
     
     // 6. Generuj sesję użytkownika
@@ -92,6 +100,10 @@ export async function POST(request: NextRequest) {
       created_at: supabaseUser.created_at,
       updated_at: supabaseUser.updated_at
     })
+    
+    // Debug: sprawdź rolę użytkownika
+    console.log(`🔍 User role in API response: ${supabaseUser.role}`)
+    console.log(`🔍 Full user data:`, supabaseUser)
     
     // Sesja jest zarządzana przez JWT + Zustand (nie zapisujemy do bazy)
     

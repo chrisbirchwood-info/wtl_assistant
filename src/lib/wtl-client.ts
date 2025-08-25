@@ -439,6 +439,19 @@ class WTLClient {
       }
     }
   }
+
+  /**
+   * Generyczna metoda do wywoływania dowolnych endpointów WTL API
+   */
+  async get(endpoint: string): Promise<any> {
+    try {
+      const response = await this.client.get(endpoint)
+      return response
+    } catch (error: any) {
+      console.error(`Error calling WTL API endpoint ${endpoint}:`, error)
+      throw error
+    }
+  }
 }
 
 export const wtlClient = new WTLClient()
