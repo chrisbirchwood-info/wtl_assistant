@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyOTP, generateUserSession } from '@/lib/auth'
 import { wtlClient } from '@/lib/wtl-client'
-import { createUser, getUserByEmail, saveUserSession } from '@/lib/supabase'
+import { createUser, getUserByEmail } from '@/lib/supabase'
 import { UserSyncService } from '@/lib/user-sync-service'
 
 export async function POST(request: NextRequest) {
@@ -93,17 +93,7 @@ export async function POST(request: NextRequest) {
       updated_at: supabaseUser.updated_at
     })
     
-    // 7. Zapisz sesję w bazie danych
-    try {
-      await saveUserSession({
-        user_id: supabaseUser.id,
-        session_token: userSession,
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dni
-      })
-    } catch (error) {
-      console.error('⚠️ Failed to save user session:', error)
-      // Nie blokuj logowania jeśli zapisanie sesji się nie powiedzie
-    }
+    // Sesja jest zarządzana przez JWT + Zustand (nie zapisujemy do bazy)
     
     console.log(`✅ Login successful for: ${email}`)
     

@@ -147,29 +147,7 @@ export interface Database {
           created_at?: string
         }
       }
-      user_sessions: {
-        Row: {
-          id: string
-          user_id: string
-          session_token: string
-          expires_at: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          session_token: string
-          expires_at: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          session_token?: string
-          expires_at?: string
-          created_at?: string
-        }
-      }
+      // user_sessions table removed - using JWT + Zustand instead
     }
   }
 }
@@ -243,24 +221,7 @@ export async function getUserByEmail(email: string) {
   return data
 }
 
-export async function saveUserSession(sessionData: {
-  user_id: string
-  session_token: string
-  expires_at: string
-}) {
-  const { data, error } = await supabase
-    .from('user_sessions')
-    .insert([sessionData])
-    .select()
-    .single()
-
-  if (error) {
-    console.error('Error saving session:', error)
-    throw error
-  }
-
-  return data
-}
+// saveUserSession function removed - using JWT + Zustand instead
 
 // Funkcje pomocnicze dla nowych typów użytkowników
 export async function createUserWithRole(userData: { 

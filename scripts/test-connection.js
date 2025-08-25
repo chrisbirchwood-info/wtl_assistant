@@ -74,26 +74,33 @@ async function testConnection() {
       console.log(`   Liczba użytkowników: ${count || 0}`)
     }
     
-    // Test 3: Sprawdź tabelę user_sessions
-    const { data: sessions, error: sessionsError } = await supabase
-      .from('user_sessions')
-      .select('*')
-      .limit(1)
+    // Test 3: Sprawdź tabele profilów (user_sessions została usunięta)
+    console.log('\n🔄 Sprawdzanie tabel profilów...')
     
-    if (sessionsError && sessionsError.code === '42P01') {
-      console.log('❌ Tabela `user_sessions` nie istnieje!')
-      console.log('   Uruchom migrację SQL w Supabase Dashboard')
-    } else if (sessionsError) {
-      console.log('⚠️  Błąd podczas sprawdzania tabeli user_sessions:', sessionsError.message)
-    } else {
-      console.log('✅ Tabela `user_sessions` istnieje i jest dostępna')
+    try {
+      const { data: teacherProfiles, error: teacherError } = await supabase
+        .from('teacher_profiles')
+        .select('count')
+        .limit(1)
       
-      // Pobierz liczbę sesji
-      const { count } = await supabase
-        .from('user_sessions')
-        .select('*', { count: 'exact', head: true })
+      if (teacherError) {
+        console.log('⚠️  Tabela teacher_profiles:', teacherError.message)
+      } else {
+        console.log('✅ Tabela `teacher_profiles` istnieje i jest dostępna')
+      }
       
-      console.log(`   Liczba sesji: ${count || 0}`)
+      const { data: studentProfiles, error: studentError } = await supabase
+        .from('student_profiles')
+        .select('count')
+        .limit(1)
+      
+      if (studentError) {
+        console.log('⚠️  Tabela student_profiles:', studentError.message)
+      } else {
+        console.log('✅ Tabela `student_profiles` istnieje i jest dostępna')
+      }
+    } catch (error) {
+      console.log('❌ Błąd podczas sprawdzania tabel profilów:', error.message)
     }
     
   } catch (error) {
