@@ -359,6 +359,9 @@ export default function TeacherRegistrationPage() {
           <p className="text-xs text-gray-400">
             Musisz mieć uprawnienia nauczyciela w systemie WTL.
           </p>
+          <p className="text-xs text-gray-400">
+            💡 Podpowiedź: kod OTP to 555555
+          </p>
           <div className="pt-4">
             <Link 
               href="/auth/login" 
