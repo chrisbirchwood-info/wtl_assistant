@@ -28,24 +28,8 @@ export async function GET(request: NextRequest) {
 
     const endpointResults = [];
     for (const endpoint of testEndpoints) {
-      try {
-        const response = await wtlClient.client.get(endpoint);
-        endpointResults.push({
-          endpoint,
-          status: response.status,
-          hasData: !!response.data,
-          dataType: typeof response.data,
-          isArray: Array.isArray(response.data),
-          dataLength: Array.isArray(response.data)
-            ? response.data.length
-            : "N/A",
-        });
-      } catch (error: any) {
-        endpointResults.push({
-          endpoint,
-          error: error.response?.status || error.message,
-        });
-      }
+      const result = await wtlClient.testEndpoint(endpoint);
+      endpointResults.push(result);
     }
 
     return NextResponse.json({

@@ -464,6 +464,28 @@ class WTLClient {
   }
 
   /**
+   * Testuje endpoint WTL API
+   */
+  async testEndpoint(endpoint: string): Promise<any> {
+    try {
+      const response = await this.client.get(endpoint);
+      return {
+        endpoint,
+        status: response.status,
+        hasData: !!response.data,
+        dataType: typeof response.data,
+        isArray: Array.isArray(response.data),
+        dataLength: Array.isArray(response.data) ? response.data.length : 'N/A'
+      };
+    } catch (error: any) {
+      return {
+        endpoint,
+        error: error.response?.status || error.message
+      };
+    }
+  }
+
+  /**
    * Generyczna metoda do wywoływania dowolnych endpointów WTL API
    */
   async get(endpoint: string): Promise<any> {
