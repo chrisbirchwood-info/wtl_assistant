@@ -272,17 +272,6 @@ export default function LoginPage() {
           <p className="text-xs text-gray-500">
             Kod OTP zostanie wysłany na podany adres email.
           </p>
-          <div className="pt-4 space-y-2">
-            <p className="text-xs text-gray-400">
-              Jesteś nauczycielem w systemie WTL?
-            </p>
-            <Link 
-              href="/auth/register-teacher" 
-              className="text-sm text-green-600 hover:text-green-500 font-medium"
-            >
-              Zarejestruj się jako nauczyciel →
-            </Link>
-          </div>
         </div>
       </div>
     </div>
