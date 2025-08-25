@@ -171,20 +171,17 @@ export class UserSyncService {
       .eq('email', wtlUser.email)
       .single()
 
-    const userData = {
-      email: wtlUser.email,
-      username: wtlUser.name,
-      role: wtlUser.role,
-      wtl_user_id: wtlUser.id,
-      wtl_last_sync: new Date().toISOString(),
-      wtl_sync_status: 'synced'
-    }
-
     if (existingUser) {
-      // Aktualizuj istniejącego użytkownika
+      // Aktualizuj istniejącego użytkownika - NIE zmieniaj roli
       const { data: updatedUser, error } = await supabase
         .from('users')
-        .update(userData)
+        .update({
+          username: wtlUser.name,
+          wtl_user_id: wtlUser.id,
+          wtl_last_sync: new Date().toISOString(),
+          wtl_sync_status: 'synced'
+          // NIE aktualizuj roli - zachowaj obecną
+        })
         .eq('id', existingUser.id)
         .select()
         .single()
@@ -192,7 +189,16 @@ export class UserSyncService {
       if (error) throw error
       return updatedUser
     } else {
-      // Utwórz nowego użytkownika
+      // Utwórz nowego użytkownika - ustaw rolę z WTL
+      const userData = {
+        email: wtlUser.email,
+        username: wtlUser.name,
+        role: wtlUser.role, // Tylko dla nowych użytkowników
+        wtl_user_id: wtlUser.id,
+        wtl_last_sync: new Date().toISOString(),
+        wtl_sync_status: 'synced'
+      }
+
       const { data: newUser, error } = await supabase
         .from('users')
         .insert([userData])

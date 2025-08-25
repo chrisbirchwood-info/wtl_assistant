@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         supabaseUser = await createUser({
           email: email,
           username: email.split('@')[0], // Użyj części przed @ jako username
-          role: 'student' // Domyślnie ustaw jako kursanta
+          role: 'student' // ZAWSZE ustaw jako kursanta dla nowych użytkowników
         })
         
         console.log(`✅ User created in Supabase: ${supabaseUser.id}`)
@@ -83,8 +83,16 @@ export async function POST(request: NextRequest) {
     }
     
     // Upewnij się, że użytkownik ma ustawioną rolę
+    // Dla nowych użytkowników ZAWSZE 'student', dla istniejących zachowaj obecną
     if (!supabaseUser.role) {
       console.log(`⚠️ User has no role, setting default role 'student'`)
+      supabaseUser.role = 'student'
+    }
+    
+    // Dodatkowe zabezpieczenie: jeśli użytkownik nie ma roli 'teacher' w bazie,
+    // to nie może być nauczycielem (nawet jeśli WTL mówi inaczej)
+    if (supabaseUser.role !== 'teacher') {
+      console.log(`🔒 User role is not 'teacher', ensuring role is 'student'`)
       supabaseUser.role = 'student'
     }
     
