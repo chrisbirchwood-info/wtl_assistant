@@ -21,6 +21,15 @@ export default function Navigation() {
     { name: 'Dashboard', href: '/wtl', current: pathname === '/wtl' },
     { name: 'Mój profil', href: '/profile', current: pathname === '/profile' },
   ]
+
+  // Dodaj link do zarządzania studentami dla nauczycieli
+  if (user.role === 'teacher') {
+    navigation.push({ 
+      name: 'Moi studenci', 
+      href: '/teacher/students', 
+      current: pathname === '/teacher/students' 
+    })
+  }
   
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">

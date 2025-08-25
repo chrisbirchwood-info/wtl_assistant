@@ -23,6 +23,7 @@
     "db:check": "node scripts/check-users-structure.js",
     "db:auto": "node scripts/auto-migrate.js",
     "db:sql": "node scripts/run-sql-migration.js",
+    "add-test-data": "node scripts/add-test-data.js",
     "prebuild": "npm run db:auto",
     "postbuild": "npm run db:check"
   },
