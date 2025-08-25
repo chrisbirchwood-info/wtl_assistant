@@ -25,7 +25,7 @@ interface TeacherProfile {
 }
 
 export default function UserProfile() {
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated, initialize } = useAuthStore()
   const [profile, setProfile] = useState<StudentProfile | TeacherProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -38,6 +38,12 @@ export default function UserProfile() {
   })
 
   useEffect(() => {
+    // Inicjalizuj stan autoryzacji przy pierwszym renderowaniu
+    initialize()
+  }, [initialize])
+
+  useEffect(() => {
+    console.log('👤 UserProfile - Auth state:', { isAuthenticated, user: !!user })
     if (!user || !isAuthenticated) {
       setError('Brak sesji użytkownika')
       setIsLoading(false)

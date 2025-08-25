@@ -15,6 +15,7 @@ interface AuthState {
   login: (user: UserSession) => void
   logout: () => void
   clearError: () => void
+  initialize: () => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -22,7 +23,7 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
-      isLoading: false,
+      isLoading: true, // Start with loading true to check auth state
       error: null,
       
       setUser: (user) => set({ 
@@ -48,6 +49,16 @@ export const useAuthStore = create<AuthState>()(
       }),
       
       clearError: () => set({ error: null }),
+      
+      // Inicjalizacja stanu autoryzacji
+      initialize: () => {
+        const state = get()
+        if (state.user) {
+          set({ isAuthenticated: true, isLoading: false })
+        } else {
+          set({ isAuthenticated: false, isLoading: false })
+        }
+      },
     }),
     {
       name: 'auth-storage',

@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import UserMenu from '@/components/auth/UserMenu'
@@ -7,9 +8,14 @@ import { useAuthStore } from '@/store/auth-store'
 
 export default function Navigation() {
   const pathname = usePathname()
-  const { user } = useAuthStore()
+  const { user, isAuthenticated, initialize } = useAuthStore()
   
-  if (!user) return null
+  useEffect(() => {
+    // Inicjalizuj stan autoryzacji przy pierwszym renderowaniu
+    initialize()
+  }, [initialize])
+  
+  if (!user || !isAuthenticated) return null
   
   const navigation = [
     { name: 'Dashboard', href: '/wtl', current: pathname === '/wtl' },

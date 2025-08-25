@@ -10,11 +10,18 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, user, isLoading } = useAuthStore()
+  const { isAuthenticated, user, isLoading, initialize } = useAuthStore()
   const router = useRouter()
   
   useEffect(() => {
+    // Inicjalizuj stan autoryzacji przy pierwszym renderowaniu
+    initialize()
+  }, [initialize])
+  
+  useEffect(() => {
+    console.log('🔒 ProtectedRoute - Auth state:', { isAuthenticated, isLoading, user: !!user })
     if (!isLoading && !isAuthenticated) {
+      console.log('🚫 Access denied, redirecting to login')
       router.push('/auth/login')
     }
   }, [isAuthenticated, isLoading, router])

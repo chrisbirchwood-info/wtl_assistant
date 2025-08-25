@@ -7,9 +7,15 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function HomePage() {
   const router = useRouter()
-  const { isAuthenticated, isLoading } = useAuthStore()
+  const { isAuthenticated, isLoading, initialize } = useAuthStore()
   
   useEffect(() => {
+    // Inicjalizuj stan autoryzacji przy pierwszym renderowaniu
+    initialize()
+  }, [initialize])
+  
+  useEffect(() => {
+    console.log('🏠 HomePage - Auth state:', { isAuthenticated, isLoading })
     if (!isLoading) {
       if (isAuthenticated) {
         router.push('/wtl')

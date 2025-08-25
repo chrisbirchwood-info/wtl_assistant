@@ -1,20 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import { useRouter } from 'next/navigation'
 
 export default function UserMenu() {
-  const { user, logout } = useAuthStore()
+  const { user, isAuthenticated, logout, initialize } = useAuthStore()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  
+  useEffect(() => {
+    // Inicjalizuj stan autoryzacji przy pierwszym renderowaniu
+    initialize()
+  }, [initialize])
   
   const handleLogout = () => {
     logout()
     router.push('/auth/login')
   }
   
-  if (!user) return null
+  if (!user || !isAuthenticated) return null
   
   return (
     <div className="relative">
