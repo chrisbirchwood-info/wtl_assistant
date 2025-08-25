@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import axios from 'axios'
+import { wtlClient } from '@/lib/wtl-client'
 
 export async function GET() {
   try {
@@ -74,5 +76,73 @@ export async function GET() {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
     })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { email, action } = await request.json()
+    
+    if (!email || typeof email !== 'string') {
+      return NextResponse.json(
+        { error: 'Email jest wymagany' },
+        { status: 400 }
+      )
+    }
+    
+    if (action === 'verify_teacher') {
+      console.log(`🔍 Verifying teacher in WTL: ${email}`)
+      
+      try {
+        // Sprawdź czy użytkownik ma uprawnienia nauczyciela w WTL
+        const wtlUser = await wtlClient.verifyUserWithRole(email)
+        
+        if (!wtlUser.success || !wtlUser.data) {
+          return NextResponse.json(
+            { error: 'Użytkownik nie został znaleziony w systemie WTL' },
+            { status: 404 }
+          )
+        }
+        
+        // Sprawdź czy użytkownik ma rolę nauczyciela w WTL
+        if (wtlUser.data.role !== 'teacher') {
+          return NextResponse.json(
+            { error: 'Użytkownik nie ma uprawnień nauczyciela w systemie WTL' },
+            { status: 403 }
+          )
+        }
+        
+        console.log(`✅ Teacher verified in WTL: ${email}, role: ${wtlUser.data.role}`)
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Weryfikacja nauczyciela udana',
+          user: {
+            email: wtlUser.data.email,
+            role: wtlUser.data.role,
+            name: wtlUser.data.name
+          }
+        })
+        
+      } catch (error) {
+        console.error(`❌ WTL API verification failed for ${email}:`, error)
+        return NextResponse.json(
+          { error: 'Błąd podczas weryfikacji w systemie WTL' },
+          { status: 500 }
+        )
+      }
+    }
+    
+    return NextResponse.json(
+      { error: 'Nieznana akcja' },
+      { status: 400 }
+    )
+    
+  } catch (error) {
+    console.error('POST test-public error:', error)
+    return NextResponse.json(
+      { error: 'Wystąpił błąd podczas przetwarzania żądania' },
+      { status: 500 }
+    )
   }
 }
