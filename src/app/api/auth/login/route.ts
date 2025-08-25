@@ -84,7 +84,13 @@ export async function POST(request: NextRequest) {
     const userSession = generateUserSession({
       id: supabaseUser.id,
       email: supabaseUser.email,
-      username: supabaseUser.username
+      username: supabaseUser.username,
+      role: supabaseUser.role,
+      wtl_user_id: supabaseUser.wtl_user_id,
+      wtl_last_sync: supabaseUser.wtl_last_sync,
+      wtl_sync_status: supabaseUser.wtl_sync_status,
+      created_at: supabaseUser.created_at,
+      updated_at: supabaseUser.updated_at
     })
     
     // 7. Zapisz sesję w bazie danych

@@ -40,6 +40,13 @@ export default function UserMenu() {
             <p className="text-gray-500">{user.email}</p>
           </div>
           
+          <a
+            href="/profile"
+            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+          >
+            Mój profil
+          </a>
+          
           <button
             onClick={handleLogout}
             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"

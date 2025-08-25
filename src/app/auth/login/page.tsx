@@ -72,8 +72,13 @@ export default function LoginPage() {
       const result = await response.json()
       
       if (response.ok) {
-        // Zaloguj użytkownika
-        login(result.user)
+        // Zaloguj użytkownika z pełnymi danymi
+        const userData = {
+          ...result.user,
+          iat: Math.floor(Date.now() / 1000),
+          exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 dni
+        }
+        login(userData)
         toast.success('Logowanie udane!')
         router.push('/wtl')
       } else {
