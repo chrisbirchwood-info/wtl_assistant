@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/auth-store'
+import React from 'react'
 
 interface User {
   id: string
@@ -19,6 +20,8 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<any>(null)
+  const [deletingUser, setDeletingUser] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -80,6 +83,50 @@ export default function AdminUsers() {
     } finally {
       setSyncing(false)
     }
+  }
+
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    if (deleteConfirm !== userEmail) {
+      setDeleteConfirm(null)
+      return
+    }
+
+    try {
+      setDeletingUser(userId)
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('✅ Użytkownik usunięty:', result.message)
+        
+        // Odśwież listę użytkowników
+        await fetchUsers()
+        
+        // Pokaż komunikat sukcesu
+        setSyncResult({ success: true, message: result.message })
+        setTimeout(() => setSyncResult(null), 5000)
+      } else {
+        const error = await response.json()
+        setSyncResult({ success: false, error: error.error || 'Błąd usuwania użytkownika' })
+        console.error('❌ Błąd usuwania użytkownika:', error)
+      }
+    } catch (error) {
+      console.error('❌ Błąd podczas usuwania użytkownika:', error)
+      setSyncResult({ success: false, error: 'Błąd połączenia' })
+    } finally {
+      setDeletingUser(null)
+      setDeleteConfirm(null)
+    }
+  }
+
+  const confirmDelete = (userId: string, userEmail: string) => {
+    setDeleteConfirm(userEmail)
+  }
+
+  const cancelDelete = () => {
+    setDeleteConfirm(null)
   }
 
   if (!isAuthenticated || !user || user.role !== 'superadmin') {
@@ -174,50 +221,91 @@ export default function AdminUsers() {
               </tr>
             ) : (
               users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {user.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.role === 'superadmin' 
-                        ? 'bg-purple-100 text-purple-800'
-                        : user.role === 'teacher'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.is_active 
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {user.is_active ? 'Aktywny' : 'Nieaktywny'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(user.created_at).toLocaleDateString('pl-PL')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => router.push(`/admin/users/${user.id}/edit`)}
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        Edytuj
-                      </button>
-                      <button
-                        onClick={() => {/* TODO: Implement delete */}}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Usuń
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                <React.Fragment key={user.id}>
+                  <tr className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {user.email}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        user.role === 'superadmin' 
+                          ? 'bg-purple-100 text-purple-800'
+                          : user.role === 'teacher'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        user.is_active 
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {user.is_active ? 'Aktywny' : 'Nieaktywny'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(user.created_at).toLocaleDateString('pl-PL')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => router.push(`/admin/users/${user.id}/edit`)}
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
+                          Edytuj
+                        </button>
+                        <button
+                          onClick={() => confirmDelete(user.id, user.email)}
+                          disabled={user.role === 'superadmin'}
+                          className={`${
+                            user.role === 'superadmin'
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-red-600 hover:text-red-900'
+                          }`}
+                          title={user.role === 'superadmin' ? 'Nie można usunąć superadmina' : 'Usuń użytkownika'}
+                        >
+                          Usuń
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {/* Potwierdzenie usunięcia */}
+                  {deleteConfirm === user.email && (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-4 bg-red-50">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm text-red-800">
+                            <strong>Potwierdź usunięcie:</strong> Czy na pewno chcesz usunąć użytkownika <strong>{user.email}</strong>?
+                            <br />
+                            <span className="text-xs">Ta operacja jest nieodwracalna!</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleDeleteUser(user.id, user.email)}
+                              disabled={deletingUser === user.id}
+                              className={`px-3 py-1 text-sm rounded ${
+                                deletingUser === user.id
+                                  ? 'bg-red-400 cursor-not-allowed'
+                                  : 'bg-red-600 hover:bg-red-700 text-white'
+                              }`}
+                            >
+                              {deletingUser === user.id ? 'Usuwanie...' : 'Tak, usuń'}
+                            </button>
+                            <button
+                              onClick={cancelDelete}
+                              className="px-3 py-1 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded"
+                            >
+                              Anuluj
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))
             )}
           </tbody>

@@ -121,3 +121,72 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+// Nowy endpoint do aktualizacji użytkowników
+export async function PATCH(request: NextRequest) {
+  try {
+    // TODO: Dodać weryfikację roli superadmin
+    const body = await request.json();
+    const { id, email, role, is_active, username } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Brakuje ID użytkownika" },
+        { status: 400 }
+      );
+    }
+
+    // Sprawdź czy użytkownik istnieje
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("id, email")
+      .eq("id", id)
+      .single();
+
+    if (!existingUser) {
+      return NextResponse.json(
+        { error: "Użytkownik nie został znaleziony" },
+        { status: 404 }
+      );
+    }
+
+    // Przygotuj dane do aktualizacji
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (email !== undefined) updateData.email = email;
+    if (role !== undefined) updateData.role = role;
+    if (is_active !== undefined) updateData.is_active = is_active;
+    if (username !== undefined) updateData.username = username;
+
+    // Aktualizuj użytkownika
+    const { data: updatedUser, error } = await supabase
+      .from("users")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Błąd podczas aktualizacji użytkownika:", error);
+      return NextResponse.json(
+        { error: "Błąd podczas aktualizacji użytkownika" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      user: updatedUser,
+      message: "Użytkownik został zaktualizowany pomyślnie"
+    });
+
+  } catch (error) {
+    console.error("Błąd podczas aktualizacji użytkownika:", error);
+    return NextResponse.json(
+      { error: "Błąd podczas aktualizacji użytkownika" },
+      { status: 500 }
+    );
+  }
+}
