@@ -28,9 +28,33 @@ export async function GET(
       )
     }
 
-    const users = await response.json()
-    console.log(`✅ Pobrano ${users.length} studentów dla kursu ${trainingId}`)
+    const data = await response.json()
+    console.log('📊 Otrzymane dane studentów z WTL API:', typeof data, data)
 
+    // Sprawdź czy dane są tablicą
+    let users = []
+    if (Array.isArray(data)) {
+      users = data
+    } else if (data && typeof data === 'object') {
+      // Jeśli to obiekt, spróbuj znaleźć tablicę użytkowników
+      if (Array.isArray(data.data)) {
+        users = data.data
+      } else if (Array.isArray(data.users)) {
+        users = data.users
+      } else if (Array.isArray(data.students)) {
+        users = data.students
+      } else if (Array.isArray(data.members)) {
+        users = data.members
+      } else {
+        console.warn('⚠️ Nieznana struktura danych studentów z WTL API:', data)
+        users = []
+      }
+    } else {
+      console.warn('⚠️ Otrzymane dane studentów nie są tablicą ani obiektem:', data)
+      users = []
+    }
+
+    console.log(`✅ Pobrano ${users.length} studentów dla kursu ${trainingId}`)
     return NextResponse.json(users)
 
   } catch (error) {

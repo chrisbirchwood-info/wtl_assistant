@@ -22,9 +22,31 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const trainings = await response.json()
-    console.log(`✅ Pobrano ${trainings.length} kursów z WTL API`)
+    const data = await response.json()
+    console.log('📊 Otrzymane dane z WTL API:', typeof data, data)
 
+    // Sprawdź czy dane są tablicą
+    let trainings = []
+    if (Array.isArray(data)) {
+      trainings = data
+    } else if (data && typeof data === 'object') {
+      // Jeśli to obiekt, spróbuj znaleźć tablicę kursów
+      if (Array.isArray(data.data)) {
+        trainings = data.data
+      } else if (Array.isArray(data.trainings)) {
+        trainings = data.trainings
+      } else if (Array.isArray(data.courses)) {
+        trainings = data.courses
+      } else {
+        console.warn('⚠️ Nieznana struktura danych z WTL API:', data)
+        trainings = []
+      }
+    } else {
+      console.warn('⚠️ Otrzymane dane nie są tablicą ani obiektem:', data)
+      trainings = []
+    }
+
+    console.log(`✅ Pobrano ${trainings.length} kursów z WTL API`)
     return NextResponse.json(trainings)
 
   } catch (error) {

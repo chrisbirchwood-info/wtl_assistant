@@ -16,10 +16,6 @@ interface Student {
   id: string
   email: string
   username?: string
-  enrollment_date: string
-  progress_percentage: number
-  status: string
-  last_activity: string
 }
 
 interface CourseEnrollment {
@@ -73,6 +69,23 @@ export default function StudentList() {
 
       const coursesData = await response.json()
       
+      // Sprawdź czy dane są tablicą
+      if (!Array.isArray(coursesData)) {
+        console.warn('⚠️ Otrzymane dane kursów nie są tablicą:', coursesData)
+        setCourses([])
+        setError('Nieprawidłowa struktura danych z WTL API')
+        setIsLoading(false)
+        return
+      }
+      
+      // Sprawdź czy są jakieś kursy
+      if (coursesData.length === 0) {
+        console.log('ℹ️ Brak kursów w WTL API')
+        setCourses([])
+        setIsLoading(false)
+        return
+      }
+
       // Mapuj dane z WTL API na nasz format
       const mappedCourses = coursesData.map((course: any) => ({
         id: course.id,
@@ -114,6 +127,21 @@ export default function StudentList() {
       }
 
       const usersData = await response.json()
+      
+      // Sprawdź czy dane są tablicą
+      if (!Array.isArray(usersData)) {
+        console.warn('⚠️ Otrzymane dane studentów nie są tablicą:', usersData)
+        setEnrollments([])
+        setError('Nieprawidłowa struktura danych studentów z WTL API')
+        return
+      }
+      
+      // Sprawdź czy są jacyś studenci
+      if (usersData.length === 0) {
+        console.log('ℹ️ Brak studentów w kursie')
+        setEnrollments([])
+        return
+      }
       
       // Mapuj dane z WTL API na nasz format
       const mappedEnrollments = usersData.map((user: any) => ({
@@ -337,11 +365,38 @@ export default function StudentList() {
           </div>
         ) : selectedCourse ? (
           <div className="bg-white shadow rounded-lg p-6 text-center">
-            <p className="text-gray-500">Brak studentów zapisanych na ten kurs.</p>
+            <div className="text-gray-500">
+              <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Brak studentów</h3>
+              <p className="text-sm text-gray-600">
+                Na ten kurs nie jest jeszcze zapisany żaden student.
+              </p>
+            </div>
           </div>
         ) : courses.length === 0 ? (
           <div className="bg-white shadow rounded-lg p-6 text-center">
-            <p className="text-gray-500">Nie masz jeszcze żadnych aktywnych kursów.</p>
+            <div className="text-gray-500">
+              <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 5.477 5.754 5 7.5 5s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.523 18.246 19 16.5 19c-1.746 0-3.332-.477-4.5-1.253" />
+              </svg>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Brak kursów</h3>
+              <p className="text-sm text-gray-600">
+                {error ? error : 'Nie masz jeszcze żadnych aktywnych kursów w systemie WTL.'}
+              </p>
+              {error && (
+                <button
+                  onClick={() => {
+                    setError(null)
+                    fetchTeacherData()
+                  }}
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Spróbuj ponownie
+                </button>
+              )}
+            </div>
           </div>
         ) : null}
       </div>
