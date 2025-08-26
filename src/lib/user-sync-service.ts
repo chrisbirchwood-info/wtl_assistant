@@ -198,15 +198,15 @@ export class UserSyncService {
       // Pobierz wszystkich użytkowników z WTL
       const wtlUsers = await wtlClient.getUsers();
 
-      if (!wtlUsers || !Array.isArray(wtlUsers)) {
+      if (!wtlUsers || !wtlUsers.success || !Array.isArray(wtlUsers.data)) {
         console.log("⚠️ Brak użytkowników z WTL lub nieprawidłowa odpowiedź");
         return { success: false, message: "Brak użytkowników z WTL" };
       }
 
-      console.log(`📊 Znaleziono ${wtlUsers.length} użytkowników w WTL`);
+      console.log(`📊 Znaleziono ${wtlUsers.data.length} użytkowników w WTL`);
 
       const results = {
-        total: wtlUsers.length,
+        total: wtlUsers.data.length,
         created: 0,
         updated: 0,
         errors: 0,
@@ -219,7 +219,7 @@ export class UserSyncService {
       };
 
       // Synchronizuj każdego użytkownika
-      for (const wtlUser of wtlUsers) {
+      for (const wtlUser of wtlUsers.data) {
         try {
           console.log(
             `🔄 Synchronizuję użytkownika: ${wtlUser.email || wtlUser.id}`

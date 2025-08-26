@@ -38,7 +38,9 @@ export default function AdminUsers() {
       const response = await fetch('/api/admin/users')
       if (response.ok) {
         const data = await response.json()
-        setUsers(data.users || [])
+        // Filtruj użytkowników - wyklucz superadmina
+        const filteredUsers = (data.users || []).filter((user: User) => user.role !== 'superadmin')
+        setUsers(filteredUsers)
       }
     } catch (error) {
       console.error('Błąd podczas pobierania użytkowników:', error)
@@ -85,7 +87,8 @@ export default function AdminUsers() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-white">
+      <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Zarządzanie Użytkownikami</h1>
         <div className="flex gap-4">
@@ -219,6 +222,7 @@ export default function AdminUsers() {
             )}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   )
