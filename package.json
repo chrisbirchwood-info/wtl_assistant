@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:local": "node scripts/switch-env.js local && next dev",
+    "dev:prod": "node scripts/switch-env.js prod && next dev",
     "build": "next build",
+    "build:local": "node scripts/switch-env.js local && next build",
+    "build:prod": "node scripts/switch-env.js prod && next build",
     "start": "next start",
     "lint": "next lint",
     "supabase": "node scripts/supabase-cli.js",
@@ -23,7 +27,17 @@
     "db:check": "node scripts/check-users-structure.js",
     "db:auto": "node scripts/auto-migrate.js",
     "db:sql": "node scripts/run-sql-migration.js",
-    "add-test-data": "node scripts/add-test-data.js"
+    "add-test-data": "node scripts/add-test-data.js",
+    "supabase:db:reset": "supabase db reset",
+    "supabase:db:push": "supabase db push",
+    "supabase:db:diff": "supabase db diff",
+    "supabase:migration:new": "supabase migration new",
+    "supabase:migration:list": "supabase migration list",
+    "env:local": "node scripts/switch-env.js local",
+    "env:prod": "node scripts/switch-env.js prod",
+    "env:status": "node scripts/switch-env.js status",
+    "env:info": "node scripts/switch-env.js info",
+    "sync:production": "node scripts/sync-production-data.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

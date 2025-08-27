@@ -13,6 +13,8 @@ interface Course {
   wtl_course_id?: string
   last_sync_at?: string
   sync_status?: string
+  teacher_role?: string // Rola nauczyciela w tym kursie
+  assigned_at?: string // Data przypisania kursu do nauczyciela
 }
 
 interface Student {
@@ -67,8 +69,8 @@ export default function StudentList() {
       setIsLoading(true)
       setError(null)
 
-      // Pobierz kursy z lokalnej bazy Supabase
-      const response = await fetch('/api/courses/local', {
+      // Pobierz kursy z lokalnej bazy Supabase (tylko dla tego nauczyciela)
+      const response = await fetch(`/api/courses/local?teacherId=${user?.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -95,7 +97,7 @@ export default function StudentList() {
       
       // Sprawdź czy są jakieś kursy
       if (coursesData.length === 0) {
-        console.log('ℹ️ Brak kursów w lokalnej bazie')
+        console.log('ℹ️ Brak kursów przypisanych do tego nauczyciela')
         setCourses([])
         setIsLoading(false)
         return
@@ -111,7 +113,9 @@ export default function StudentList() {
         created_at: course.created_at || new Date().toISOString(),
         wtl_course_id: course.wtl_course_id,
         last_sync_at: course.last_sync_at,
-        sync_status: course.sync_status
+        sync_status: course.sync_status,
+        teacher_role: course.teacher_role, // Rola nauczyciela w tym kursie
+        assigned_at: course.assigned_at
       }))
 
       setCourses(mappedCourses)
@@ -307,6 +311,19 @@ export default function StudentList() {
     }
   }
 
+  const getTeacherRoleLabel = (role: string) => {
+    switch (role) {
+      case 'teacher':
+        return 'Nauczyciel'
+      case 'assistant':
+        return 'Asystent'
+      case 'student':
+        return 'Student'
+      default:
+        return role
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -427,7 +444,7 @@ export default function StudentList() {
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>
                   {course.title}
-                  {course.sync_status && ` (${course.sync_status})`}
+                  {course.teacher_role && ` (${getTeacherRoleLabel(course.teacher_role)})`}
                 </option>
               ))}
             </select>
@@ -443,6 +460,11 @@ export default function StudentList() {
               </h3>
               <p className="mt-1 text-sm text-gray-500">
                 Dane z lokalnej bazy danych - zsynchronizowane z WTL API
+                {selectedCourse && courses.find(c => c.id === selectedCourse)?.teacher_role && (
+                  <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    Rola: {getTeacherRoleLabel(courses.find(c => c.id === selectedCourse)?.teacher_role || '')}
+                  </span>
+                )}
               </p>
             </div>
             
@@ -559,7 +581,7 @@ export default function StudentList() {
               <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 5.477 5.754 5 7.5 5s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.523 18.246 19 16.5 19c-1.746 0-3.332-.477-4.5-1.253" />
               </svg>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Brak kursów</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Brak przypisanych kursów</h3>
               <p className="text-sm text-gray-600">
                 {error ? (
                   <>
@@ -567,17 +589,10 @@ export default function StudentList() {
                     {error}
                   </>
                 ) : (
-                  'Nie masz jeszcze żadnych aktywnych kursów w lokalnej bazie danych.'
+                  'Nie masz jeszcze żadnych kursów przypisanych w systemie. Skontaktuj się z administratorem, aby został przypisany do kursów.'
                 )}
               </p>
               <div className="mt-4 space-y-2">
-                <button
-                  onClick={syncCourses}
-                  disabled={isSyncing}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-                >
-                  🔄 Synchronizuj kursy z WTL
-                </button>
                 {error && (
                   <button
                     onClick={() => {

@@ -9,24 +9,103 @@ const supabase = createClient(
 
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Dodać weryfikację roli superadmin
-    const { data: users, error } = await supabase
-      .from("users")
-      .select("id, email, role, created_at, is_active")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Błąd podczas pobierania użytkowników:", error);
+    console.log('🔍 [GET /api/admin/users] Rozpoczynam pobieranie użytkowników...');
+    console.log('🌐 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('🔑 Service Role Key (pierwsze 20 znaków):', process.env.SUPABASE_SERVICE_ROLE_KEY?.substring(0, 20) + '...');
+    
+    // Sprawdź połączenie z bazą
+    console.log('🔌 Testuję połączenie z bazą...');
+    const { data: connectionTest, error: connectionError } = await supabase
+      .from('users')
+      .select('count')
+      .limit(1);
+    
+    if (connectionError) {
+      console.error('❌ Błąd połączenia z bazą:', connectionError);
+      console.error('🔍 Szczegóły błędu:', {
+        code: connectionError.code,
+        message: connectionError.message,
+        details: connectionError.details,
+        hint: connectionError.hint
+      });
       return NextResponse.json(
-        { error: "Błąd podczas pobierania użytkowników" },
+        { 
+          error: "Błąd połączenia z bazą danych",
+          details: connectionError
+        },
         { status: 500 }
       );
     }
+    
+    console.log('✅ Połączenie z bazą OK');
+    
+    // Sprawdź strukturę tabeli users
+    console.log('📋 Sprawdzam strukturę tabeli users...');
+    const { data: tableInfo, error: tableError } = await supabase
+      .rpc('get_table_info', { table_name: 'users' });
+    
+    if (tableError) {
+      console.log('⚠️ Nie mogę pobrać informacji o tabeli (może brakuje funkcji RPC):', tableError.message);
+    } else {
+      console.log('📊 Informacje o tabeli users:', tableInfo);
+    }
+    
+    // Pobierz użytkowników
+    console.log('👥 Pobieram użytkowników z tabeli users...');
+    const { data: users, error } = await supabase
+      .from("users")
+      .select("id, email, role, created_at, is_active, first_name, last_name")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error('❌ Błąd podczas pobierania użytkowników:', error);
+      console.error('🔍 Szczegóły błędu PGRST301:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        fullError: error
+      });
+      
+      // Dodatkowe informacje diagnostyczne
+      console.error('🔍 Możliwe przyczyny PGRST301:');
+      console.error('   - Brak klucza głównego w tabeli users');
+      console.error('   - Nieprawidłowy typ klucza głównego');
+      console.error('   - Problem z uprawnieniami RLS');
+      console.error('   - Nieprawidłowa konfiguracja Supabase');
+      
+      return NextResponse.json(
+        { 
+          error: "Błąd podczas pobierania użytkowników",
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        },
+        { status: 500 }
+      );
+    }
+    
+    console.log(`✅ Pobrano ${users?.length || 0} użytkowników pomyślnie`);
+    if (users && users.length > 0) {
+      console.log('📋 Przykładowi użytkownicy:', users.slice(0, 3).map(u => ({
+        id: u.id,
+        email: u.email,
+        role: u.role,
+        first_name: u.first_name,
+        last_name: u.last_name
+      })));
+    }
+    
     return NextResponse.json({ users: users || [] });
   } catch (error) {
-    console.error("Błąd podczas pobierania użytkowników:", error);
+    console.error('💥 Nieoczekiwany błąd podczas pobierania użytkowników:', error);
+    console.error('🔍 Stack trace:', error instanceof Error ? error.stack : 'Brak stack trace');
     return NextResponse.json(
-      { error: "Błąd podczas pobierania użytkowników" },
+      { 
+        error: "Nieoczekiwany błąd podczas pobierania użytkowników",
+        details: error instanceof Error ? error.message : 'Nieznany błąd'
+      },
       { status: 500 }
     );
   }
