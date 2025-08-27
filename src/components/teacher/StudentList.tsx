@@ -64,7 +64,9 @@ export default function StudentList() {
       })
 
       if (!response.ok) {
-        throw new Error(`Błąd pobierania kursów: ${response.status} ${response.statusText}`)
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.error || `Błąd pobierania kursów: ${response.status} ${response.statusText}`
+        throw new Error(errorMessage)
       }
 
       const coursesData = await response.json()
@@ -123,7 +125,9 @@ export default function StudentList() {
       })
 
       if (!response.ok) {
-        throw new Error(`Błąd pobierania studentów: ${response.status} ${response.statusText}`)
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.error || `Błąd pobierania studentów: ${response.status} ${response.statusText}`
+        throw new Error(errorMessage)
       }
 
       const usersData = await response.json()
@@ -383,18 +387,30 @@ export default function StudentList() {
               </svg>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Brak kursów</h3>
               <p className="text-sm text-gray-600">
-                {error ? error : 'Nie masz jeszcze żadnych aktywnych kursów w systemie WTL.'}
+                {error ? (
+                  <>
+                    <span className="font-medium text-red-600">Błąd WTL API:</span><br />
+                    {error}
+                  </>
+                ) : (
+                  'Nie masz jeszcze żadnych aktywnych kursów w systemie WTL.'
+                )}
               </p>
               {error && (
-                <button
-                  onClick={() => {
-                    setError(null)
-                    fetchTeacherData()
-                  }}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Spróbuj ponownie
-                </button>
+                <div className="mt-4 space-y-2">
+                  <button
+                    onClick={() => {
+                      setError(null)
+                      fetchTeacherData()
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Spróbuj ponownie
+                  </button>
+                  <div className="text-xs text-gray-500">
+                    Jeśli problem się powtarza, skontaktuj się z administratorem systemu.
+                  </div>
+                </div>
               )}
             </div>
           </div>

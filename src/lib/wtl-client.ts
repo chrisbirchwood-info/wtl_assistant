@@ -490,11 +490,35 @@ class WTLClient {
    */
   async get(endpoint: string): Promise<any> {
     try {
-      const response = await this.client.get(endpoint);
-      return response;
+      console.log(`🌐 WTL Client: Wywołuję endpoint: ${endpoint}`)
+      console.log(`🔑 WTL Client: Base URL: ${this.client.defaults.baseURL}`)
+      console.log(`🔑 WTL Client: API Key: ${process.env.WTL_API_KEY ? 'Ustawiony' : 'BRAK!'}`)
+      
+      const response = await this.client.get(endpoint)
+      
+      console.log(`✅ WTL Client: Sukces dla ${endpoint}`, {
+        status: response.status,
+        statusText: response.statusText,
+        dataType: typeof response.data,
+        isArray: Array.isArray(response.data)
+      })
+      
+      return response
     } catch (error: any) {
-      console.error(`Error calling WTL API endpoint ${endpoint}:`, error);
-      throw error;
+      console.error(`❌ WTL Client: Błąd dla ${endpoint}:`, {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      })
+      
+      // Jeśli to błąd HTTP, zwróć response object
+      if (error.response) {
+        return error.response
+      }
+      
+      // Jeśli to inny błąd, rzuć go dalej
+      throw error
     }
   }
 }

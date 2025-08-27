@@ -8,6 +8,17 @@ export async function GET(
   try {
     const { trainingId } = await context.params
     console.log(`👥 Pobieranie studentów dla kursu ${trainingId} z WTL API...`)
+    console.log('🔑 WTL_API_URL:', process.env.WTL_API_URL)
+    console.log('🔑 WTL_API_KEY:', process.env.WTL_API_KEY ? 'Ustawiony' : 'BRAK!')
+
+    // Sprawdź czy mamy klucz API
+    if (!process.env.WTL_API_KEY) {
+      console.error('❌ BRAK WTL_API_KEY w zmiennych środowiskowych!')
+      return NextResponse.json(
+        { error: 'Brak konfiguracji WTL API - skontaktuj się z administratorem' },
+        { status: 500 }
+      )
+    }
 
     // Pobierz parametry z query string
     const { searchParams } = new URL(request.url)
@@ -15,21 +26,38 @@ export async function GET(
     const sort = searchParams.get('sort') || '["id", "ASC"]'
     const filter = searchParams.get('filter') || '[]'
 
+    console.log('🌐 Wywołuję WTL API z parametrami:', { trainingId, range, sort, filter })
+
     // Wywołaj WTL API
     const response = await wtlClient.get(
       `/training/${trainingId}/user/list?range=${range}&sort=${sort}&filter=${filter}`
     )
 
-    if (!response.ok) {
+    console.log('📡 Odpowiedź WTL API:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers ? Object.keys(response.headers) : 'Brak headers'
+    })
+
+    if (response.status >= 400) {
       console.error('❌ Błąd WTL API:', response.status, response.statusText)
       return NextResponse.json(
-        { error: 'Błąd pobierania studentów z WTL API' },
+        { error: `Błąd WTL API: ${response.status} ${response.statusText}` },
         { status: response.status }
       )
     }
 
-    const data = await response.json()
+    const data = response.data
     console.log('📊 Otrzymane dane studentów z WTL API:', typeof data, data)
+
+    // Sprawdź czy dane zawierają błąd
+    if (data && data.error) {
+      console.error('❌ WTL API zwróciło błąd:', data.error)
+      return NextResponse.json(
+        { error: `Błąd WTL API: ${data.error}` },
+        { status: 400 }
+      )
+    }
 
     // Sprawdź czy dane są tablicą
     let users = []
