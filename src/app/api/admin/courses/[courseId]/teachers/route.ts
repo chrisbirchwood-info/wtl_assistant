@@ -16,11 +16,25 @@ export async function GET(
     
     console.log(`👥 Pobieram nauczycieli dla kursu ${courseId}...`)
     
+    // Sprawdź czy kurs istnieje
+    const { data: course, error: courseError } = await supabase
+      .from('courses')
+      .select('id, title')
+      .eq('id', courseId)
+      .single()
+    
+    if (courseError || !course) {
+      return NextResponse.json({
+        success: false,
+        message: 'Kurs nie istnieje'
+      }, { status: 404 })
+    }
+    
     const { data: teachers, error } = await supabase
       .from('course_teachers')
       .select(`
         *,
-        teacher:users(id, email, username, first_name, last_name, role),
+        teacher:users!course_teachers_teacher_id_fkey(id, email, username, first_name, last_name, role),
         assigned_by_user:users!course_teachers_assigned_by_fkey(id, email, username)
       `)
       .eq('course_id', courseId)
