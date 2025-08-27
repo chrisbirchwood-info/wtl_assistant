@@ -10,12 +10,20 @@ interface Course {
   status: string
   max_students: number
   created_at: string
+  wtl_course_id?: string
+  last_sync_at?: string
+  sync_status?: string
 }
 
 interface Student {
   id: string
   email: string
   username?: string
+  first_name?: string
+  last_name?: string
+  status: string
+  last_sync_at?: string
+  sync_status?: string
 }
 
 interface CourseEnrollment {
@@ -26,6 +34,8 @@ interface CourseEnrollment {
   progress_percentage: number
   status: string
   last_activity: string
+  last_sync_at?: string
+  sync_status?: string
 }
 
 export default function StudentList() {
@@ -34,7 +44,9 @@ export default function StudentList() {
   const [enrollments, setEnrollments] = useState<CourseEnrollment[]>([])
   const [selectedCourse, setSelectedCourse] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
 
   useEffect(() => {
     initialize()
@@ -50,13 +62,13 @@ export default function StudentList() {
     fetchTeacherData()
   }, [user, isAuthenticated])
 
-    const fetchTeacherData = async () => {
+  const fetchTeacherData = async () => {
     try {
       setIsLoading(true)
       setError(null)
 
-      // Pobierz kursy z API WTL
-      const response = await fetch('/api/wtl/trainings', {
+      // Pobierz kursy z lokalnej bazy Supabase
+      const response = await fetch('/api/courses/local', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -69,34 +81,37 @@ export default function StudentList() {
         throw new Error(errorMessage)
       }
 
-      const coursesData = await response.json()
+      const result = await response.json()
+      const coursesData = result.courses || []
       
       // Sprawdź czy dane są tablicą
       if (!Array.isArray(coursesData)) {
         console.warn('⚠️ Otrzymane dane kursów nie są tablicą:', coursesData)
         setCourses([])
-        setError('Nieprawidłowa struktura danych z WTL API')
+        setError('Nieprawidłowa struktura danych z lokalnej bazy')
         setIsLoading(false)
         return
       }
       
       // Sprawdź czy są jakieś kursy
       if (coursesData.length === 0) {
-        console.log('ℹ️ Brak kursów w WTL API')
+        console.log('ℹ️ Brak kursów w lokalnej bazie')
         setCourses([])
         setIsLoading(false)
         return
       }
 
-      // Mapuj dane z WTL API na nasz format
+      // Mapuj dane z lokalnej bazy na nasz format
       const mappedCourses = coursesData.map((course: any) => ({
         id: course.id,
-        title: course.name,
+        title: course.title,
         description: course.description || '',
-        status: 'active',
-        max_students: 50,
-        created_at: new Date().toISOString(),
-        wtl_course_id: course.id
+        status: course.status || 'active',
+        max_students: course.max_students || 50,
+        created_at: course.created_at || new Date().toISOString(),
+        wtl_course_id: course.wtl_course_id,
+        last_sync_at: course.last_sync_at,
+        sync_status: course.sync_status
       }))
 
       setCourses(mappedCourses)
@@ -116,8 +131,8 @@ export default function StudentList() {
 
   const fetchEnrollments = async (courseId: string) => {
     try {
-      // Pobierz studentów z API WTL dla konkretnego kursu
-      const response = await fetch(`/api/wtl/training/${courseId}/users`, {
+      // Pobierz studentów z lokalnej bazy dla konkretnego kursu
+      const response = await fetch(`/api/courses/${courseId}/students/local`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -130,26 +145,27 @@ export default function StudentList() {
         throw new Error(errorMessage)
       }
 
-      const usersData = await response.json()
+      const result = await response.json()
+      const enrollmentsData = result.students || []
       
       // Sprawdź czy dane są tablicą
-      if (!Array.isArray(usersData)) {
-        console.warn('⚠️ Otrzymane dane studentów nie są tablicą:', usersData)
+      if (!Array.isArray(enrollmentsData)) {
+        console.warn('⚠️ Otrzymane dane studentów nie są tablicą:', enrollmentsData)
         setEnrollments([])
-        setError('Nieprawidłowa struktura danych studentów z WTL API')
+        setError('Nieprawidłowa struktura danych studentów z lokalnej bazy')
         return
       }
       
       // Sprawdź czy są jacyś studenci
-      if (usersData.length === 0) {
+      if (enrollmentsData.length === 0) {
         console.log('ℹ️ Brak studentów w kursie')
         setEnrollments([])
         return
       }
       
-      // Mapuj dane z WTL API na nasz format
-      const mappedEnrollments = usersData.map((user: any) => ({
-        id: user.id,
+      // Mapuj dane z lokalnej bazy na nasz format
+      const mappedEnrollments = enrollmentsData.map((enrollment: any) => ({
+        id: enrollment.id,
         course: courses.find(c => c.id === courseId) || {
           id: courseId,
           title: 'Nieznany kurs',
@@ -159,14 +175,21 @@ export default function StudentList() {
           created_at: new Date().toISOString()
         },
         student: {
-          id: user.id,
-          email: user.email || 'brak@email.com',
-          username: user.name || user.first_name || 'Student ' + user.id
+          id: enrollment.student?.id || enrollment.id,
+          email: enrollment.student?.email || 'brak@email.com',
+          username: enrollment.student?.username || enrollment.student?.first_name || 'Student ' + (enrollment.student?.id || enrollment.id),
+          first_name: enrollment.student?.first_name,
+          last_name: enrollment.student?.last_name,
+          status: enrollment.student?.status || 'active',
+          last_sync_at: enrollment.student?.last_sync_at,
+          sync_status: enrollment.student?.sync_status
         },
-        enrollment_date: new Date().toISOString(), // WTL API nie zwraca tej informacji
-        progress_percentage: Math.floor(Math.random() * 100), // Tymczasowo losowy postęp
-        status: 'enrolled',
-        last_activity: new Date().toISOString() // WTL API nie zwraca tej informacji
+        enrollment_date: enrollment.enrollment_date || new Date().toISOString(),
+        progress_percentage: enrollment.progress_percentage || 0,
+        status: enrollment.status || 'enrolled',
+        last_activity: enrollment.last_activity || new Date().toISOString(),
+        last_sync_at: enrollment.last_sync_at,
+        sync_status: enrollment.sync_status
       }))
 
       setEnrollments(mappedEnrollments)
@@ -180,6 +203,76 @@ export default function StudentList() {
   const handleCourseChange = async (courseId: string) => {
     setSelectedCourse(courseId)
     await fetchEnrollments(courseId)
+  }
+
+  const syncCourses = async () => {
+    try {
+      setIsSyncing(true)
+      setError(null)
+
+      console.log('🔄 Rozpoczynam synchronizację kursów z WTL...')
+      
+      const response = await fetch('/api/courses/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.error || `Błąd synchronizacji: ${response.status} ${response.statusText}`
+        throw new Error(errorMessage)
+      }
+
+      const result = await response.json()
+      console.log('✅ Synchronizacja zakończona:', result)
+      
+      setLastSyncTime(new Date().toISOString())
+      
+      // Odśwież dane po synchronizacji
+      await fetchTeacherData()
+      
+    } catch (err) {
+      console.error('Error syncing courses:', err)
+      setError(err instanceof Error ? err.message : 'Wystąpił błąd podczas synchronizacji')
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
+  const syncCourseStudents = async (courseId: string) => {
+    try {
+      setIsSyncing(true)
+      setError(null)
+
+      console.log(`🔄 Synchronizuję studentów dla kursu ${courseId}...`)
+      
+      const response = await fetch(`/api/courses/${courseId}/students/local`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.error || `Błąd synchronizacji studentów: ${response.status} ${response.statusText}`
+        throw new Error(errorMessage)
+      }
+
+      const result = await response.json()
+      console.log('✅ Synchronizacja studentów zakończona:', result)
+      
+      // Odśwież dane po synchronizacji
+      await fetchEnrollments(courseId)
+      
+    } catch (err) {
+      console.error('Error syncing course students:', err)
+      setError(err instanceof Error ? err.message : 'Wystąpił błąd podczas synchronizacji studentów')
+    } finally {
+      setIsSyncing(false)
+    }
   }
 
   const getStatusColor = (status: string) => {
@@ -199,6 +292,19 @@ export default function StudentList() {
     if (progress >= 80) return 'text-green-600'
     if (progress >= 50) return 'text-yellow-600'
     return 'text-red-600'
+  }
+
+  const getSyncStatusColor = (syncStatus?: string) => {
+    switch (syncStatus) {
+      case 'synced':
+        return 'bg-green-100 text-green-800'
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'error':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
   }
 
   if (isLoading) {
@@ -251,9 +357,59 @@ export default function StudentList() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Zarządzanie studentami</h1>
           <p className="mt-2 text-gray-600">Przeglądaj listę studentów zapisanych na Twoje kursy</p>
-          <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            🌐 Dane z Web to Learn API
+          <div className="mt-2 flex items-center space-x-2">
+            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              🗄️ Lokalna baza Supabase
+            </div>
+            {lastSyncTime && (
+              <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                🔄 Ostatnia synchronizacja: {new Date(lastSyncTime).toLocaleString('pl-PL')}
+              </div>
+            )}
           </div>
+        </div>
+
+        {/* Przyciski synchronizacji */}
+        <div className="mb-6 flex space-x-4">
+          <button
+            onClick={syncCourses}
+            disabled={isSyncing}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              isSyncing
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
+            } text-white`}
+          >
+            {isSyncing ? (
+              <>
+                <span className="animate-spin mr-2">⟳</span>
+                Synchronizuję...
+              </>
+            ) : (
+              '🔄 Synchronizuj kursy z WTL'
+            )}
+          </button>
+          
+          {selectedCourse && (
+            <button
+              onClick={() => syncCourseStudents(selectedCourse)}
+              disabled={isSyncing}
+              className={`px-4 py-2 rounded-lg font-medium ${
+                isSyncing
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-green-600 hover:bg-green-700'
+              } text-white`}
+            >
+              {isSyncing ? (
+                <>
+                  <span className="animate-spin mr-2">⟳</span>
+                  Synchronizuję...
+                </>
+              ) : (
+                '👥 Synchronizuj studentów kursu'
+              )}
+            </button>
+          )}
         </div>
 
         {/* Wybór kursu */}
@@ -271,6 +427,7 @@ export default function StudentList() {
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>
                   {course.title}
+                  {course.sync_status && ` (${course.sync_status})`}
                 </option>
               ))}
             </select>
@@ -285,7 +442,7 @@ export default function StudentList() {
                 Studenci zapisani na kurs ({enrollments.length})
               </h3>
               <p className="mt-1 text-sm text-gray-500">
-                Postęp i daty są szacowane - WTL API nie dostarcza tych informacji
+                Dane z lokalnej bazy danych - zsynchronizowane z WTL API
               </p>
             </div>
             
@@ -307,6 +464,9 @@ export default function StudentList() {
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Ostatnia aktywność
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status sync
                     </th>
                   </tr>
                 </thead>
@@ -361,6 +521,13 @@ export default function StudentList() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(enrollment.last_activity).toLocaleDateString('pl-PL')}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSyncStatusColor(enrollment.sync_status)}`}>
+                          {enrollment.sync_status === 'synced' ? 'Zsynchronizowany' :
+                           enrollment.sync_status === 'pending' ? 'Oczekujący' :
+                           enrollment.sync_status === 'error' ? 'Błąd' : 'Nieznany'}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -377,6 +544,13 @@ export default function StudentList() {
               <p className="text-sm text-gray-600">
                 Na ten kurs nie jest jeszcze zapisany żaden student.
               </p>
+              <button
+                onClick={() => syncCourseStudents(selectedCourse)}
+                disabled={isSyncing}
+                className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+              >
+                🔄 Synchronizuj studentów z WTL
+              </button>
             </div>
           </div>
         ) : courses.length === 0 ? (
@@ -389,33 +563,40 @@ export default function StudentList() {
               <p className="text-sm text-gray-600">
                 {error ? (
                   <>
-                    <span className="font-medium text-red-600">Błąd WTL API:</span><br />
+                    <span className="font-medium text-red-600">Błąd lokalnej bazy:</span><br />
                     {error}
                   </>
                 ) : (
-                  'Nie masz jeszcze żadnych aktywnych kursów w systemie WTL.'
+                  'Nie masz jeszcze żadnych aktywnych kursów w lokalnej bazie danych.'
                 )}
               </p>
-              {error && (
-                <div className="mt-4 space-y-2">
+              <div className="mt-4 space-y-2">
+                <button
+                  onClick={syncCourses}
+                  disabled={isSyncing}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                >
+                  🔄 Synchronizuj kursy z WTL
+                </button>
+                {error && (
                   <button
                     onClick={() => {
                       setError(null)
                       fetchTeacherData()
                     }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="block w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
                   >
                     Spróbuj ponownie
                   </button>
-                  <div className="text-xs text-gray-500">
-                    Jeśli problem się powtarza, skontaktuj się z administratorem systemu.
-                  </div>
+                )}
+                <div className="text-xs text-gray-500">
+                  Jeśli problem się powtarza, skontaktuj się z administratorem systemu.
                 </div>
-              )}
+              </div>
             </div>
           </div>
         ) : null}
       </div>
     </div>
-     )
- }
+  )
+}
