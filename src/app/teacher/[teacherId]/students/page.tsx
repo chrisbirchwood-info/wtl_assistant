@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/auth-store'
+import { useParams } from 'next/navigation'
 
 interface Course {
   id: string
@@ -40,8 +41,11 @@ interface CourseEnrollment {
   sync_status?: string
 }
 
-export default function StudentList() {
+export default function TeacherStudentsPage() {
   const { user, isAuthenticated, initialize } = useAuthStore()
+  const params = useParams()
+  const teacherId = params.teacherId as string
+  
   const [courses, setCourses] = useState<Course[]>([])
   const [enrollments, setEnrollments] = useState<CourseEnrollment[]>([])
   const [selectedCourse, setSelectedCourse] = useState<string>('')
@@ -55,14 +59,24 @@ export default function StudentList() {
   }, [initialize])
 
   useEffect(() => {
-    if (!user || !isAuthenticated || user.role !== 'teacher') {
+    if (!user || !isAuthenticated) return
+
+    // Sprawdź czy użytkownik ma dostęp do tego widoku
+    if (user.role !== 'teacher' && user.role !== 'superadmin') {
       setError('Dostęp tylko dla nauczycieli')
       setIsLoading(false)
       return
     }
 
+    // Sprawdź czy nauczyciel przegląda swoje dane (lub superadmin może wszystko)
+    if (user.role === 'teacher' && user.id !== teacherId) {
+      setError('Możesz przeglądać tylko swoje dane')
+      setIsLoading(false)
+      return
+    }
+
     fetchTeacherData()
-  }, [user, isAuthenticated])
+  }, [user, isAuthenticated, teacherId])
 
   const fetchTeacherData = async () => {
     try {
@@ -70,7 +84,7 @@ export default function StudentList() {
       setError(null)
 
       // Pobierz kursy z lokalnej bazy Supabase (tylko dla tego nauczyciela)
-      const response = await fetch(`/api/courses/local?teacherId=${user?.id}`, {
+      const response = await fetch(`/api/courses/local?teacherId=${teacherId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -298,16 +312,16 @@ export default function StudentList() {
     return 'text-red-600'
   }
 
-  const getSyncStatusColor = (syncStatus?: string) => {
-    switch (syncStatus) {
-      case 'synced':
-        return 'bg-green-100 text-green-800'
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'error':
-        return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
+  const handleViewLessons = (courseId: string, studentId: string) => {
+    // Przejdź do strony z lekcjami dla konkretnego studenta i kursu
+    const course = courses.find(c => c.id === courseId)
+    const student = enrollments.find(e => e.student.id === studentId)?.student
+    
+    if (course && student) {
+      console.log(`📚 Przechodzę do lekcji dla studenta ${student.email} w kursie ${course.title}`)
+      
+      // Przejdź do strony z lekcjami używając nowego URL
+      window.location.href = `/teacher/${teacherId}/students/${studentId}?courseId=${courseId}`
     }
   }
 
@@ -354,7 +368,7 @@ export default function StudentList() {
     )
   }
 
-  if (user?.role !== 'teacher') {
+  if (user?.role !== 'teacher' && user?.role !== 'superadmin') {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -488,7 +502,7 @@ export default function StudentList() {
                       Ostatnia aktywność
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status sync
+                      Akcje
                     </th>
                   </tr>
                 </thead>
@@ -543,12 +557,17 @@ export default function StudentList() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(enrollment.last_activity).toLocaleDateString('pl-PL')}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSyncStatusColor(enrollment.sync_status)}`}>
-                          {enrollment.sync_status === 'synced' ? 'Zsynchronizowany' :
-                           enrollment.sync_status === 'pending' ? 'Oczekujący' :
-                           enrollment.sync_status === 'error' ? 'Błąd' : 'Nieznany'}
-                        </span>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => handleViewLessons(enrollment.course.id, enrollment.student.id)}
+                          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                          title="Zobacz lekcje dla tego studenta"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 5.477 5.754 5 7.5 5s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.523 18.246 19 16.5 19c-1.746 0-3.332-.477-4.5-1.253" />
+                          </svg>
+                          Lekcje
+                        </button>
                       </td>
                     </tr>
                   ))}

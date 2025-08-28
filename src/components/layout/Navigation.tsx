@@ -25,6 +25,16 @@ export default function Navigation() {
     { name: 'Mój profil', href: '/profile', current: pathname === '/profile' },
   ]
 
+  // Dodaj link do lekcji TYLKO dla studentów
+  if (user.role && user.role === 'student') {
+    console.log('🔒 Navigation: User has student role, showing "Moje lekcje" link')
+    navigation.push({ 
+      name: 'Moje lekcje', 
+      href: '/wtl', // Przejdź do dashboard gdzie może wybrać kurs
+      current: pathname.startsWith('/lessons') 
+    })
+  }
+
   // Dodaj link do zarządzania studentami TYLKO dla nauczycieli
   // Dodatkowe sprawdzenie czy rola jest zdefiniowana i równa 'teacher'
   // Dodatkowe zabezpieczenie: upewnij się, że rola jest rzeczywiście 'teacher' w bazie
@@ -32,8 +42,8 @@ export default function Navigation() {
     console.log('🔒 Navigation: User has teacher role, showing "Moi studenci" link')
     navigation.push({ 
       name: 'Moi studenci', 
-      href: '/teacher/students', 
-      current: pathname === '/teacher/students' 
+      href: `/teacher/${user.id}/students`, 
+      current: pathname.startsWith('/teacher/') && pathname.includes('/students') 
     })
   } else {
     console.log('🔒 Navigation: User does NOT have teacher role, hiding "Moi studenci" link')
