@@ -145,6 +145,16 @@ export default function AdminCoursesPage() {
         setError('Wybierz nauczyciela i kurs')
         return
       }
+      
+      // Sprawdź czy user ma prawidłowe ID
+      if (!user?.id) {
+        setError('Błąd autoryzacji: brak ID użytkownika')
+        return
+      }
+      
+      // Debug: wyświetl ID użytkownika
+      console.log('🔍 Debug - User ID:', user.id)
+      console.log('🔍 Debug - User object:', user)
 
       const response = await fetch(`/api/admin/courses/${selectedCourse}/teachers`, {
         method: 'POST',

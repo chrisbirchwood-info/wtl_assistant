@@ -107,6 +107,22 @@ export async function POST(
       }, { status: 400 })
     }
     
+    // Sprawdź czy użytkownik assignedBy istnieje (jeśli podano)
+    if (assignedBy) {
+      const { data: assignedByUser, error: assignedByError } = await supabase
+        .from('users')
+        .select('id, email, username')
+        .eq('id', assignedBy)
+        .single()
+      
+      if (assignedByError || !assignedByUser) {
+        return NextResponse.json({
+          success: false,
+          message: 'Użytkownik przypisujący nie istnieje'
+        }, { status: 400 })
+      }
+    }
+    
     // Sprawdź czy przypisanie już istnieje
     const { data: existingAssignment } = await supabase
       .from('course_teachers')
@@ -135,7 +151,7 @@ export async function POST(
       })
       .select(`
         *,
-        teacher:users(id, email, username, first_name, last_name)
+        teacher:users!course_teachers_teacher_id_fkey(id, email, username, first_name, last_name)
       `)
       .single()
     
