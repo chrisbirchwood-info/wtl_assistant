@@ -123,23 +123,57 @@ export async function POST(
       }
     }
     
-    // Sprawdź czy przypisanie już istnieje
+    // Sprawdź czy przypisanie już istnieje (aktywne lub nieaktywne)
     const { data: existingAssignment } = await supabase
       .from('course_teachers')
-      .select('id')
+      .select('id, is_active')
       .eq('course_id', courseId)
       .eq('teacher_id', teacherId)
-      .eq('is_active', true)
       .single()
     
     if (existingAssignment) {
-      return NextResponse.json({
-        success: false,
-        message: 'Nauczyciel jest już przypisany do tego kursu'
-      }, { status: 400 })
+      if (existingAssignment.is_active) {
+        return NextResponse.json({
+          success: false,
+          message: 'Nauczyciel jest już przypisany do tego kursu'
+        }, { status: 400 })
+      } else {
+        // Reaktywuj istniejące przypisanie
+        const { data: assignment, error: assignmentError } = await supabase
+          .from('course_teachers')
+          .update({
+            role,
+            assigned_by: assignedBy,
+            is_active: true,
+            assigned_at: new Date().toISOString()
+          })
+          .eq('id', existingAssignment.id)
+          .select(`
+            *,
+            teacher:users!course_teachers_teacher_id_fkey(id, email, username, first_name, last_name)
+          `)
+          .single()
+        
+        if (assignmentError) {
+          console.error('❌ Błąd reaktywowania przypisania:', assignmentError)
+          return NextResponse.json({
+            success: false,
+            message: 'Wystąpił błąd podczas przypisywania nauczyciela',
+            error: assignmentError.message
+          }, { status: 500 })
+        }
+        
+        console.log(`✅ Nauczyciel ${teacher.email} został ponownie przypisany do kursu ${course.title}`)
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Nauczyciel został przypisany do kursu',
+          assignment
+        })
+      }
     }
     
-    // Utwórz przypisanie
+    // Utwórz nowe przypisanie
     const { data: assignment, error: assignmentError } = await supabase
       .from('course_teachers')
       .insert({
