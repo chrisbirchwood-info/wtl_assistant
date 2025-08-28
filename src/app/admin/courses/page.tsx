@@ -152,9 +152,8 @@ export default function AdminCoursesPage() {
         return
       }
       
-      // Debug: wyświetl ID użytkownika
+      // Debug: wyświetl ID użytkownika (opcjonalne)
       console.log('🔍 Debug - User ID:', user.id)
-      console.log('🔍 Debug - User object:', user)
 
       const response = await fetch(`/api/admin/courses/${selectedCourse}/teachers`, {
         method: 'POST',
@@ -162,7 +161,7 @@ export default function AdminCoursesPage() {
         body: JSON.stringify({
           teacherId: selectedTeacherId,
           role: selectedRole,
-          assignedBy: user?.id
+          assignedBy: user.id // user.id jest już zwalidowane
         })
       })
 
