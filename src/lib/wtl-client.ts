@@ -40,8 +40,9 @@ class WTLClient {
   private client: AxiosInstance;
 
   constructor() {
-    // Prawdziwy URL WTL API
-    const baseURL = process.env.WTL_API_URL || "https://teachm3.elms.pl/api/v1";
+    // Prawdziwy URL WTL API (bez końcowego /)
+    const rawBase = process.env.WTL_API_URL || "https://teachm3.elms.pl/api/v1";
+    const baseURL = rawBase.replace(/\/+$/, "");
 
     console.log("WTL Client initialized with baseURL:", baseURL);
 
@@ -488,13 +489,13 @@ class WTLClient {
   /**
    * Generyczna metoda do wywoływania dowolnych endpointów WTL API
    */
-  async get(endpoint: string): Promise<any> {
+  async get(endpoint: string, config?: any): Promise<any> {
     try {
       console.log(`🌐 WTL Client: Wywołuję endpoint: ${endpoint}`)
       console.log(`🔑 WTL Client: Base URL: ${this.client.defaults.baseURL}`)
       console.log(`🔑 WTL Client: API Key: ${process.env.WTL_API_KEY ? 'Ustawiony' : 'BRAK!'}`)
       
-      const response = await this.client.get(endpoint)
+      const response = await this.client.get(endpoint, config)
       
       console.log(`✅ WTL Client: Sukces dla ${endpoint}`, {
         status: response.status,
