@@ -126,7 +126,18 @@ export default function AdminCoursesPage() {
       if (!response.ok) throw new Error('Błąd synchronizacji kursów')
 
       const result = await response.json()
-      setSuccessMessage('Kursy zostały zsynchronizowane z WTL')
+      
+      // Utwórz szczegółowy komunikat sukcesu
+      let message = 'Kursy zostały zsynchronizowane z WTL'
+      if (result.result?.lessons) {
+        const lessons = result.result.lessons
+        message += `\n\n📚 Lekcje: ${lessons.created} zsynchronizowanych`
+        if (lessons.errors > 0) {
+          message += `, ${lessons.errors} błędów`
+        }
+      }
+      
+      setSuccessMessage(message)
       
       // Odśwież dane
       await fetchData()
@@ -310,7 +321,9 @@ export default function AdminCoursesPage() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-green-800">{successMessage}</p>
+                  <div className="text-sm font-medium text-green-800 whitespace-pre-line">
+                    {successMessage}
+                  </div>
                 </div>
                 <div className="ml-auto pl-3">
                   <button

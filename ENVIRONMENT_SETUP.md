@@ -117,3 +117,4 @@ npm run env:status          # Pokaż status
 npm run dev:local           # Dev z lokalną bazą
 npm run dev:prod            # Dev z zdalną bazą
 ```
+

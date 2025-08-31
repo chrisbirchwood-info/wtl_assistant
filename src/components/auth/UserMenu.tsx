@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function UserMenu() {
   const { user, isAuthenticated, logout, initialize } = useAuthStore()
@@ -45,21 +46,21 @@ export default function UserMenu() {
             <p className="text-gray-500">{user.email}</p>
           </div>
           
-          <a
+          <Link
             href="/profile"
             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
           >
             Mój profil
-          </a>
+          </Link>
           
           {/* Link do zarządzania studentami dla nauczycieli */}
           {user.role === 'teacher' && (
-            <a
-              href="/teacher/students"
+            <Link
+              href={`/teacher/${user.id}/students`}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
             >
               Moi studenci
-            </a>
+            </Link>
           )}
           
           <button

@@ -31,92 +31,191 @@ const getAllMockLessons = () => {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
+    const courseId = searchParams.get('courseId')
     const trainingId = searchParams.get('trainingId')
 
-    console.log('Fetching lessons from WTL API...', trainingId ? `for training ${trainingId}` : 'all lessons')
+    console.log('Fetching lessons...', courseId ? `for course ${courseId}` : trainingId ? `for training ${trainingId}` : 'all lessons')
 
-    // Najpierw spróbuj WTL API (prawdziwe dane)
+    // Najpierw spróbuj pobrać z bazy danych (jeśli mamy courseId)
+    if (courseId) {
+      const { data: dbLessons, error: dbError } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('course_id', courseId)
+        .eq('status', 'active')
+        .order('order_number', { ascending: true })
+
+      if (!dbError && dbLessons && dbLessons.length > 0) {
+        console.log('Using lessons from database:', dbLessons.length, 'lessons')
+        return NextResponse.json({
+          success: true,
+          lessons: dbLessons,
+          source: 'database',
+          message: 'Lessons loaded from database'
+        })
+      }
+    }
+
+    // Jeśli nie ma lekcji w bazie, spróbuj WTL API
     const wtlResponse = await wtlClient.getLessons(trainingId || undefined)
     if (wtlResponse.success && wtlResponse.data && wtlResponse.data.length > 0) {
       console.log('Successfully fetched from WTL API:', wtlResponse.data.length, 'lessons')
       
-      // Opcjonalnie cache w Supabase
-      try {
-        const lessonsToCache = wtlResponse.data.map((lesson: any) => ({
-          training_id: lesson.training_id || lesson.trainingId || trainingId || '1',
-          name: lesson.name || lesson.title || 'Unnamed Lesson',
-          description: lesson.description || lesson.summary,
-          order: lesson.order || lesson.position || 1,
-          duration: lesson.duration || lesson.time,
-          type: lesson.type || 'content',
-          status: lesson.status || 'published',
-          wtl_lesson_id: lesson.id || lesson.lesson_id,
-          created_at: lesson.created_at || lesson.createdAt || new Date().toISOString(),
-          updated_at: lesson.updated_at || lesson.updatedAt || new Date().toISOString()
-        }))
+      // Synchronizuj lekcje z WTL do bazy danych
+      if (courseId) {
+        try {
+          const lessonsToSync = wtlResponse.data.map((lesson: any) => {
+            // Mapuj różne możliwe pola z WTL API
+            const lessonId = lesson.id || lesson.lesson_id || lesson.lessonId
+            const lessonTitle = lesson.title || lesson.name || lesson.lesson_name
+            const lessonDescription = lesson.description || lesson.summary || lesson.content_summary
+            const lessonContent = lesson.content || lesson.lesson_content || lesson.text || ''
+            const lessonOrder = lesson.order_number || lesson.order || lesson.position || lesson.sequence || 1
+            
+            return {
+              wtl_lesson_id: lessonId.toString(),
+              course_id: courseId,
+              title: lessonTitle,
+              description: lessonDescription || null,
+              content: lessonContent || null,
+              order_number: lessonOrder,
+              status: 'active'
+            }
+          })
 
-        await supabase
-          .from('lessons')
-          .upsert(lessonsToCache, { onConflict: 'wtl_lesson_id' })
-        
-        console.log('Cached lessons in Supabase')
-      } catch (cacheError) {
-        console.log('Failed to cache lessons in Supabase:', cacheError)
+          const { error: syncError } = await supabase
+            .from('lessons')
+            .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id' })
+
+          if (syncError) {
+            console.log('Failed to sync lessons to database:', syncError)
+          } else {
+            console.log('Synced lessons to database')
+          }
+        } catch (syncError) {
+          console.log('Failed to sync lessons to database:', syncError)
+        }
       }
 
       return NextResponse.json({
         success: true,
-        data: wtlResponse.data,
+        lessons: wtlResponse.data,
         source: 'wtl',
         message: 'Lessons loaded from Web To Learn API'
       })
     }
 
-    console.log('WTL API failed, trying Supabase cache...')
+    console.log('WTL API failed, using mock data')
 
-    // Jeśli WTL nie działa, spróbuj cache z Supabase
-    let query = supabase.from('lessons').select('*').order('order', { ascending: true })
-    
-    if (trainingId) {
-      query = query.eq('training_id', trainingId)
-    }
-
-    const { data: lessons } = await query
-
-    if (lessons && lessons.length > 0) {
-      console.log('Using cached lessons from Supabase:', lessons.length, 'lessons')
-      return NextResponse.json({
-        success: true,
-        data: lessons,
-        source: 'supabase',
-        message: 'Lessons loaded from cache'
-      })
-    }
-
-    console.log('No cached lessons, using mock data')
-
-    // Fallback do mock danych (filter by trainingId if provided)
-    const filteredLessons = trainingId 
-      ? mockLessonsData[trainingId] || []
-      : getAllMockLessons()
+    // Fallback do mock danych
+    const mockLessons = courseId ? mockLessonsData[courseId] || [] : getAllMockLessons()
 
     return NextResponse.json({
       success: true,
-      data: filteredLessons,
+      lessons: mockLessons,
       source: 'mock',
-      message: `Using demo lessons for training ${trainingId || 'all'} - WTL API not available`
+      message: `Using demo lessons - WTL API not available`
     })
 
   } catch (error) {
     console.error('Lessons API error:', error)
     const { searchParams } = new URL(request.url)
-    const trainingId = searchParams.get('trainingId')
+    const courseId = searchParams.get('courseId')
     
     return NextResponse.json({
       success: true,
-      data: trainingId ? mockLessonsData[trainingId] || [] : getAllMockLessons(),
+      lessons: courseId ? mockLessonsData[courseId] || [] : getAllMockLessons(),
       source: 'mock',
       message: 'Error occurred, using demo lessons'
     })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const courseId = searchParams.get('courseId')
+    
+    if (!courseId) {
+      return NextResponse.json(
+        { error: 'Brak courseId w parametrach' },
+        { status: 400 }
+      )
+    }
+
+    console.log('Synchronizing lessons for course:', courseId)
+
+    // Pobierz lekcje z WTL API
+    const wtlResponse = await wtlClient.getLessons(courseId)
+    if (!wtlResponse.success || !wtlResponse.data) {
+      return NextResponse.json(
+        { error: 'Nie udało się pobrać lekcji z WTL API' },
+        { status: 500 }
+      )
+    }
+
+    // Synchronizuj lekcje do bazy danych
+    const lessonsToSync = wtlResponse.data.map((lesson: any) => {
+      // Mapuj różne możliwe pola z WTL API
+      const lessonId = lesson.id || lesson.lesson_id || lesson.lessonId
+      const lessonTitle = lesson.title || lesson.name || lesson.lesson_name
+      const lessonDescription = lesson.description || lesson.summary || lesson.content_summary
+      const lessonContent = lesson.content || lesson.lesson_content || lesson.text || ''
+      const lessonOrder = lesson.order_number || lesson.order || lesson.position || lesson.sequence || 1
+      
+      return {
+        wtl_lesson_id: lessonId.toString(),
+        course_id: courseId,
+        title: lessonTitle,
+        description: lessonDescription || null,
+        content: lessonContent || null,
+        order_number: lessonOrder,
+        status: 'active'
+      }
+    })
+
+    const { error: syncError } = await supabase
+      .from('lessons')
+      .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id' })
+
+    if (syncError) {
+      console.error('Failed to sync lessons to database:', syncError)
+      return NextResponse.json(
+        { error: 'Błąd synchronizacji lekcji do bazy danych' },
+        { status: 500 }
+      )
+    }
+
+    console.log('Successfully synced lessons to database')
+
+    // Pobierz zsynchronizowane lekcje z bazy
+    const { data: syncedLessons, error: fetchError } = await supabase
+      .from('lessons')
+      .select('*')
+      .eq('course_id', courseId)
+      .eq('status', 'active')
+      .order('order_number', { ascending: true })
+
+    if (fetchError) {
+      console.error('Failed to fetch synced lessons:', fetchError)
+      return NextResponse.json(
+        { error: 'Błąd pobierania zsynchronizowanych lekcji' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      lessons: syncedLessons || [],
+      message: `Synchronized ${lessonsToSync.length} lessons from WTL API`,
+      synced_count: lessonsToSync.length
+    })
+
+  } catch (error) {
+    console.error('Lesson sync error:', error)
+    return NextResponse.json(
+      { error: 'Wystąpił nieoczekiwany błąd podczas synchronizacji' },
+      { status: 500 }
+    )
   }
 }

@@ -35,6 +35,13 @@ export default function Navigation() {
     })
   }
 
+  // Dodaj link do notatek dla wszystkich zalogowanych użytkowników
+  navigation.push({ 
+    name: '📝 Notatki', 
+    href: '/notes', 
+    current: pathname === '/notes' 
+  })
+
   // Dodaj link do zarządzania studentami TYLKO dla nauczycieli
   // Dodatkowe sprawdzenie czy rola jest zdefiniowana i równa 'teacher'
   // Dodatkowe zabezpieczenie: upewnij się, że rola jest rzeczywiście 'teacher' w bazie

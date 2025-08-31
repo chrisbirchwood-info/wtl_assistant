@@ -14,42 +14,33 @@ export async function GET(
   try {
     const { id } = await context.params;
     
-         // Sprawdź czy użytkownik w ogóle istnieje (bez filtrowania po roli)
-     const { data: allUsers, error: allUsersError } = await supabase
-       .from("users")
-       .select("id, email, username, first_name, last_name, role, is_active, created_at, wtl_last_sync, wtl_sync_status")
+         // Sprawdź czy student istnieje w tabeli students
+     const { data: allStudents, error: allStudentsError } = await supabase
+       .from("students")
+       .select("id, email, username, first_name, last_name, status, created_at, updated_at, last_sync_at, sync_status, wtl_student_id")
        .eq("id", id);
      
-     if (allUsersError) {
-       console.error("❌ Błąd sprawdzania istnienia użytkownika:", allUsersError);
+     if (allStudentsError) {
+       console.error("❌ Błąd sprawdzania istnienia studenta:", allStudentsError);
        return NextResponse.json(
-         { error: "Błąd sprawdzania istnienia użytkownika" },
+         { error: "Błąd sprawdzania istnienia studenta" },
          { status: 500 }
        );
      }
      
-     if (!allUsers || allUsers.length === 0) {
-       console.error("❌ Użytkownik o ID", id, "nie istnieje w bazie");
+     if (!allStudents || allStudents.length === 0) {
+       console.error("❌ Student o ID", id, "nie istnieje w bazie");
        return NextResponse.json(
-         { error: "Użytkownik nie istnieje" },
+         { error: "Student nie istnieje" },
          { status: 404 }
        );
      }
      
-     const foundUser = allUsers[0];
-     console.log("🔍 Znaleziony użytkownik:", foundUser.email, "z rolą:", foundUser.role);
+     const foundStudent = allStudents[0];
+     console.log("🔍 Znaleziony student:", foundStudent.email);
      
-     // Sprawdź czy ma rolę studenta
-     if (foundUser.role !== 'student') {
-       console.error("❌ Użytkownik", foundUser.email, "ma rolę", foundUser.role, "nie student");
-       return NextResponse.json(
-         { error: `Użytkownik ma rolę ${foundUser.role}, nie student` },
-         { status: 403 }
-       );
-     }
-     
-          console.log("✅ Pobrano dane studenta:", foundUser.email);
-     return NextResponse.json({ user: foundUser });
+     console.log("✅ Pobrano dane studenta:", foundStudent.email);
+     return NextResponse.json({ user: foundStudent });
 
   } catch (error) {
     console.error("❌ Błąd podczas pobierania studenta:", error);

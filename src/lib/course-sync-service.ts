@@ -38,6 +38,11 @@ export interface SyncResult {
     updated: number
     errors: number
   }
+  lessons: {
+    created: number
+    updated: number
+    errors: number
+  }
   errors: string[]
 }
 
@@ -51,6 +56,7 @@ export class CourseSyncService {
       courses: { created: 0, updated: 0, errors: 0 },
       students: { created: 0, updated: 0, errors: 0 },
       enrollments: { created: 0, updated: 0, errors: 0 },
+      lessons: { created: 0, updated: 0, errors: 0 },
       errors: []
     }
 
@@ -70,7 +76,7 @@ export class CourseSyncService {
       // Synchronizuj każdy kurs
       for (const wtlCourse of wtlCourses) {
         try {
-          await this.syncCourse(wtlCourse)
+          await this.syncCourse(wtlCourse, result)
           result.courses.created++
         } catch (error) {
           console.error(`❌ Błąd synchronizacji kursu ${wtlCourse.id}:`, error)
@@ -93,7 +99,7 @@ export class CourseSyncService {
   /**
    * Synchronizuje pojedynczy kurs
    */
-  private async syncCourse(wtlCourse: WTLTraining): Promise<void> {
+  private async syncCourse(wtlCourse: WTLTraining, result: SyncResult): Promise<void> {
     // Sprawdź czy kurs już istnieje
     const { data: existingCourse } = await supabase
       .from('courses')
@@ -133,8 +139,81 @@ export class CourseSyncService {
       console.log(`✅ Utworzono nowy kurs: ${wtlCourse.name}`)
     }
 
+    // Synchronizuj lekcje dla tego kursu
+    try {
+      const courseId = existingCourse?.id || ''
+      if (courseId) {
+        await this.syncCourseLessons(wtlCourse.id, courseId)
+        console.log(`📚 Zsynchronizowano lekcje dla kursu: ${wtlCourse.name}`)
+        result.lessons.created++
+      }
+    } catch (error) {
+      console.error(`❌ Błąd synchronizacji lekcji dla kursu ${wtlCourse.name}:`, error)
+      result.lessons.errors++
+      result.errors.push(`Lekcje kursu ${wtlCourse.id}: ${error}`)
+    }
+
     // Loguj synchronizację
     await this.logSync('course', wtlCourse.id, 'synced', { name: wtlCourse.name })
+  }
+
+  /**
+   * Synchronizuje lekcje dla konkretnego kursu
+   */
+  private async syncCourseLessons(wtlCourseId: string, localCourseId: string): Promise<void> {
+    try {
+      console.log(`📚 Synchronizuję lekcje dla kursu WTL ${wtlCourseId}...`)
+
+      // Pobierz lekcje z WTL API
+      const wtlResponse = await wtlClient.get(`/lesson/list?training_id=${wtlCourseId}`)
+      
+      if (wtlResponse.status !== 200) {
+        throw new Error(`WTL API error: ${wtlResponse.status}`)
+      }
+
+      const wtlLessons = wtlResponse.data || []
+      console.log(`📚 Pobrano ${wtlLessons.length} lekcji z WTL API`)
+
+      if (wtlLessons.length === 0) {
+        console.log(`ℹ️ Brak lekcji do synchronizacji dla kursu ${wtlCourseId}`)
+        return
+      }
+
+      // Przygotuj lekcje do synchronizacji
+      const lessonsToSync = wtlLessons.map((lesson: any) => {
+        // Mapuj różne możliwe pola z WTL API
+        const lessonId = lesson.id || lesson.lesson_id || lesson.lessonId
+        const lessonTitle = lesson.title || lesson.name || lesson.lesson_name
+        const lessonDescription = lesson.description || lesson.summary || lesson.content_summary
+        const lessonContent = lesson.content || lesson.lesson_content || lesson.text || ''
+        const lessonOrder = lesson.order_number || lesson.order || lesson.position || lesson.sequence || 1
+        
+        return {
+          wtl_lesson_id: lessonId.toString(),
+          course_id: localCourseId,
+          title: lessonTitle,
+          description: lessonDescription || null,
+          content: lessonContent || null,
+          order_number: lessonOrder,
+          status: 'active'
+        }
+      })
+
+      // Synchronizuj lekcje do bazy danych
+      const { error: syncError } = await supabase
+        .from('lessons')
+        .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id' })
+
+      if (syncError) {
+        throw new Error(`Błąd synchronizacji lekcji: ${syncError.message}`)
+      }
+
+      console.log(`✅ Pomyślnie zsynchronizowano ${lessonsToSync.length} lekcji dla kursu ${wtlCourseId}`)
+
+    } catch (error) {
+      console.error(`❌ Błąd podczas synchronizacji lekcji dla kursu ${wtlCourseId}:`, error)
+      throw error
+    }
   }
 
   /**
@@ -146,6 +225,7 @@ export class CourseSyncService {
       courses: { created: 0, updated: 0, errors: 0 },
       students: { created: 0, updated: 0, errors: 0 },
       enrollments: { created: 0, updated: 0, errors: 0 },
+      lessons: { created: 0, updated: 0, errors: 0 },
       errors: []
     }
 
@@ -364,10 +444,15 @@ export class CourseSyncService {
       .from('course_enrollments')
       .select('sync_status', { count: 'exact' })
 
+    const { data: lessons } = await supabase
+      .from('lessons')
+      .select('sync_status', { count: 'exact' })
+
     return {
       courses: courses?.length || 0,
       students: students?.length || 0,
       enrollments: enrollments?.length || 0,
+      lessons: lessons?.length || 0,
       lastSync: new Date().toISOString()
     }
   }

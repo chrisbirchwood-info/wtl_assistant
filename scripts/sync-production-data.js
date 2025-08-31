@@ -56,3 +56,4 @@ console.log('   👨‍🏫 5 przypisań nauczycieli do kursów');
 console.log('   🎓 3 studentów z zapisami na kursy');
 console.log('');
 console.log('🎯 Dane będą identyczne w lokalnej i produkcyjnej bazie!');
+

@@ -4,13 +4,17 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { useParams, useSearchParams } from 'next/navigation'
+import CreateNoteForm from '@/components/notes/CreateNoteForm'
+import NotesList from '@/components/notes/NotesList'
+import { NoteWithConnections, Lesson as NoteLesson } from '@/types/notes'
 
 interface Lesson {
   id: string
   title: string
   description?: string
   content?: string
-  order: number
+  order_number?: number
+  order?: number // dla kompatybilności wstecznej
   status: 'active' | 'inactive' | 'draft'
   created_at: string
   updated_at: string
@@ -24,10 +28,12 @@ interface Student {
   username?: string
   first_name?: string
   last_name?: string
-  role: string
-  is_active?: boolean
-  wtl_last_sync?: string
-  wtl_sync_status?: string
+  status: string
+  created_at: string
+  updated_at: string
+  last_sync_at?: string
+  sync_status?: string
+  wtl_student_id?: string
 }
 
 interface Course {
@@ -59,9 +65,12 @@ export default function StudentLessonsPage() {
   const [student, setStudent] = useState<Student | null>(null)
   const [course, setCourse] = useState<Course | null>(null)
   const [lessonProgress, setLessonProgress] = useState<LessonProgress[]>([])
+  const [notes, setNotes] = useState<NoteWithConnections[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isSyncing, setIsSyncing] = useState(false)
+
+  const [showCreateNoteForm, setShowCreateNoteForm] = useState(false)
+  const [selectedLessonForNote, setSelectedLessonForNote] = useState<string | null>(null)
 
   useEffect(() => {
     initialize()
@@ -119,20 +128,42 @@ export default function StudentLessonsPage() {
        const studentData = await studentResponse.json()
        setStudent(studentData.user)
 
-      // Pobierz lekcje kursu
-      const lessonsResponse = await fetch(`/api/wtl/lessons?courseId=${courseId}`)
-      if (!lessonsResponse.ok) throw new Error('Błąd pobierania lekcji')
-      const lessonsData = await lessonsResponse.json()
-      setLessons(lessonsData.lessons || [])
+             // Pobierz lekcje kursu z bazy danych
+       const lessonsResponse = await fetch(`/api/lessons?courseId=${courseId}`)
+       if (!lessonsResponse.ok) throw new Error('Błąd pobierania lekcji')
+       const lessonsData = await lessonsResponse.json()
+       setLessons(lessonsData.lessons || [])
 
       // Pobierz postęp studenta w lekcjach
       await fetchLessonProgress()
+
+      // Pobierz notatki dla tego kursu
+      await fetchNotes()
 
     } catch (err) {
       console.error('Error fetching data:', err)
       setError(err instanceof Error ? err.message : 'Wystąpił nieoczekiwany błąd')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchNotes = async () => {
+    try {
+      // Pobierz notatki powiązane z lekcjami tego kursu
+      const notesResponse = await fetch('/api/notes?include_connections=true')
+      if (notesResponse.ok) {
+        const notesData = await notesResponse.json()
+        // Filtruj notatki, które są powiązane z lekcjami tego kursu
+        const courseNotes = notesData.notes?.filter((note: NoteWithConnections) => 
+          note.lesson_connections?.some(conn => 
+            lessons.some(lesson => lesson.id === conn.lesson_id)
+          )
+        ) || []
+        setNotes(courseNotes)
+      }
+    } catch (err) {
+      console.log('Błąd pobierania notatek:', err)
     }
   }
 
@@ -156,27 +187,7 @@ export default function StudentLessonsPage() {
     }
   }
 
-  const syncLessons = async () => {
-    try {
-      setIsSyncing(true)
-      setError(null)
 
-      const response = await fetch(`/api/wtl/lessons?courseId=${courseId}`, { method: 'POST' })
-      if (!response.ok) throw new Error('Błąd synchronizacji lekcji')
-
-      const result = await response.json()
-      console.log('✅ Synchronizacja lekcji zakończona:', result)
-      
-      // Odśwież dane po synchronizacji
-      await fetchData()
-      
-    } catch (err) {
-      console.error('Error syncing lessons:', err)
-      setError(err instanceof Error ? err.message : 'Błąd podczas synchronizacji')
-    } finally {
-      setIsSyncing(false)
-    }
-  }
 
   const getProgressStatus = (lessonId: string) => {
     const progress = lessonProgress.find(p => p.lesson_id === lessonId)
@@ -217,6 +228,23 @@ export default function StudentLessonsPage() {
     if (progress >= 80) return 'text-green-600'
     if (progress >= 50) return 'text-yellow-600'
     return 'text-red-600'
+  }
+
+  const handleNoteCreated = () => {
+    fetchNotes()
+  }
+
+  const handleNoteUpdated = () => {
+    fetchNotes()
+  }
+
+  const handleNoteDeleted = () => {
+    fetchNotes()
+  }
+
+  const openCreateNoteForm = (lessonId?: string) => {
+    setSelectedLessonForNote(lessonId || null)
+    setShowCreateNoteForm(true)
   }
 
   if (isLoading) {
@@ -312,24 +340,10 @@ export default function StudentLessonsPage() {
                 </div>
               </div>
               
-              <button
-                onClick={syncLessons}
-                disabled={isSyncing}
-                className={`px-4 py-2 rounded-lg font-medium ${
-                  isSyncing
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'
-                } text-white`}
-              >
-                {isSyncing ? (
-                  <>
-                    <span className="animate-spin mr-2">⟳</span>
-                    Synchronizuję...
-                  </>
-                ) : (
-                  '🔄 Synchronizuj lekcje'
-                )}
-              </button>
+                             <div className="text-sm text-gray-600">
+                 <p>Lekcje są synchronizowane automatycznie</p>
+                 <p>wraz z kursami w panelu &quot;Zarządzanie kursami&quot;</p>
+               </div>
             </div>
           </div>
 
@@ -414,16 +428,28 @@ export default function StudentLessonsPage() {
                             }
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button
-                              onClick={() => alert(`Otwieranie lekcji: ${lesson.title}`)}
-                              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-                              title="Otwórz lekcję"
-                            >
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                              </svg>
-                              Otwórz
-                            </button>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => alert(`Otwieranie lekcji: ${lesson.title}`)}
+                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                                title="Otwórz lekcję"
+                              >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                Otwórz
+                              </button>
+                              <button
+                                onClick={() => openCreateNoteForm(lesson.id)}
+                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                                title="Dodaj notatkę do tej lekcji"
+                              >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Notatka
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       )
@@ -442,16 +468,84 @@ export default function StudentLessonsPage() {
                 <p className="text-sm text-gray-600">
                   Ten kurs nie ma jeszcze żadnych lekcji.
                 </p>
-                <button
-                  onClick={syncLessons}
-                  disabled={isSyncing}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-                >
-                  🔄 Synchronizuj lekcje z WTL
-                </button>
+                                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                   <p className="text-sm text-blue-800">
+                     💡 <strong>Lekcje są synchronizowane automatycznie</strong>
+                   </p>
+                   <p className="text-sm text-blue-700 mt-1">
+                     Użyj przycisku &quot;🔄 Synchronizuj kursy z WTL&quot; w panelu &quot;Zarządzanie kursami&quot;
+                   </p>
+                 </div>
               </div>
             </div>
           )}
+
+          {/* Sekcja notatek */}
+          <div className="mt-8">
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      📝 Notatki do lekcji ({notes.length})
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Notatki powiązane z lekcjami tego kursu
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => openCreateNoteForm()}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  >
+                    ➕ Nowa notatka
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                                 {showCreateNoteForm && (
+                   <div className="mb-6">
+                     <CreateNoteForm
+                       onNoteCreated={handleNoteCreated}
+                       lessons={lessons.map(lesson => ({
+                         id: lesson.id,
+                         title: lesson.title,
+                         description: lesson.description,
+                         content: lesson.content,
+                         order: lesson.order_number || lesson.order,
+                         status: lesson.status as any,
+                         created_at: lesson.created_at,
+                         updated_at: lesson.updated_at,
+                         wtl_lesson_id: lesson.wtl_lesson_id,
+                         sync_status: lesson.sync_status
+                       }))}
+                                               preselectedLessonId={selectedLessonForNote || undefined}
+                       user={user || undefined}
+                     />
+                   </div>
+                 )}
+
+                 <NotesList
+                   notes={notes}
+                   lessons={lessons.map(lesson => ({
+                     id: lesson.id,
+                     title: lesson.title,
+                     description: lesson.description,
+                     content: lesson.content,
+                     order: lesson.order_number || lesson.order,
+                     status: lesson.status as any,
+                     created_at: lesson.created_at,
+                     updated_at: lesson.updated_at,
+                     wtl_lesson_id: lesson.wtl_lesson_id,
+                     sync_status: lesson.sync_status
+                   }))}
+                   onNoteUpdated={handleNoteUpdated}
+                   onNoteDeleted={handleNoteDeleted}
+                   user={user || undefined}
+                 />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </ProtectedRoute>
