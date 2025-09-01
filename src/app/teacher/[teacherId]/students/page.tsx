@@ -53,7 +53,7 @@ export default function TeacherStudentsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSyncing, setIsSyncing] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
+  
   // Pagination state for students list
   const [studentsPage, setStudentsPage] = useState<number>(1)
   const [studentsPageSize, setStudentsPageSize] = useState<number>(20)
@@ -251,7 +251,7 @@ export default function TeacherStudentsPage() {
       const result = await response.json()
       console.log('✅ Synchronizacja zakończona:', result)
       
-      setLastSyncTime(new Date().toISOString())
+      // lastSyncTime removed (admin-only sync)
       
       // Odśwież dane po synchronizacji
       await fetchTeacherData()
@@ -397,17 +397,17 @@ export default function TeacherStudentsPage() {
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
               🗄️ Lokalna baza Supabase
             </div>
-            {lastSyncTime && (
+            {/* removed last sync pill
               <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                 🔄 Ostatnia synchronizacja: {new Date(lastSyncTime).toLocaleString('pl-PL')}
               </div>
-            )}
+            */}
           </div>
         </div>
 
         {/* Przyciski synchronizacji */}
         <div className="mb-6 flex space-x-4">
-          <button
+          <button style={{ display: 'none' }}
             onClick={syncCourses}
             disabled={isSyncing}
             className={`px-4 py-2 rounded-lg font-medium ${

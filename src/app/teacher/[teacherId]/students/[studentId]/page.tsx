@@ -41,6 +41,7 @@ interface Course {
   title: string
   description?: string
   status: string
+  wtl_course_id?: string
 }
 
 interface LessonProgress {
@@ -129,10 +130,54 @@ export default function StudentLessonsPage() {
        setStudent(studentData.user)
 
              // Pobierz lekcje kursu z bazy danych
-       const lessonsResponse = await fetch(`/api/lessons?courseId=${courseId}`)
-       if (!lessonsResponse.ok) throw new Error('Błąd pobierania lekcji')
-       const lessonsData = await lessonsResponse.json()
-       setLessons(lessonsData.lessons || [])
+      const lessonsResponse = await fetch(`/api/lessons?courseId=${courseId}`)
+      if (!lessonsResponse.ok) throw new Error('Błąd pobierania lekcji')
+      const lessonsData = await lessonsResponse.json()
+      let fetchedLessons = lessonsData.lessons || []
+
+      // Fallback: jeśli lokalnie brak lekcji, pobierz listę lekcji z WTL (bez zapisu do bazy)
+      if (false && (!fetchedLessons || fetchedLessons.length === 0) && courseData?.course?.wtl_course_id) {
+        try {
+          const wtlResp = await fetch(`/api/wtl/lessons?trainingId=${courseData.course.wtl_course_id}`)
+          if (wtlResp.ok) {
+            const wtlData = await wtlResp.json()
+            const wtlLessons = (wtlData.lessons || []).map((l: any) => ({
+              id: String(l.id),
+              title: l.name || l.title || 'Lekcja',
+              description: l.description || '',
+              content: l.content || '',
+              order_number: l.order || l.order_number || 0,
+              status: 'active' as const,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              wtl_lesson_id: String(l.id),
+              sync_status: 'wtl-only'
+            }))
+            fetchedLessons = wtlLessons
+          }
+        } catch { /* ignore fallback errors */ }
+      }
+
+      // Jeśli brak lekcji lokalnie, spróbuj dociągnąć z WTL i zsynchronizować
+      // Synchronizacja lekcji nie jest wywoływana z tego widoku (admin only)
+      if (false && (!fetchedLessons || fetchedLessons.length === 0) && courseData?.course?.wtl_course_id) {
+        try {
+          console.log('Brak lekcji lokalnie – próbuję zsynchronizować z WTL...')
+          const wtlSync = await fetch(`/api/lessons?courseId=${courseId}`)
+          if (wtlSync.ok) {
+            // Po syncu pobierz ponownie z lokalnej bazy
+            const refetch = await fetch(`/api/lessons?courseId=${courseId}`)
+            if (refetch.ok) {
+              const refetchData = await refetch.json()
+              fetchedLessons = refetchData.lessons || []
+            }
+          }
+        } catch (syncErr) {
+          console.warn('Auto-sync lekcji z WTL nie powiódł się:', syncErr)
+        }
+      }
+
+      setLessons(fetchedLessons)
 
       // Pobierz postęp studenta w lekcjach
       await fetchLessonProgress()
@@ -507,19 +552,20 @@ export default function StudentLessonsPage() {
                    <div className="mb-6">
                      <CreateNoteForm
                        onNoteCreated={handleNoteCreated}
-                       lessons={lessons.map(lesson => ({
-                         id: lesson.id,
-                         title: lesson.title,
-                         description: lesson.description,
-                         content: lesson.content,
-                         order: lesson.order_number || lesson.order,
-                         status: lesson.status as any,
-                         created_at: lesson.created_at,
-                         updated_at: lesson.updated_at,
-                         wtl_lesson_id: lesson.wtl_lesson_id,
-                         sync_status: lesson.sync_status
-                       }))}
-                                               preselectedLessonId={selectedLessonForNote || undefined}
+                        lessons={lessons.map(lesson => ({
+                          id: lesson.wtl_lesson_id || lesson.id,
+                          title: lesson.title,
+                          description: lesson.description,
+                          content: lesson.content,
+                          order: lesson.order_number || lesson.order,
+                          status: lesson.status as any,
+                          created_at: lesson.created_at,
+                          updated_at: lesson.updated_at,
+                          wtl_lesson_id: lesson.wtl_lesson_id || lesson.id,
+                          sync_status: lesson.sync_status
+                        }))}
+                        
+                       preselectedLessonId={selectedLessonForNote || undefined}
                        user={user || undefined}
                      />
                    </div>
@@ -527,18 +573,18 @@ export default function StudentLessonsPage() {
 
                  <NotesList
                    notes={notes}
-                   lessons={lessons.map(lesson => ({
-                     id: lesson.id,
-                     title: lesson.title,
-                     description: lesson.description,
-                     content: lesson.content,
-                     order: lesson.order_number || lesson.order,
-                     status: lesson.status as any,
-                     created_at: lesson.created_at,
-                     updated_at: lesson.updated_at,
-                     wtl_lesson_id: lesson.wtl_lesson_id,
-                     sync_status: lesson.sync_status
-                   }))}
+                    lessons={lessons.map(lesson => ({
+                      id: lesson.wtl_lesson_id || lesson.id,
+                      title: lesson.title,
+                      description: lesson.description,
+                      content: lesson.content,
+                      order: lesson.order_number || lesson.order,
+                      status: lesson.status as any,
+                      created_at: lesson.created_at,
+                      updated_at: lesson.updated_at,
+                      wtl_lesson_id: lesson.wtl_lesson_id || lesson.id,
+                      sync_status: lesson.sync_status
+                    }))}
                    onNoteUpdated={handleNoteUpdated}
                    onNoteDeleted={handleNoteDeleted}
                    user={user || undefined}

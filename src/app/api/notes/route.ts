@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { CreateNoteRequest, UpdateNoteRequest } from "@/types/notes"
+import wtlClient from "@/lib/wtl-client"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
     // Na razie używamy tymczasowego rozwiązania - pobierz z query params
     const url = new URL(request.url)
     const userId = url.searchParams.get('user_id')
+    const trainingId = url.searchParams.get('trainingId') || url.searchParams.get('training_id')
     
     if (!userId) {
       return NextResponse.json(
@@ -96,6 +98,26 @@ export async function POST(request: NextRequest) {
     }
     
     const user_id = userId
+
+    // Opcjonalna walidacja: jeśli mamy trainingId i lesson_ids, ogranicz do lekcji danego kursu
+    if (trainingId && lesson_ids && lesson_ids.length > 0) {
+      try {
+        const allowedResp = await wtlClient.getLessons(trainingId)
+        const allowed = new Set((allowedResp.data || []).map((l: any) => String(l.id)))
+        const invalid = (lesson_ids || []).filter((id) => !allowed.has(String(id)))
+        if (invalid.length > 0) {
+          return NextResponse.json(
+            { error: `Lekcje nie należą do wybranego kursu: ${invalid.join(', ')}` },
+            { status: 400 }
+          )
+        }
+      } catch (e) {
+        return NextResponse.json(
+          { error: 'Nie udało się zweryfikować lekcji dla kursu' },
+          { status: 400 }
+        )
+      }
+    }
     
     // 1. Utwórz notatkę
     const { data: note, error: noteError } = await supabase

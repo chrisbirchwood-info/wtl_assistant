@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 import wtlClient from '@/lib/wtl-client'
 
 // Mock data for development - różne lekcje dla różnych kursów
@@ -37,8 +37,14 @@ export async function GET(request: NextRequest) {
     console.log('Fetching lessons...', courseId ? `for course ${courseId}` : trainingId ? `for training ${trainingId}` : 'all lessons')
 
     // Najpierw spróbuj pobrać z bazy danych (jeśli mamy courseId)
+    // Use service role client for consistent server-side access (bypasses RLS for writes/reads)
+    const srvSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
     if (courseId) {
-      const { data: dbLessons, error: dbError } = await supabase
+      const { data: dbLessons, error: dbError } = await srvSupabase
         .from('lessons')
         .select('*')
         .eq('course_id', courseId)
@@ -85,7 +91,7 @@ export async function GET(request: NextRequest) {
             }
           })
 
-          const { error: syncError } = await supabase
+          const { error: syncError } = await srvSupabase
             .from('lessons')
             .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id', ignoreDuplicates: false })
 
@@ -133,93 +139,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const courseId = searchParams.get('courseId')
-    
-    if (!courseId) {
-      return NextResponse.json(
-        { error: 'Brak courseId w parametrach' },
-        { status: 400 }
-      )
-    }
-
-    console.log('Synchronizing lessons for course:', courseId)
-
-    // Pobierz lekcje z WTL API
-    const wtlResponse = await wtlClient.getLessons(courseId)
-    if (!wtlResponse.success || !wtlResponse.data) {
-      return NextResponse.json(
-        { error: 'Nie udało się pobrać lekcji z WTL API' },
-        { status: 500 }
-      )
-    }
-
-    // Synchronizuj lekcje do bazy danych
-    const nowIso = new Date().toISOString()
-    const lessonsToSync = wtlResponse.data.map((lesson: any) => {
-      // Mapuj różne możliwe pola z WTL API
-      const lessonId = lesson.id || lesson.lesson_id || lesson.lessonId
-      const lessonTitle = lesson.name || lesson.title || lesson.lesson_name
-      const lessonDescription = lesson.description || lesson.summary || lesson.content_summary
-      const lessonContent = lesson.content || lesson.lesson_content || lesson.text || ''
-      const lessonOrder = lesson.order_number || lesson.order || lesson.position || lesson.sequence || 1
-      
-      return {
-        wtl_lesson_id: lessonId.toString(),
-        course_id: courseId,
-        title: lessonTitle,
-        description: lessonDescription || null,
-        content: lessonContent || null,
-        order_number: lessonOrder,
-        status: 'active',
-        last_sync_at: nowIso
-      }
-    })
-
-    const { error: syncError } = await supabase
-      .from('lessons')
-      .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id', ignoreDuplicates: false })
-
-    if (syncError) {
-      console.error('Failed to sync lessons to database:', syncError)
-      return NextResponse.json(
-        { error: 'Błąd synchronizacji lekcji do bazy danych' },
-        { status: 500 }
-      )
-    }
-
-    console.log('Successfully synced lessons to database')
-
-    // Pobierz zsynchronizowane lekcje z bazy
-    const { data: syncedLessons, error: fetchError } = await supabase
-      .from('lessons')
-      .select('*')
-      .eq('course_id', courseId)
-      .eq('status', 'active')
-      .order('order_number', { ascending: true })
-
-    if (fetchError) {
-      console.error('Failed to fetch synced lessons:', fetchError)
-      return NextResponse.json(
-        { error: 'Błąd pobierania zsynchronizowanych lekcji' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({
-      success: true,
-      lessons: syncedLessons || [],
-      message: `Synchronized ${lessonsToSync.length} lessons from WTL API`,
-      synced_count: lessonsToSync.length
-    })
-
-  } catch (error) {
-    console.error('Lesson sync error:', error)
-    return NextResponse.json(
-      { error: 'Wystąpił nieoczekiwany błąd podczas synchronizacji' },
-      { status: 500 }
-    )
-  }
+export async function POST(_request: NextRequest) {
+  // Synchronizacja lekcji tym endpointem jest wyłączona – użyj panelu admina
+  return NextResponse.json(
+    { error: 'Lesson sync disabled. Use admin admin/lessons sync.' },
+    { status: 405 }
+  )
 }

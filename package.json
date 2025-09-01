@@ -30,6 +30,7 @@
     "db:auto": "node scripts/auto-migrate.js",
     "db:push:prod": "node scripts/push-migrations-prod.js",
     "db:sql": "node scripts/run-sql-migration.js",
+    "db:merge-lessons": "node scripts/merge-lessons.js",
     "add-test-data": "node scripts/add-test-data.js",
     "supabase:db:reset": "supabase db reset",
     "supabase:db:push": "supabase db push",

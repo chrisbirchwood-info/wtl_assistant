@@ -99,7 +99,7 @@ export default function StudentLessonsPage() {
       setCourse(courseData.course)
 
       // Pobierz lekcje kursu
-      const lessonsResponse = await fetch(`/api/wtl/lessons?courseId=${courseId}`)
+      const lessonsResponse = await fetch(`/api/lessons?courseId=${courseId}`)
       if (!lessonsResponse.ok) throw new Error('Błąd pobierania lekcji')
       const lessonsData = await lessonsResponse.json()
       setLessons(lessonsData.lessons || [])
@@ -140,7 +140,7 @@ export default function StudentLessonsPage() {
       setIsSyncing(true)
       setError(null)
 
-      const response = await fetch(`/api/wtl/lessons?courseId=${courseId}`, { method: 'POST' })
+      const response = await fetch(`/api/lessons?courseId=${courseId}`, { method: 'GET' })
       if (!response.ok) throw new Error('Błąd synchronizacji lekcji')
 
       const result = await response.json()
@@ -271,7 +271,7 @@ export default function StudentLessonsPage() {
                 </div>
               </div>
               
-              <button
+              <button style={{ display: 'none' }}
                 onClick={syncLessons}
                 disabled={isSyncing}
                 className={`px-4 py-2 rounded-lg font-medium ${
@@ -401,7 +401,7 @@ export default function StudentLessonsPage() {
                 <p className="text-sm text-gray-600">
                   Ten kurs nie ma jeszcze żadnych lekcji.
                 </p>
-                <button
+                <button style={{ display: 'none' }}
                   onClick={syncLessons}
                   disabled={isSyncing}
                   className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
