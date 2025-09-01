@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import Pagination from '@/components/ui/Pagination'
 
 interface Course {
   id: string
@@ -50,10 +51,37 @@ export default function AdminCoursesPage() {
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   
+  
+  // Lessons mapping state
+  interface Lesson { id: string; wtl_lesson_id: string; title: string }
+  interface CourseLessonItem { lesson_id: string; wtl_lesson_id?: string; title?: string; position: number; required: boolean }
+  const [courseLessons, setCourseLessons] = useState<CourseLessonItem[]>([])
+  const [allLessons, setAllLessons] = useState<Lesson[]>([])
+  const [selectedLessonIds, setSelectedLessonIds] = useState<string[]>([])
+  const [assignedLessonIds, setAssignedLessonIds] = useState<string[]>([])
+  const [selectedLessonIdsToRemove, setSelectedLessonIdsToRemove] = useState<string[]>([])
+  const [isReordering, setIsReordering] = useState<boolean>(false)
+  const [isAddDropdownOpen, setIsAddDropdownOpen] = useState<boolean>(false)
+  const [lessonSearch, setLessonSearch] = useState<string>('')
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  
   // Form states
   const [showAssignForm, setShowAssignForm] = useState(false)
   const [selectedTeacherId, setSelectedTeacherId] = useState<string>('')
   const [selectedRole, setSelectedRole] = useState<string>('teacher')
+
+  // Pagination for teachers list
+  const [teachersPage, setTeachersPage] = useState<number>(1)
+  const [teachersPageSize, setTeachersPageSize] = useState<number>(10)
+  const teachersPageSlice = courseTeachers.slice((teachersPage-1)*teachersPageSize, (teachersPage-1)*teachersPageSize + teachersPageSize)
+
+  // Pagination for course lessons list
+  const [lessonsPage, setLessonsPage] = useState<number>(1)
+  const [lessonsPageSize, setLessonsPageSize] = useState<number>(20)
+  const lessonsPageSlice = courseLessons.slice((lessonsPage-1)*lessonsPageSize, (lessonsPage-1)*lessonsPageSize + lessonsPageSize)
+
+  
 
   useEffect(() => {
     initialize()
@@ -68,6 +96,9 @@ export default function AdminCoursesPage() {
 
     fetchData()
   }, [user, isAuthenticated])
+
+  
+
 
   const fetchData = async () => {
     try {
@@ -86,9 +117,29 @@ export default function AdminCoursesPage() {
       const teachersData = await teachersResponse.json()
       setTeachers(teachersData.teachers || [])
 
-      if (coursesData.courses?.length > 0) {
-        setSelectedCourse(coursesData.courses[0].id)
-        await fetchCourseTeachers(coursesData.courses[0].id)
+      // Pobierz globalne lekcje (do wyszukiwania/dodawania)
+      try {
+        const lessonsResponse = await fetch('/api/admin/lessons')
+        if (lessonsResponse.ok) {
+          const lessonsData = await lessonsResponse.json()
+          setAllLessons((lessonsData.lessons || []).map((l: any) => ({ id: l.id, wtl_lesson_id: l.wtl_lesson_id, title: l.title })))
+        }
+      } catch {}
+
+      // Pobierz listę już przypisanych lekcji (globalnie)
+      try {
+        const assignedResp = await fetch('/api/admin/lessons/assigned')
+        if (assignedResp.ok) {
+          const assignedData = await assignedResp.json()
+          setAssignedLessonIds(assignedData.lesson_ids || [])
+        }
+      } catch {}
+
+      if (coursesData.courses?.length > 0 && !selectedCourse) {
+        const firstId = coursesData.courses[0].id
+        setSelectedCourse(firstId)
+        await fetchCourseTeachers(firstId)
+        await fetchCourseLessons(firstId)
       }
 
     } catch (err) {
@@ -115,6 +166,7 @@ export default function AdminCoursesPage() {
   const handleCourseChange = async (courseId: string) => {
     setSelectedCourse(courseId)
     await fetchCourseTeachers(courseId)
+    await fetchCourseLessons(courseId)
   }
 
   const syncCourses = async () => {
@@ -245,6 +297,166 @@ export default function AdminCoursesPage() {
     }
   }
 
+  // --- Lessons mapping functions ---
+  const fetchCourseLessons = async (courseId: string) => {
+    try {
+      const response = await fetch(`/api/admin/courses/${courseId}/lessons`)
+      if (!response.ok) throw new Error('B��d pobierania lekcji kursu')
+      const data = await response.json()
+      setCourseLessons(data.items || [])
+      // Odśwież globalny zbiór przypisanych lekcji
+      try {
+        const assignedResp = await fetch('/api/admin/lessons/assigned')
+        if (assignedResp.ok) {
+          const assignedData = await assignedResp.json()
+          setAssignedLessonIds(assignedData.lesson_ids || [])
+        }
+      } catch {}
+    } catch (err) {
+      console.error('Error fetching course lessons:', err)
+      setCourseLessons([])
+    }
+  }
+
+  const addLessonsToCourse = async () => {
+    try {
+      if (!selectedLessonIds || !selectedCourse) return
+      const response = await fetch(`/api/admin/courses/${selectedCourse}/lessons`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson_id: selectedLessonIds })
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message || 'B��d przypinania lekcji')
+      setSelectedLessonIds([])
+      await fetchCourseLessons(selectedCourse)
+    } catch (err) {
+      console.error('Error adding lesson:', err)
+      setError(err instanceof Error ? err.message : 'B��d przypinania lekcji')
+    }
+  }
+
+  const removeLessonFromCourse = async (lessonId: string) => {
+    try {
+      if (!confirm('Usun�� lekcj� z kursu?')) return
+      const response = await fetch(`/api/admin/courses/${selectedCourse}/lessons/${lessonId}`, { method: 'DELETE' })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message || 'B��d usuwania lekcji')
+      await fetchCourseLessons(selectedCourse)
+    } catch (err) {
+      console.error('Error removing lesson:', err)
+      setError(err instanceof Error ? err.message : 'B��d usuwania lekcji')
+    }
+  }
+
+  const removeSelectedLessonsFromCourse = async () => {
+    try {
+      if (selectedLessonIdsToRemove.length === 0) return
+      if (!confirm(`Usunąć ${selectedLessonIdsToRemove.length} zaznaczone lekcje z kursu?`)) return
+      const response = await fetch(`/api/admin/courses/${selectedCourse}/lessons`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson_ids: selectedLessonIdsToRemove })
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message || 'Błąd usuwania lekcji')
+      setSelectedLessonIdsToRemove([])
+      await fetchCourseLessons(selectedCourse)
+    } catch (err) {
+      console.error('Error removing selected lessons:', err)
+      setError(err instanceof Error ? err.message : 'Błąd usuwania lekcji')
+    }
+  }
+
+  const reorderLessons = async (items: CourseLessonItem[]) => {
+    try {
+      const payload = { items: items.map((it, idx) => ({ lesson_id: it.lesson_id, position: idx + 1 })) }
+      const response = await fetch(`/api/admin/courses/${selectedCourse}/lessons/reorder`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message || 'B��d zapisu kolejno�ci')
+      await fetchCourseLessons(selectedCourse)
+    } catch (err) {
+      console.error('Error reordering lessons:', err)
+      setError(err instanceof Error ? err.message : 'B��d zapisu kolejno�ci')
+    }
+  }
+
+  // Reorder optimization: send only rows with changed positions
+  const reorderLessonsDiff = async (before: CourseLessonItem[], after: CourseLessonItem[]) => {
+    try {
+      const beforePos = new Map(before.map((it, idx) => [it.lesson_id, idx + 1]))
+      const changed = after
+        .map((it, idx) => ({ lesson_id: it.lesson_id, position: idx + 1, prev: beforePos.get(it.lesson_id) }))
+        .filter(row => row.prev !== row.position)
+        .map(({ lesson_id, position }) => ({ lesson_id, position }))
+      if (changed.length === 0) return
+      const response = await fetch(`/api/admin/courses/${selectedCourse}/lessons/reorder`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: changed })
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message || 'B??d zapisu kolejno?ci')
+    } catch (err) {
+      console.error('Error reordering lessons (diff):', err)
+      setError(err instanceof Error ? err.message : 'B??d zapisu kolejno?ci')
+    }
+  }
+
+  const moveLesson = async (lessonId: string, direction: 'up' | 'down') => {
+    const idx = courseLessons.findIndex(l => l.lesson_id === lessonId)
+    if (idx === -1) return
+    const swapWith = direction === 'up' ? idx - 1 : idx + 1
+    if (swapWith < 0 || swapWith >= courseLessons.length) return
+    const newList = [...courseLessons]
+    const tmp = newList[idx]
+    newList[idx] = newList[swapWith]
+    newList[swapWith] = tmp
+    setCourseLessons(newList)
+    // minimal payload to speed up
+    try {
+      const payload = { items: [
+        { lesson_id: newList[idx].lesson_id, position: idx + 1 },
+        { lesson_id: newList[swapWith].lesson_id, position: swapWith + 1 }
+      ] }
+      const response = await fetch(`/api/admin/courses/${selectedCourse}/lessons/reorder`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message || 'Błąd zapisu kolejności')
+    } catch (err) {
+      console.error('Error reordering (swap):', err)
+      setError(err instanceof Error ? err.message : 'Błąd zapisu kolejności')
+    }
+  }
+
+  // --- Drag & Drop handlers ---
+  const handleDragStart = (index: number) => {
+    setDragIndex(index)
+  }
+  const handleDragOver = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
+    e.preventDefault()
+    if (dragOverIndex !== index) setDragOverIndex(index)
+  }
+  const handleDrop = async (index: number) => {
+    if (dragIndex === null || index === dragIndex) {
+      setDragIndex(null)
+      setDragOverIndex(null)
+      return
+    }
+    const newList = [...courseLessons]
+    const [moved] = newList.splice(dragIndex, 1)
+    newList.splice(index, 0, moved)
+    setCourseLessons(newList)
+    setDragIndex(null)
+    setDragOverIndex(null)
+    await reorderLessonsDiff(courseLessons, newList)
+  }
+
   if (isLoading) {
     return (
       <ProtectedRoute allowedRoles={['superadmin']}>
@@ -355,6 +567,7 @@ export default function AdminCoursesPage() {
                   </option>
                 ))}
               </select>
+
             </div>
           )}
 
@@ -453,7 +666,7 @@ export default function AdminCoursesPage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {courseTeachers.map((courseTeacher) => (
+                      {teachersPageSlice.map((courseTeacher) => (
                         <tr key={courseTeacher.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
@@ -500,6 +713,15 @@ export default function AdminCoursesPage() {
                       ))}
                     </tbody>
                   </table>
+                  <div className="px-6 py-4 border-t border-gray-200">
+                    <Pagination
+                      total={courseTeachers.length}
+                      page={teachersPage}
+                      pageSize={teachersPageSize}
+                      onPageChange={(p) => setTeachersPage(p)}
+                      onPageSizeChange={(s) => { setTeachersPage(1); setTeachersPageSize(s) }}
+                    />
+                  </div>
                 </div>
               ) : (
                 <div className="px-6 py-8 text-center text-gray-500">
@@ -536,8 +758,238 @@ export default function AdminCoursesPage() {
               </div>
             </div>
           )}
+          {/* Lekcje przypiete do kursu */}
+          {selectedCourse && (
+            <div className="bg-white shadow rounded-lg mt-8">
+              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">Lekcje przypiete do kursu</h3>
+                  <p className="mt-1 text-sm text-gray-500">{courseLessons.length} lekcji przypietych</p>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={removeSelectedLessonsFromCourse}
+                    disabled={selectedLessonIdsToRemove.length === 0}
+                    className={`px-4 py-2 rounded-lg font-medium ${selectedLessonIdsToRemove.length > 0 ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'} text-white`}
+                  >
+                    Usuń zaznaczone
+                  </button>
+                </div>
+              </div>
+
+              {/* Dodawanie lekcji */}
+              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="relative">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Lekcje</label>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddDropdownOpen(v => !v)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-left bg-white hover:bg-gray-50"
+                    >
+                      {selectedLessonIds.length > 0
+                        ? `Wybrane: ${selectedLessonIds.length}`
+                        : 'Wybierz lekcje...'}
+                    </button>
+
+                    {isAddDropdownOpen && (
+                      <div className="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg">
+                        <div className="p-2 border-b border-gray-100">
+                          <input
+                            type="text"
+                            value={lessonSearch}
+                            onChange={(e) => setLessonSearch(e.target.value)}
+                            placeholder="Szukaj tytułu lub WTL ID..."
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                          />
+                        </div>
+
+                        {(() => {
+                          const q = lessonSearch.trim().toLowerCase()
+                          const available = allLessons.filter(l => !assignedLessonIds.includes(l.id))
+                          const filtered = q
+                            ? available.filter(l =>
+                                (l.title || '').toLowerCase().includes(q) ||
+                                (l.wtl_lesson_id || '').toLowerCase().includes(q)
+                              )
+                            : available
+                          const visibleIds = filtered.map(l => l.id)
+
+                          const selectAllVisible = () => {
+                            setSelectedLessonIds(prev => {
+                              const toAdd = visibleIds.filter(id => !prev.includes(id))
+                              return [...prev, ...toAdd]
+                            })
+                          }
+                          const clearVisible = () => {
+                            setSelectedLessonIds(prev => prev.filter(id => !visibleIds.includes(id)))
+                          }
+
+                          return (
+                            <>
+                              <div className="px-2 py-2 flex items-center justify-between text-sm border-b border-gray-100">
+                                <div className="text-gray-600">Widoczne: {filtered.length}</div>
+                                <div className="space-x-2">
+                                  <button onClick={selectAllVisible} className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">Zaznacz widoczne</button>
+                                  <button onClick={clearVisible} className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">Odznacz widoczne</button>
+                                </div>
+                              </div>
+                              <div className="max-h-64 overflow-auto">
+                                {filtered.length === 0 ? (
+                                  <div className="px-3 py-2 text-sm text-gray-500">Brak wyników</div>
+                                ) : (
+                                  filtered.map(l => (
+                                    <label key={l.id} className="flex items-center px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedLessonIds.includes(l.id)}
+                                        onChange={(e) => {
+                                          const id = l.id
+                                          setSelectedLessonIds(prev => e.target.checked
+                                            ? Array.from(new Set([...prev, id]))
+                                            : prev.filter(x => x !== id)
+                                          )
+                                        }}
+                                      />
+                                      <span className="ml-2 text-gray-800">
+                                        {l.title} {l.wtl_lesson_id ? `( #${l.wtl_lesson_id} )` : ''}
+                                      </span>
+                                    </label>
+                                  ))
+                                )}
+                              </div>
+                              <div className="p-2 border-t border-gray-100 text-right">
+                                <button onClick={() => setIsAddDropdownOpen(false)} className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded">Zamknij</button>
+                              </div>
+                            </>
+                          )
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      onClick={addLessonsToCourse}
+                      disabled={selectedLessonIds.length === 0}
+                      className={`px-4 py-2 rounded-lg font-medium ${selectedLessonIds.length > 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'} text-white`}
+                    >
+                      Dodaj lekcje
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lista lekcji */}
+              {courseLessons.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={courseLessons.length > 0 && selectedLessonIdsToRemove.length === courseLessons.length}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedLessonIdsToRemove(lessonsPageSlice.map(cl => cl.lesson_id))
+                              } else {
+                                setSelectedLessonIdsToRemove([])
+                              }
+                            }}
+                          />
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poz.</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tytul</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WTL ID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcje</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {lessonsPageSlice.map((item, index) => (
+                        <tr
+                          key={item.lesson_id}
+                          draggable
+                          onDragStart={() => handleDragStart(index)}
+                          onDragOver={(e) => handleDragOver(e, index)}
+                          onDrop={() => handleDrop(index)}
+                          className={`hover:bg-gray-50 ${dragOverIndex === index ? 'bg-blue-50' : ''}`}
+                        >
+                          <td className="px-4 py-4 whitespace-nowrap text-sm">
+                            <input
+                              type="checkbox"
+                              checked={selectedLessonIdsToRemove.includes(item.lesson_id)}
+                              onChange={(e) => {
+                                setSelectedLessonIdsToRemove(prev => e.target.checked
+                                  ? Array.from(new Set([...prev, item.lesson_id]))
+                                  : prev.filter(id => id !== item.lesson_id)
+                                )
+                              }}
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 1}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.title || '-'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.wtl_lesson_id || '-'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <button
+                              onClick={() => moveLesson(item.lesson_id, 'up')}
+                              title="Przenieś w górę"
+                              aria-label="Przenieś w górę"
+                              className="inline-flex items-center p-1 rounded text-blue-600 hover:bg-blue-50"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                                <path fillRule="evenodd" d="M10 3a1 1 0 01.894.553l3 6a1 1 0 11-1.788.894L10 6.118 7.894 10.447a1 1 0 01-1.788-.894l3-6A1 1 0 0110 3z" clipRule="evenodd" />
+                                <path d="M4 13a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => moveLesson(item.lesson_id, 'down')}
+                              title="Przenieś w dół"
+                              aria-label="Przenieś w dół"
+                              className="inline-flex items-center p-1 rounded text-blue-600 hover:bg-blue-50"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                                <path d="M4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z" />
+                                <path fillRule="evenodd" d="M10 17a1 1 0 01-.894-.553l-3-6a1 1 0 111.788-.894L10 13.882l2.106-4.329a1 1 0 111.788.894l-3 6A1 1 0 0110 17z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => removeLessonFromCourse(item.lesson_id)}
+                              title="Usuń z kursu"
+                              aria-label="Usuń z kursu"
+                              className="inline-flex items-center p-1 rounded text-red-600 hover:bg-red-50"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 100 2h.293l.853 10.236A2 2 0 007.14 18h5.72a2 2 0 001.994-1.764L15.707 6H16a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0010 2H9zm1 5a1 1 0 00-1 1v7a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="px-6 py-4 border-t border-gray-200">
+                    <Pagination total={courseLessons.length} page={lessonsPage} pageSize={lessonsPageSize} onPageChange={(p)=>setLessonsPage(p)} onPageSizeChange={(s)=>{ setLessonsPage(1); setLessonsPageSize(s) }} />
+                  </div>
+
+                </div>
+              ) : (
+                <div className="px-6 py-8 text-center text-gray-500">
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Brak lekcji</h3>
+                  <p className="text-sm text-gray-600">Przypnij lekcje do kursu, aby ustalic kolejnosc realizacji.</p>
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
       </div>
     </ProtectedRoute>
   )
 }
+
+
+
+
+
+
+

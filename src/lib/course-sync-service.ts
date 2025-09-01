@@ -71,13 +71,14 @@ export class CourseSyncService {
       }
 
       const wtlCourses: WTLTraining[] = wtlResponse.data
+      await this.softDeleteMissingCourses(wtlCourses.map(c => String(c.id)))
       console.log(`📚 Pobrano ${wtlCourses.length} kursów z WTL API`)
 
       // Synchronizuj każdy kurs
       for (const wtlCourse of wtlCourses) {
         try {
           await this.syncCourse(wtlCourse, result)
-          result.courses.created++
+          // result.courses.created++ (counted inside syncCourse)
         } catch (error) {
           console.error(`❌ Błąd synchronizacji kursu ${wtlCourse.id}:`, error)
           result.courses.errors++
@@ -145,7 +146,7 @@ export class CourseSyncService {
       if (courseId) {
         await this.syncCourseLessons(wtlCourse.id, courseId)
         console.log(`📚 Zsynchronizowano lekcje dla kursu: ${wtlCourse.name}`)
-        result.lessons.created++
+        // result.lessons.created++ (deprecated: counted in syncCourseLessons)
       }
     } catch (error) {
       console.error(`❌ Błąd synchronizacji lekcji dla kursu ${wtlCourse.name}:`, error)
@@ -164,14 +165,12 @@ export class CourseSyncService {
     try {
       console.log(`📚 Synchronizuję lekcje dla kursu WTL ${wtlCourseId}...`)
 
-      // Pobierz lekcje z WTL API
-      const wtlResponse = await wtlClient.get(`/lesson/list?training_id=${wtlCourseId}`)
-      
-      if (wtlResponse.status !== 200) {
-        throw new Error(`WTL API error: ${wtlResponse.status}`)
+      // Pobierz lekcje z WTL API (robust helper with fallbacks)
+      const wtlResp = await wtlClient.getLessons(wtlCourseId)
+      if (!wtlResp.success) {
+        throw new Error(`WTL getLessons error: ${wtlResp.error || 'unknown'}`)
       }
-
-      const wtlLessons = wtlResponse.data || []
+      const wtlLessons = wtlResp.data || []
       console.log(`📚 Pobrano ${wtlLessons.length} lekcji z WTL API`)
 
       if (wtlLessons.length === 0) {
@@ -180,10 +179,11 @@ export class CourseSyncService {
       }
 
       // Przygotuj lekcje do synchronizacji
+      const nowIso = new Date().toISOString()
       const lessonsToSync = wtlLessons.map((lesson: any) => {
         // Mapuj różne możliwe pola z WTL API
         const lessonId = lesson.id || lesson.lesson_id || lesson.lessonId
-        const lessonTitle = lesson.title || lesson.name || lesson.lesson_name
+        const lessonTitle = lesson.name || lesson.title || lesson.lesson_name
         const lessonDescription = lesson.description || lesson.summary || lesson.content_summary
         const lessonContent = lesson.content || lesson.lesson_content || lesson.text || ''
         const lessonOrder = lesson.order_number || lesson.order || lesson.position || lesson.sequence || 1
@@ -195,19 +195,21 @@ export class CourseSyncService {
           description: lessonDescription || null,
           content: lessonContent || null,
           order_number: lessonOrder,
-          status: 'active'
+          status: 'active',
+          last_sync_at: nowIso
         }
       })
 
       // Synchronizuj lekcje do bazy danych
       const { error: syncError } = await supabase
         .from('lessons')
-        .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id' })
+        .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id', ignoreDuplicates: false })
 
       if (syncError) {
         throw new Error(`Błąd synchronizacji lekcji: ${syncError.message}`)
       }
 
+      await this.softDeleteMissingLessons(localCourseId, lessonsToSync.map(l => String(l.wtl_lesson_id)))
       console.log(`✅ Pomyślnie zsynchronizowano ${lessonsToSync.length} lekcji dla kursu ${wtlCourseId}`)
 
     } catch (error) {
@@ -389,14 +391,20 @@ export class CourseSyncService {
   /**
    * Pobiera kursy z lokalnej bazy danych
    */
-  async getLocalCourses(): Promise<any[]> {
-    const { data, error } = await supabase
+  async getLocalCourses(status: 'active' | 'inactive' | 'all' = 'active'): Promise<any[]> {
+    let query = supabase
       .from('courses')
       .select(`
         *,
         teacher:users(username, email)
       `)
-      .order('title')
+      .order('title') as any
+
+    if (status !== 'all') {
+      query = query.eq('status', status)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       console.error('❌ Błąd pobierania kursów:', error)
@@ -426,6 +434,49 @@ export class CourseSyncService {
     }
 
     return data || []
+  }
+
+  // Soft-delete local courses missing from WTL
+  private async softDeleteMissingCourses(wtlIds: string[]): Promise<void> {
+    try {
+      const nowIso = new Date().toISOString()
+      const set = new Set(wtlIds.map(String))
+      const { data: local, error } = await supabase
+        .from('courses')
+        .select('id, wtl_course_id, status')
+      if (error) return
+      const toDeactivate = (local || [])
+        .filter((c: any) => !set.has(String(c.wtl_course_id)) && c.status !== 'inactive')
+        .map((c: any) => c.id)
+      if (toDeactivate.length > 0) {
+        await supabase
+          .from('courses')
+          .update({ status: 'inactive', sync_status: 'deleted', updated_at: nowIso, last_sync_at: nowIso })
+          .in('id', toDeactivate)
+      }
+    } catch {}
+  }
+
+  // Soft-delete lessons for a course that are missing in the latest WTL payload
+  private async softDeleteMissingLessons(localCourseId: string, incomingWtlIds: string[]): Promise<void> {
+    try {
+      const nowIso = new Date().toISOString()
+      const set = new Set(incomingWtlIds.map(String))
+      const { data: local, error } = await supabase
+        .from('lessons')
+        .select('id, wtl_lesson_id, status')
+        .eq('course_id', localCourseId)
+      if (error) return
+      const toDeactivate = (local || [])
+        .filter((l: any) => !set.has(String(l.wtl_lesson_id)) && l.status !== 'inactive')
+        .map((l: any) => l.id)
+      if (toDeactivate.length > 0) {
+        await supabase
+          .from('lessons')
+          .update({ status: 'inactive', sync_status: 'deleted', updated_at: nowIso, last_sync_at: nowIso })
+          .in('id', toDeactivate)
+      }
+    } catch {}
   }
 
   /**
@@ -459,3 +510,6 @@ export class CourseSyncService {
 }
 
 export const courseSyncService = new CourseSyncService()
+
+
+

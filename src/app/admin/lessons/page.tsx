@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Pagination from '@/components/ui/Pagination'
 import { useAuthStore } from '@/store/auth-store'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
@@ -32,6 +33,9 @@ export default function AdminLessonsPage() {
   const [isSyncing, setIsSyncing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  // Pagination for lessons table
+  const [listPage, setListPage] = useState<number>(1)
+  const [listPageSize, setListPageSize] = useState<number>(20)
 
   useEffect(() => {
     initialize()
@@ -393,7 +397,10 @@ export default function AdminLessonsPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {lessons.map((lesson) => (
+                    {(() => {
+                      const start = (listPage - 1) * listPageSize
+                      return lessons.slice(start, start + listPageSize)
+                    })().map((lesson) => (
                       <tr key={lesson.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
@@ -437,6 +444,15 @@ export default function AdminLessonsPage() {
                     ))}
                   </tbody>
                 </table>
+                <div className="px-6 py-4 border-t border-gray-200">
+                  <Pagination
+                    total={lessons.length}
+                    page={listPage}
+                    pageSize={listPageSize}
+                    onPageChange={(p) => setListPage(p)}
+                    onPageSizeChange={(s) => { setListPage(1); setListPageSize(s) }}
+                  />
+                </div>
               </div>
             )}
           </div>

@@ -64,10 +64,11 @@ export async function GET(request: NextRequest) {
       // Synchronizuj lekcje z WTL do bazy danych
       if (courseId) {
         try {
+          const nowIso = new Date().toISOString()
           const lessonsToSync = wtlResponse.data.map((lesson: any) => {
             // Mapuj różne możliwe pola z WTL API
             const lessonId = lesson.id || lesson.lesson_id || lesson.lessonId
-            const lessonTitle = lesson.title || lesson.name || lesson.lesson_name
+            const lessonTitle = lesson.name || lesson.title || lesson.lesson_name
             const lessonDescription = lesson.description || lesson.summary || lesson.content_summary
             const lessonContent = lesson.content || lesson.lesson_content || lesson.text || ''
             const lessonOrder = lesson.order_number || lesson.order || lesson.position || lesson.sequence || 1
@@ -79,13 +80,14 @@ export async function GET(request: NextRequest) {
               description: lessonDescription || null,
               content: lessonContent || null,
               order_number: lessonOrder,
-              status: 'active'
+              status: 'active',
+              last_sync_at: nowIso
             }
           })
 
           const { error: syncError } = await supabase
             .from('lessons')
-            .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id' })
+            .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id', ignoreDuplicates: false })
 
           if (syncError) {
             console.log('Failed to sync lessons to database:', syncError)
@@ -155,10 +157,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Synchronizuj lekcje do bazy danych
+    const nowIso = new Date().toISOString()
     const lessonsToSync = wtlResponse.data.map((lesson: any) => {
       // Mapuj różne możliwe pola z WTL API
       const lessonId = lesson.id || lesson.lesson_id || lesson.lessonId
-      const lessonTitle = lesson.title || lesson.name || lesson.lesson_name
+      const lessonTitle = lesson.name || lesson.title || lesson.lesson_name
       const lessonDescription = lesson.description || lesson.summary || lesson.content_summary
       const lessonContent = lesson.content || lesson.lesson_content || lesson.text || ''
       const lessonOrder = lesson.order_number || lesson.order || lesson.position || lesson.sequence || 1
@@ -170,13 +173,14 @@ export async function POST(request: NextRequest) {
         description: lessonDescription || null,
         content: lessonContent || null,
         order_number: lessonOrder,
-        status: 'active'
+        status: 'active',
+        last_sync_at: nowIso
       }
     })
 
     const { error: syncError } = await supabase
       .from('lessons')
-      .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id' })
+      .upsert(lessonsToSync, { onConflict: 'wtl_lesson_id', ignoreDuplicates: false })
 
     if (syncError) {
       console.error('Failed to sync lessons to database:', syncError)

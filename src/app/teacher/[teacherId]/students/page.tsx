@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import { useParams } from 'next/navigation'
+import Pagination from '@/components/ui/Pagination'
 
 interface Course {
   id: string
@@ -53,6 +54,9 @@ export default function TeacherStudentsPage() {
   const [isSyncing, setIsSyncing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
+  // Pagination state for students list
+  const [studentsPage, setStudentsPage] = useState<number>(1)
+  const [studentsPageSize, setStudentsPageSize] = useState<number>(20)
 
   useEffect(() => {
     initialize()
@@ -220,6 +224,7 @@ export default function TeacherStudentsPage() {
 
   const handleCourseChange = async (courseId: string) => {
     setSelectedCourse(courseId)
+    setStudentsPage(1)
     await fetchEnrollments(courseId)
   }
 
@@ -507,7 +512,11 @@ export default function TeacherStudentsPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {enrollments.map((enrollment) => (
+                  {(() => {
+                    const start = (studentsPage - 1) * studentsPageSize
+                    const pageSlice = enrollments.slice(start, start + studentsPageSize)
+                    return pageSlice
+                  })().map((enrollment) => (
                     <tr key={enrollment.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -573,6 +582,15 @@ export default function TeacherStudentsPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-200">
+              <Pagination
+                total={enrollments.length}
+                page={studentsPage}
+                pageSize={studentsPageSize}
+                onPageChange={(p) => setStudentsPage(p)}
+                onPageSizeChange={(s) => { setStudentsPage(1); setStudentsPageSize(s) }}
+              />
             </div>
           </div>
         ) : selectedCourse ? (

@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const [
       { count: totalUsers },
       { count: activeUsers },
-      { count: totalCourses },
+      { count: activeCourses },
     ] = await Promise.all([
       // Liczba wszystkich użytkowników
       supabase.from("users").select("*", { count: "exact", head: true }),
@@ -26,13 +26,16 @@ export async function GET(request: NextRequest) {
         .eq("is_active", true),
 
       // Liczba kursów (placeholder - na razie 0)
-      Promise.resolve({ count: 0 }),
+      supabase
+        .from("courses")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "active"),
     ]);
 
     return NextResponse.json({
       totalUsers: totalUsers || 0,
       activeUsers: activeUsers || 0,
-      totalCourses: totalCourses || 0,
+      totalCourses: activeCourses || 0,
     });
   } catch (error) {
     console.error("Błąd podczas pobierania statystyk:", error);

@@ -14,14 +14,24 @@ export async function GET(request: NextRequest) {
     // Sprawdź czy to jest nauczyciel (ma parametr teacherId)
     const { searchParams } = new URL(request.url)
     const teacherId = searchParams.get('teacherId')
+    // Paging params (optional)
+    const pageParam = searchParams.get('page')
+    const limitParam = searchParams.get('limit')
+    const hasPaging = !!(pageParam || limitParam)
+    const page = Math.max(1, parseInt(pageParam || '1', 10))
+    const limitRaw = Math.max(1, parseInt(limitParam || '20', 10))
+    const limit = Math.min(100, limitRaw)
     
     let courses: any[] = []
+    let total = 0
     
     if (teacherId) {
       // Dla nauczyciela - pobierz tylko kursy do których jest przypisany
       console.log(`👥 Pobieram kursy dla nauczyciela ${teacherId}...`)
       
-      const { data: courseTeachers, error: ctError } = await supabase
+      const start = (page - 1) * limit
+      const end = start + limit - 1
+      const { data: courseTeachers, error: ctError, count } = await supabase
         .from('course_teachers')
         .select(`
           course_id,
@@ -31,10 +41,12 @@ export async function GET(request: NextRequest) {
             *,
             teacher:users(username, email)
           )
-        `)
+        `, { count: hasPaging ? 'exact' : undefined })
         .eq('teacher_id', teacherId)
         .eq('is_active', true)
+        .eq('course.status', 'active')
         .order('assigned_at', { ascending: false })
+        .range(hasPaging ? start : 0, hasPaging ? end : 100000)
       
       if (ctError) {
         console.error('❌ Błąd pobierania przypisań kursów:', ctError)
@@ -47,12 +59,13 @@ export async function GET(request: NextRequest) {
         teacher_role: ct.role, // Dodaj rolę nauczyciela w tym kursie
         assigned_at: ct.assigned_at // Data przypisania
       })) || []
-      
+      total = count ?? courses.length
+
       console.log(`✅ Pobrano ${courses.length} kursów dla nauczyciela ${teacherId}`)
     } else {
       // Dla admina - pobierz wszystkie kursy
       console.log('👑 Pobieram wszystkie kursy (admin)...')
-      courses = await courseSyncService.getLocalCourses()
+      courses = await courseSyncService.getLocalCourses('active')
       console.log(`✅ Pobrano ${courses.length} wszystkich kursów`)
     }
     
