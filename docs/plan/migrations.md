@@ -97,15 +97,19 @@ ON CONFLICT (course_id, lesson_id) DO NOTHING;
 
 Docelowo: nowych mapowań używa UI `/admin/courses/:id/lessons`. W kolejnej fazie można zdeprecjonować `lessons.course_id`.
 
-## 3) Notatki: rozszerzenie o author_id i course_id
+## 3) Wątki (rename z `notes`) + rozszerzenia
 
 ```sql
-ALTER TABLE public.notes
+-- (jeśli jeszcze nie wykonane) rename notes -> threads i powiązane nazwy
+-- patrz: supabase/migrations/20250902130000_rename_notes_to_threads.sql
+
+-- rozszerzenia kolumn (gdy wymagane)
+ALTER TABLE public.threads
   ADD COLUMN IF NOT EXISTS author_id uuid NULL REFERENCES public.users(id) ON DELETE SET NULL,
   ADD COLUMN IF NOT EXISTS course_id uuid NULL REFERENCES public.courses(id) ON DELETE SET NULL;
 
 -- (opcjonalnie) weryfikacja spójności istniejących danych
--- UPDATE public.notes SET course_id = ... WHERE course_id IS NULL; -- wg potrzeb
+-- UPDATE public.threads SET course_id = ... WHERE course_id IS NULL; -- wg potrzeb
 ```
 
-Polityki RLS dla nowych kolumn można dopiąć po stronie API (service role przy zapisie). Ewentualne restrykcje RLS dopracujemy po MVP.
+Polityki RLS dla `threads` są zdefiniowane w migracji rename. Ewentualne restrykcje dopracujemy po MVP.

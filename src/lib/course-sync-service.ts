@@ -21,6 +21,25 @@ export interface WTLStudent {
   expired_at?: string
 }
 
+export interface WTLLesson {
+  id?: string | number
+  lesson_id?: string | number
+  lessonId?: string | number
+  name?: string
+  title?: string
+  lesson_name?: string
+  description?: string
+  summary?: string
+  content_summary?: string
+  content?: string
+  lesson_content?: string
+  text?: string
+  order_number?: number
+  order?: number
+  position?: number
+  sequence?: number
+}
+
 export interface SyncResult {
   success: boolean
   courses: {
@@ -44,6 +63,69 @@ export interface SyncResult {
     errors: number
   }
   errors: string[]
+}
+
+// Lokalne typy struktur danych Supabase
+type LocalCourseRecord = {
+  id: string
+  title: string
+  description?: string | null
+  status?: string
+  max_students?: number | null
+  created_at?: string | null
+  updated_at?: string | null
+  wtl_course_id?: string | null
+  last_sync_at?: string | null
+  sync_status?: string | null
+  teacher?: { username?: string | null; email?: string | null } | null
+}
+
+type LocalStudent = {
+  id?: string
+  email?: string
+  username?: string
+  first_name?: string
+  last_name?: string
+  status?: string
+  last_sync_at?: string
+  sync_status?: string
+}
+
+type LocalCourseEnrollmentRecord = {
+  id: string
+  course_id: string
+  student_id: string
+  enrollment_date?: string
+  progress_percentage?: number
+  status?: string
+  last_activity?: string
+  created_at?: string
+  last_sync_at?: string
+  sync_status?: string
+  student?: LocalStudent | null
+  course?: LocalCourseRecord | null
+}
+
+type LocalStudentCourseEnrollment = {
+  id: string
+  course_id: string
+  student_id: string
+  enrollment_date?: string
+  progress_percentage?: number
+  status?: string
+  last_activity?: string
+  created_at?: string
+  last_sync_at?: string
+  sync_status?: string
+  course?: LocalCourseRecord | null
+}
+
+type SyncStats = {
+  courses: number
+  students: number
+  enrollments: number
+  lessons: number
+  lastSync: string
 }
 
 export class CourseSyncService {
@@ -180,7 +262,7 @@ export class CourseSyncService {
 
       // Przygotuj lekcje do synchronizacji
       const nowIso = new Date().toISOString()
-      const lessonsToSync = wtlLessons.map((lesson: any) => {
+      const lessonsToSync = wtlLessons.map((lesson: WTLLesson) => {
         // Mapuj różne możliwe pola z WTL API
         const lessonId = lesson.id || lesson.lesson_id || lesson.lessonId
         const lessonTitle = lesson.name || lesson.title || lesson.lesson_name
@@ -189,7 +271,7 @@ export class CourseSyncService {
         const lessonOrder = lesson.order_number || lesson.order || lesson.position || lesson.sequence || 1
         
         return {
-          wtl_lesson_id: lessonId.toString(),
+          wtl_lesson_id: String(lessonId),
           course_id: localCourseId,
           title: lessonTitle,
           description: lessonDescription || null,
@@ -376,7 +458,7 @@ export class CourseSyncService {
   /**
    * Loguje akcję synchronizacji
    */
-  private async logSync(entityType: string, entityId: string, action: string, details: any): Promise<void> {
+  private async logSync(entityType: string, entityId: string, action: string, details: Record<string, unknown>): Promise<void> {
     await supabase
       .from('sync_log')
       .insert({
@@ -391,14 +473,14 @@ export class CourseSyncService {
   /**
    * Pobiera kursy z lokalnej bazy danych
    */
-  async getLocalCourses(status: 'active' | 'inactive' | 'all' = 'active'): Promise<any[]> {
+  async getLocalCourses(status: 'active' | 'inactive' | 'all' = 'active'): Promise<LocalCourseRecord[]> {
     let query = supabase
       .from('courses')
       .select(`
         *,
         teacher:users(username, email)
       `)
-      .order('title') as any
+      .order('title')
 
     if (status !== 'all') {
       query = query.eq('status', status)
@@ -417,7 +499,7 @@ export class CourseSyncService {
   /**
    * Pobiera studentów dla konkretnego kursu z lokalnej bazy danych
    */
-  async getLocalCourseStudents(courseId: string): Promise<any[]> {
+  async getLocalCourseStudents(courseId: string): Promise<LocalCourseEnrollmentRecord[]> {
     const { data, error } = await supabase
       .from('course_enrollments')
       .select(`
@@ -433,7 +515,28 @@ export class CourseSyncService {
       throw error
     }
 
-    return data || []
+    return (data || []) as LocalCourseEnrollmentRecord[]
+  }
+
+  /**
+   * Pobiera kursy, do których zapisany jest dany student (lokalna baza)
+   */
+  async getLocalStudentCourses(studentId: string): Promise<LocalStudentCourseEnrollment[]> {
+    const { data, error } = await supabase
+      .from('course_enrollments')
+      .select(`
+        *,
+        course:courses(*)
+      `)
+      .eq('student_id', studentId)
+      .order('enrollment_date')
+
+    if (error) {
+      console.error('🚫 Błąd pobierania kursów dla studenta:', error)
+      throw error
+    }
+
+    return (data || []) as LocalStudentCourseEnrollment[]
   }
 
   // Soft-delete local courses missing from WTL
@@ -446,8 +549,8 @@ export class CourseSyncService {
         .select('id, wtl_course_id, status')
       if (error) return
       const toDeactivate = (local || [])
-        .filter((c: any) => !set.has(String(c.wtl_course_id)) && c.status !== 'inactive')
-        .map((c: any) => c.id)
+        .filter((c: { id: string; wtl_course_id: string | null; status: string }) => !set.has(String(c.wtl_course_id)) && c.status !== 'inactive')
+        .map((c: { id: string }) => c.id)
       if (toDeactivate.length > 0) {
         await supabase
           .from('courses')
@@ -468,8 +571,8 @@ export class CourseSyncService {
         .eq('course_id', localCourseId)
       if (error) return
       const toDeactivate = (local || [])
-        .filter((l: any) => !set.has(String(l.wtl_lesson_id)) && l.status !== 'inactive')
-        .map((l: any) => l.id)
+        .filter((l: { id: string; wtl_lesson_id: string | null; status: string }) => !set.has(String(l.wtl_lesson_id)) && l.status !== 'inactive')
+        .map((l: { id: string }) => l.id)
       if (toDeactivate.length > 0) {
         await supabase
           .from('lessons')
@@ -482,7 +585,7 @@ export class CourseSyncService {
   /**
    * Pobiera statystyki synchronizacji
    */
-  async getSyncStats(): Promise<any> {
+  async getSyncStats(): Promise<SyncStats> {
     const { data: courses } = await supabase
       .from('courses')
       .select('sync_status', { count: 'exact' })

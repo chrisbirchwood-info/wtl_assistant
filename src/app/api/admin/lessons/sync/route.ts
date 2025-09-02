@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextResponse } from 'next/server'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -10,7 +11,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     console.log('>> Rozpoczynam synchronizację lekcji z WTL...')
 
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
             console.log(`✅ Wybrano działający endpoint: ${testUrl}`)
             break
           }
-        } catch (e) {
+        } catch {
           // ignoruj błędy prób
         }
       }
@@ -252,7 +253,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Pobierz wszystkie lekcje z bazy danych
     const { data: lessons, error } = await supabase

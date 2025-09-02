@@ -37,12 +37,12 @@ Poniżej lista kluczowych plików oraz planowanych zmian, tak aby wdrożyć uzgo
 - `src/app/api/admin/users/route.ts`
   - `POST/PATCH` – obsługa `roles: string[]` i zapis do `user_roles`.
 
-## Notatki
-- `src/app/notes/page.tsx`
-  - Widok użytkownika; dodać filtrowanie po kursie/lekcji.
-- [Nowe] `src/app/api/teacher/notes/route.ts`
-  - Tworzenie notatki przez nauczyciela (author_id), skojarzonej z uczniem/kurs/lekcją.
-- Migracje `notes`: `author_id`, `course_id`.
+## Wątki
+- `src/app/threads/page.tsx`
+  - Widok użytkownika; filtrowanie po kursie/lekcji.
+- API: `src/app/api/threads/route.ts`, `src/app/api/threads/[id]/route.ts`
+  - Tworzenie/przegląd wątków (obsługa `user_id` studenta w query; nauczyciel może tworzyć w imieniu studenta).
+- Migracje: rename `notes` -> `threads` + rozszerzenia (`author_id`, `course_id`).
 
 ## Auth/Store
 - `src/lib/auth.ts`, `src/store/auth-store.ts`, `src/lib/supabase.ts`

@@ -1,48 +1,75 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { UpdateNoteRequest } from "@/types/notes"
+import { UpdateThreadRequest as UpdateNoteRequest } from "@/types/threads"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Pobierz konkretną notatkę
+// Helper: resolve array of lesson identifiers to local lessons.id (uuid)
+async function resolveLessonIdsToLocal(lessonIds: string[] | undefined | null): Promise<string[]> {
+  if (!lessonIds || lessonIds.length === 0) return []
+
+  const unique = Array.from(new Set(lessonIds.filter(Boolean)))
+
+  let { data: byId } = await supabase
+    .from('lessons')
+    .select('id, wtl_lesson_id')
+    .in('id', unique as string[])
+
+  byId = byId || []
+  const matchedById = new Map((byId as any[]).map((r) => [String(r.id), String(r.id)]))
+  const unresolved = unique.filter((x) => !matchedById.has(x))
+
+  let byWtl: any[] = []
+  if (unresolved.length > 0) {
+    const resp = await supabase
+      .from('lessons')
+      .select('id, wtl_lesson_id')
+      .in('wtl_lesson_id', unresolved as string[])
+    byWtl = resp.data || []
+  }
+
+  const wtlMap = new Map(byWtl.map((r) => [String(r.wtl_lesson_id), String(r.id)]))
+
+  const resolved: string[] = unique.map((orig) => matchedById.get(orig) || wtlMap.get(orig) || orig)
+  return resolved
+}
+
+// GET: pojedynczy wątek (czyta z `threads`)
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await context.params
-    
+
     const { data: note, error } = await supabase
-      .from('notes')
+      .from('threads')
       .select(`
         *,
-        note_lesson_connections(*)
+        lesson_connections:thread_lesson_connections(*)
       `)
       .eq('id', id)
       .single()
-    
+
     if (error) {
       if (error.code === 'PGRST116') {
         return NextResponse.json(
-          { error: "Notatka nie została znaleziona" },
+          { error: "Wątek nie został znaleziony" },
           { status: 404 }
         )
       }
-      console.error("❌ Błąd pobierania notatki:", error)
       return NextResponse.json(
-        { error: "Błąd podczas pobierania notatki" },
+        { error: "Błąd podczas pobierania wątku" },
         { status: 500 }
       )
     }
-    
-    console.log("✅ Pobrano notatkę:", note.id)
-    return NextResponse.json({ note })
-    
-  } catch (error) {
-    console.error("❌ Błąd podczas pobierania notatki:", error)
+
+    return NextResponse.json({ thread: note })
+  } catch {
     return NextResponse.json(
       { error: "Wystąpił nieoczekiwany błąd" },
       { status: 500 }
@@ -50,7 +77,7 @@ export async function GET(
   }
 }
 
-// Aktualizuj notatkę
+// PUT: aktualizuj wątek
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -58,63 +85,57 @@ export async function PUT(
   try {
     const { id } = await context.params
     const { title, content, lesson_ids, connection_types }: UpdateNoteRequest = await request.json()
-    
-    // Sprawdź czy notatka istnieje
+
     const { data: existingNote, error: checkError } = await supabase
-      .from('notes')
+      .from('threads')
       .select('id')
       .eq('id', id)
       .single()
-    
+
     if (checkError || !existingNote) {
       return NextResponse.json(
-        { error: "Notatka nie została znaleziona" },
+        { error: "Wątek nie został znaleziony" },
         { status: 404 }
       )
     }
-    
-    // 1. Aktualizuj notatkę
-    const updateData: any = {}
+
+    const updateData: Record<string, unknown> = {}
     if (title !== undefined) updateData.title = title
     if (content !== undefined) updateData.content = content
-    
+
     if (Object.keys(updateData).length > 0) {
       const { error: updateError } = await supabase
-        .from('notes')
+        .from('threads')
         .update(updateData)
         .eq('id', id)
-      
+
       if (updateError) {
-        console.error("❌ Błąd aktualizacji notatki:", updateError)
         return NextResponse.json(
-          { error: "Błąd podczas aktualizacji notatki" },
+          { error: "Błąd podczas aktualizacji wątku" },
           { status: 500 }
         )
       }
     }
-    
-    // 2. Aktualizuj powiązania z lekcjami (jeśli są)
+
     if (lesson_ids !== undefined) {
-      // Usuń istniejące powiązania
+      const resolvedLessonIds = await resolveLessonIdsToLocal(lesson_ids)
       await supabase
-        .from('note_lesson_connections')
+        .from('thread_lesson_connections')
         .delete()
-        .eq('note_id', id)
-      
-      // Utwórz nowe powiązania
-      if (lesson_ids.length > 0) {
-        const connections = lesson_ids.map((lesson_id: string, index: number) => ({
-          note_id: id,
+        .eq('thread_id', id)
+
+      if (resolvedLessonIds.length > 0) {
+        const connections = resolvedLessonIds.map((lesson_id: string, index: number) => ({
+          thread_id: id,
           lesson_id,
           connection_type: connection_types?.[index] || 'related'
         }))
-        
+
         const { error: connectionError } = await supabase
-          .from('note_lesson_connections')
+          .from('thread_lesson_connections')
           .insert(connections)
-        
+
         if (connectionError) {
-          console.error("❌ Błąd aktualizacji powiązań:", connectionError)
           return NextResponse.json(
             { error: "Błąd podczas aktualizacji powiązań z lekcjami" },
             { status: 500 }
@@ -122,14 +143,9 @@ export async function PUT(
         }
       }
     }
-    
-    console.log("✅ Zaktualizowano notatkę:", id)
-    return NextResponse.json({ 
-      message: "Notatka została zaktualizowana pomyślnie" 
-    })
-    
-  } catch (error) {
-    console.error("❌ Błąd podczas aktualizacji notatki:", error)
+
+    return NextResponse.json({ message: "Wątek został zaktualizowany pomyślnie" })
+  } catch {
     return NextResponse.json(
       { error: "Wystąpił nieoczekiwany błąd" },
       { status: 500 }
@@ -137,49 +153,41 @@ export async function PUT(
   }
 }
 
-// Usuń notatkę
+// DELETE: usuń wątek
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await context.params
-    
-    // Sprawdź czy notatka istnieje
+
     const { data: existingNote, error: checkError } = await supabase
-      .from('notes')
+      .from('threads')
       .select('id')
       .eq('id', id)
       .single()
-    
+
     if (checkError || !existingNote) {
       return NextResponse.json(
-        { error: "Notatka nie została znaleziona" },
+        { error: "Wątek nie został znaleziony" },
         { status: 404 }
       )
     }
-    
-    // Usuń notatkę (powiązania zostaną usunięte automatycznie przez CASCADE)
+
     const { error: deleteError } = await supabase
-      .from('notes')
+      .from('threads')
       .delete()
       .eq('id', id)
-    
+
     if (deleteError) {
-      console.error("❌ Błąd usuwania notatki:", deleteError)
       return NextResponse.json(
-        { error: "Błąd podczas usuwania notatki" },
+        { error: "Błąd podczas usuwania wątku" },
         { status: 500 }
       )
     }
-    
-    console.log("✅ Usunięto notatkę:", id)
-    return NextResponse.json({ 
-      message: "Notatka została usunięta pomyślnie" 
-    })
-    
-  } catch (error) {
-    console.error("❌ Błąd podczas usuwania notatki:", error)
+
+    return NextResponse.json({ message: "Wątek został usunięty pomyślnie" })
+  } catch {
     return NextResponse.json(
       { error: "Wystąpił nieoczekiwany błąd" },
       { status: 500 }

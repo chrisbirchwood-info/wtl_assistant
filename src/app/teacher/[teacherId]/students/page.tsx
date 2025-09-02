@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import { useParams } from 'next/navigation'
 import Pagination from '@/components/ui/Pagination'
@@ -42,12 +42,49 @@ interface CourseEnrollment {
   sync_status?: string
 }
 
+// Minimalne typy do mapowania odpowiedzi lokalnych API (zamiast any)
+type LocalCourse = {
+  id: string
+  title: string
+  description?: string
+  status?: string
+  max_students?: number
+  created_at?: string
+  wtl_course_id?: string
+  last_sync_at?: string
+  sync_status?: string
+  teacher_role?: string
+  assigned_at?: string
+}
+
+type LocalEnrollment = {
+  id: string
+  student?: {
+    id?: string
+    email?: string
+    username?: string
+    first_name?: string
+    last_name?: string
+    status?: string
+    last_sync_at?: string
+    sync_status?: string
+  }
+  enrollment_date?: string
+  progress_percentage?: number
+  status?: string
+  last_activity?: string
+  last_sync_at?: string
+  sync_status?: string
+}
+
 export default function TeacherStudentsPage() {
   const { user, isAuthenticated, initialize } = useAuthStore()
   const params = useParams()
   const teacherId = params.teacherId as string
   
   const [courses, setCourses] = useState<Course[]>([])
+  // Keep a ref with latest courses to avoid callback identity churn
+  const coursesRef = useRef<Course[]>([])
   const [enrollments, setEnrollments] = useState<CourseEnrollment[]>([])
   const [selectedCourse, setSelectedCourse] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
@@ -62,27 +99,80 @@ export default function TeacherStudentsPage() {
     initialize()
   }, [initialize])
 
-  useEffect(() => {
-    if (!user || !isAuthenticated) return
 
-    // Sprawdź czy użytkownik ma dostęp do tego widoku
-    if (user.role !== 'teacher' && user.role !== 'superadmin') {
-      setError('Dostęp tylko dla nauczycieli')
-      setIsLoading(false)
-      return
+  const fetchEnrollments = useCallback(async (courseId: string) => {
+    try {
+      // Pobierz studentów z lokalnej bazy dla konkretnego kursu
+      const response = await fetch(`/api/courses/${courseId}/students/local`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.error || `Błąd pobierania studentów: ${response.status} ${response.statusText}`
+        throw new Error(errorMessage)
+      }
+
+      const result = await response.json()
+      const enrollmentsData = result.students || []
+      
+      // Sprawdź czy dane są tablicą
+      if (!Array.isArray(enrollmentsData)) {
+        console.warn('⚠️ Otrzymane dane studentów nie są tablicą:', enrollmentsData)
+        setEnrollments([])
+        setError('Nieprawidłowa struktura danych studentów z lokalnej bazy')
+        return
+      }
+      
+      // Sprawdź czy są jacyś studenci
+      if (enrollmentsData.length === 0) {
+        console.log('ℹ️ Brak studentów w kursie')
+        setEnrollments([])
+        return
+      }
+      
+      // Mapuj dane z lokalnej bazy na nasz format
+      const currentCourses = coursesRef.current || []
+      const mappedEnrollments = enrollmentsData.map((enrollment: LocalEnrollment) => ({
+        id: enrollment.id,
+        course: currentCourses.find(c => c.id === courseId) || {
+          id: courseId,
+          title: 'Nieznany kurs',
+          description: '',
+          status: 'active',
+          max_students: 50,
+          created_at: new Date().toISOString()
+        },
+        student: {
+          id: enrollment.student?.id || enrollment.id,
+          email: enrollment.student?.email || 'brak@email.com',
+          username: enrollment.student?.username || enrollment.student?.first_name || 'Student ' + (enrollment.student?.id || enrollment.id),
+          first_name: enrollment.student?.first_name,
+          last_name: enrollment.student?.last_name,
+          status: enrollment.student?.status || 'active',
+          last_sync_at: enrollment.student?.last_sync_at,
+          sync_status: enrollment.student?.sync_status
+        },
+        enrollment_date: enrollment.enrollment_date || new Date().toISOString(),
+        progress_percentage: enrollment.progress_percentage || 0,
+        status: enrollment.status || 'enrolled',
+        last_activity: enrollment.last_activity || new Date().toISOString(),
+        last_sync_at: enrollment.last_sync_at,
+        sync_status: enrollment.sync_status
+      }))
+
+      setEnrollments(mappedEnrollments)
+
+    } catch (err) {
+      console.error('Error fetching enrollments:', err)
+      setError(err instanceof Error ? err.message : 'Wystąpił nieoczekiwany błąd')
     }
+  }, [])
 
-    // Sprawdź czy nauczyciel przegląda swoje dane (lub superadmin może wszystko)
-    if (user.role === 'teacher' && user.id !== teacherId) {
-      setError('Możesz przeglądać tylko swoje dane')
-      setIsLoading(false)
-      return
-    }
-
-    fetchTeacherData()
-  }, [user, isAuthenticated, teacherId])
-
-  const fetchTeacherData = async () => {
+  const fetchTeacherData = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -122,7 +212,7 @@ export default function TeacherStudentsPage() {
       }
 
       // Mapuj dane z lokalnej bazy na nasz format
-      const mappedCourses = coursesData.map((course: any) => ({
+      const mappedCourses = coursesData.map((course: LocalCourse) => ({
         id: course.id,
         title: course.title,
         description: course.description || '',
@@ -136,6 +226,8 @@ export default function TeacherStudentsPage() {
         assigned_at: course.assigned_at
       }))
 
+      // Update ref first to make it immediately available to callbacks
+      coursesRef.current = mappedCourses
       setCourses(mappedCourses)
 
       if (mappedCourses.length > 0) {
@@ -149,78 +241,27 @@ export default function TeacherStudentsPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [teacherId])
+  useEffect(() => {
+    if (!user || !isAuthenticated) return
 
-  const fetchEnrollments = async (courseId: string) => {
-    try {
-      // Pobierz studentów z lokalnej bazy dla konkretnego kursu
-      const response = await fetch(`/api/courses/${courseId}/students/local`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        const errorMessage = errorData.error || `Błąd pobierania studentów: ${response.status} ${response.statusText}`
-        throw new Error(errorMessage)
-      }
-
-      const result = await response.json()
-      const enrollmentsData = result.students || []
-      
-      // Sprawdź czy dane są tablicą
-      if (!Array.isArray(enrollmentsData)) {
-        console.warn('⚠️ Otrzymane dane studentów nie są tablicą:', enrollmentsData)
-        setEnrollments([])
-        setError('Nieprawidłowa struktura danych studentów z lokalnej bazy')
-        return
-      }
-      
-      // Sprawdź czy są jacyś studenci
-      if (enrollmentsData.length === 0) {
-        console.log('ℹ️ Brak studentów w kursie')
-        setEnrollments([])
-        return
-      }
-      
-      // Mapuj dane z lokalnej bazy na nasz format
-      const mappedEnrollments = enrollmentsData.map((enrollment: any) => ({
-        id: enrollment.id,
-        course: courses.find(c => c.id === courseId) || {
-          id: courseId,
-          title: 'Nieznany kurs',
-          description: '',
-          status: 'active',
-          max_students: 50,
-          created_at: new Date().toISOString()
-        },
-        student: {
-          id: enrollment.student?.id || enrollment.id,
-          email: enrollment.student?.email || 'brak@email.com',
-          username: enrollment.student?.username || enrollment.student?.first_name || 'Student ' + (enrollment.student?.id || enrollment.id),
-          first_name: enrollment.student?.first_name,
-          last_name: enrollment.student?.last_name,
-          status: enrollment.student?.status || 'active',
-          last_sync_at: enrollment.student?.last_sync_at,
-          sync_status: enrollment.student?.sync_status
-        },
-        enrollment_date: enrollment.enrollment_date || new Date().toISOString(),
-        progress_percentage: enrollment.progress_percentage || 0,
-        status: enrollment.status || 'enrolled',
-        last_activity: enrollment.last_activity || new Date().toISOString(),
-        last_sync_at: enrollment.last_sync_at,
-        sync_status: enrollment.sync_status
-      }))
-
-      setEnrollments(mappedEnrollments)
-
-    } catch (err) {
-      console.error('Error fetching enrollments:', err)
-      setError(err instanceof Error ? err.message : 'Wystąpił nieoczekiwany błąd')
+    // Sprawdź czy użytkownik ma dostęp do tego widoku
+    if (user.role !== 'teacher' && user.role !== 'superadmin') {
+      setError('Dostęp tylko dla nauczycieli')
+      setIsLoading(false)
+      return
     }
-  }
+
+    // Sprawdź czy nauczyciel przegląda swoje dane (lub superadmin może wszystko)
+    if (user.role === 'teacher' && user.id !== teacherId) {
+      setError('Możesz przeglądać tylko swoje dane')
+      setIsLoading(false)
+      return
+    }
+
+    fetchTeacherData()
+  }, [user, isAuthenticated, teacherId, fetchTeacherData])
+
 
   const handleCourseChange = async (courseId: string) => {
     setSelectedCourse(courseId)
@@ -325,8 +366,8 @@ export default function TeacherStudentsPage() {
     if (course && student) {
       console.log(`📚 Przechodzę do lekcji dla studenta ${student.email} w kursie ${course.title}`)
       
-      // Przejdź do strony z lekcjami używając nowego URL
-      window.location.href = `/teacher/${teacherId}/students/${studentId}?courseId=${courseId}`
+      // Przejdź do listy wątków danego studenta
+      window.location.href = `/teacher/${teacherId}/students/${studentId}/threads`
     }
   }
 
@@ -652,3 +693,4 @@ export default function TeacherStudentsPage() {
     </div>
   )
 }
+

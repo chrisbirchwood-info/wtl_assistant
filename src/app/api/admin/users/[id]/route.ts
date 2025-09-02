@@ -62,7 +62,7 @@ export async function PATCH(
     }
 
     // Przygotuj dane do aktualizacji
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
 

@@ -1,4 +1,4 @@
-# Kontrakty API (Admin, Sync, Notatki)
+# Kontrakty API (Admin, Sync, Wątki)
 
 Uwaga: ścieżki są względem Next.js app routes (np. `src/app/api/...`). Ochrona uprawnień po stronie panelu admin i weryfikacja ról po stronie API.
 
@@ -50,19 +50,17 @@ Uwaga: ścieżki są względem Next.js app routes (np. `src/app/api/...`). Ochro
 - `GET /api/admin/lessons`
   - Zwraca: globalną listę lekcji (przegląd)
 
-## Notatki
-- `GET /api/notes?student_id?&course_id?&lesson_id?&include_connections?`
-  - Zwraca: notatki; opcjonalnie z powiązaniami do lekcji
-- `POST /api/notes` (ogólne tworzenie notatki użytkownika)
+## Wątki
+- `GET /api/threads?user_id?&owner_student_id?&owner_email?&course_id?&lesson_id?&include_connections=true|false`
+  - Zwraca: wątki; opcjonalnie z powiązaniami do lekcji (thread_lesson_connections)
+- `POST /api/threads?user_id={studentUserId}` (tworzenie wątku; nauczyciel może podać `user_id` studenta)
   - Body: `{ title, content, lesson_ids?: string[], connection_types?: string[] }`
-- NOWE: `POST /api/teacher/notes`
-  - Body: `{ student_id, course_id, lesson_id?, content }`
-  - Efekt: tworzy notatkę w imieniu nauczyciela (author_id), przypisaną do ucznia/kursu/lekcji
+  - Efekt: tworzy wątek (owner = `user_id`), opcjonalne powiązania z lekcjami
 
 ## Uprawnienia (RBAC)
 - Admin (rola `admin` lub `superadmin` w okresie przejściowym): pełny dostęp do `/api/admin/**` i sync.
-- Teacher: dostęp do swoich kursów/uczniów, tworzenie/przegląd notatek.
-- Student: własne notatki (poza `/admin`).
+- Teacher: dostęp do swoich kursów/uczniów, tworzenie/przegląd wątków.
+- Student: własne wątki (poza `/admin`).
 
 ## Kształt odpowiedzi (przykłady skrótowe)
 - Sukces: `{ success: true, ... }`

@@ -14,13 +14,25 @@ interface User {
   is_active: boolean
 }
 
+interface SyncResult {
+  success?: boolean
+  message?: string
+  error?: string
+  results?: {
+    total?: number
+    created?: number
+    updated?: number
+    errors?: number
+  }
+}
+
 export default function AdminUsers() {
   const { user, isAuthenticated } = useAuthStore()
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
-  const [syncResult, setSyncResult] = useState<any>(null)
+  const [syncResult, setSyncResult] = useState<SyncResult | null>(null)
   const [deletingUser, setDeletingUser] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   // Pagination state for users list
@@ -70,7 +82,7 @@ export default function AdminUsers() {
       })
       
       if (response.ok) {
-        const result = await response.json()
+        const result: SyncResult = await response.json()
         setSyncResult(result)
         console.log('✅ Synchronizacja zakończona:', result)
         
@@ -102,7 +114,7 @@ export default function AdminUsers() {
       })
 
       if (response.ok) {
-        const result = await response.json()
+        const result: { message?: string } = await response.json()
         console.log('✅ Użytkownik usunięty:', result.message)
         
         // Odśwież listę użytkowników

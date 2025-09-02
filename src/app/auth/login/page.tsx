@@ -8,7 +8,6 @@ import { useAuthStore } from '@/store/auth-store'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 const emailSchema = z.object({
   email: z.string().email('Nieprawidłowy format email')

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 export interface WTLResponse<T = any> {
@@ -181,8 +182,8 @@ class WTLClient {
           const response = await this.client.get(endpoint);
           console.log(`WTL Tasks fetched from ${endpoint}:`, response.data);
           return { success: true, data: response.data };
-        } catch (error) {
-          console.log(`Failed to fetch from ${endpoint}:`, error);
+        } catch (_error) {
+          console.log(`Failed to fetch from ${endpoint}:`, _error);
           continue;
         }
       }
@@ -360,7 +361,7 @@ class WTLClient {
       const user = userResponse.data;
 
       // 2. Określ rolę użytkownika na podstawie różnych endpointów
-      const role = await this.determineUserRole(user.id, email);
+      const role = await this.determineUserRole(user.id);
 
       return {
         success: true,
@@ -383,8 +384,7 @@ class WTLClient {
    * Określa rolę użytkownika na podstawie różnych endpointów WTL
    */
   private async determineUserRole(
-    userId: string,
-    email: string
+    userId: string
   ): Promise<"student" | "teacher" | "superadmin"> {
     try {
       // Sprawdź czy użytkownik jest nauczycielem (ma dostęp do panelu nauczyciela)
@@ -445,7 +445,7 @@ class WTLClient {
       // Określ rolę dla każdego użytkownika
       const usersWithRoles = await Promise.all(
         usersResponse.data.map(async (user) => {
-          const role = await this.determineUserRole(user.id, user.email);
+          const role = await this.determineUserRole(user.id);
           return { ...user, role };
         })
       );
@@ -526,3 +526,4 @@ class WTLClient {
 
 export const wtlClient = new WTLClient();
 export default wtlClient;
+

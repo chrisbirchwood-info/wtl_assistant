@@ -18,8 +18,8 @@
 - Lista wszystkich lekcji z bazy (przegląd, debug), info o źródle i `last_sync_at`.
 - Akcja „Synchronizuj lekcje” (globalnie przez /admin/lessons/sync).
 
-## Notatki
-- (Admin) Brak edycji treści — tylko wgląd (opcjonalnie). Główny flow w widokach nauczyciela/studenta.
+## Wątki
+- (Admin) Brak edycji treści - tylko wgląd (opcjonalnie). Główny flow w widokach nauczyciela/studenta.
 
 ## Kontrola dostępu
 - Gating po wieloroli: `hasRole('admin')` do sekcji `/admin/**`.

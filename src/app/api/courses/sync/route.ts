@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { courseSyncService } from '@/lib/course-sync-service'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     console.log('🔄 Rozpoczynam synchronizację kursów...')
     

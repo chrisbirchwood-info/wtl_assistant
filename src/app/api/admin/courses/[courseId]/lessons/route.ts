@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -34,12 +35,12 @@ export async function GET(
       return NextResponse.json({ success: false, message: 'Błąd pobierania lekcji', error: error.message }, { status: 500 })
     }
 
-    const items = (data || []).map((row: any) => ({
+    const items = (data || []).map((row) => ({
       lesson_id: row.lesson_id,
       position: row.position,
       required: row.required,
-      wtl_lesson_id: row.lesson?.wtl_lesson_id,
-      title: row.lesson?.title,
+      wtl_lesson_id: (row as any).lesson?.wtl_lesson_id,
+      title: (row as any).lesson?.title,
     }))
 
     return NextResponse.json({ success: true, items })
@@ -59,10 +60,10 @@ export async function POST(
     const body = await request.json()
     let lessonIds: string[] = []
     if (Array.isArray(body?.lesson_ids)) {
-      lessonIds = (body.lesson_ids as any[]).map((v) => String(v))
+      lessonIds = (body.lesson_ids as unknown[]).map((v) => String(v))
     } else if (Array.isArray(body?.lesson_id)) {
       // Backward compatibility: accept lesson_id as array
-      lessonIds = (body.lesson_id as any[]).map((v) => String(v))
+      lessonIds = (body.lesson_id as unknown[]).map((v) => String(v))
     } else if (body?.lesson_id) {
       lessonIds = [String(body.lesson_id)]
     }
@@ -90,7 +91,7 @@ export async function POST(
       .from('course_lessons')
       .select('lesson_id')
       .eq('course_id', courseId)
-    const existingSet = new Set((existingMap || []).map((r: any) => r.lesson_id))
+    const existingSet = new Set((existingMap || []).map((r: { lesson_id: string }) => r.lesson_id))
 
     // Compute next position
     const { data: maxPosRows } = await supabase
@@ -101,14 +102,15 @@ export async function POST(
       .limit(1)
 
     let pos = (maxPosRows && maxPosRows.length > 0) ? (maxPosRows[0].position + 1) : 1
-    const idToLesson = new Map<string, any>(lessonsFound.map((l: any) => [l.id, l]))
-    const rows = [] as any[]
-    const addedLessons: any[] = []
+    const idToLesson = new Map<string, { id: string; title?: string; wtl_lesson_id?: string }>(lessonsFound.map((l: { id: string; title?: string; wtl_lesson_id?: string }) => [l.id, l]))
+    const rows: { course_id: string; lesson_id: string; position: number; required: boolean }[] = []
+    const addedLessons: { id: string; title?: string; wtl_lesson_id?: string }[] = []
     for (const id of lessonIds) {
       if (existingSet.has(id)) continue
       if (!idToLesson.has(id)) continue
       rows.push({ course_id: courseId, lesson_id: id, position: pos++, required: false })
-      addedLessons.push(idToLesson.get(id))
+      const info = idToLesson.get(id)
+      if (info) addedLessons.push(info)
     }
 
     if (rows.length === 0) {
@@ -125,9 +127,9 @@ export async function POST(
     }
 
     // Merge extra lesson info for convenience
-    const items = (insertedRows || []).map((r: any) => {
-      const info = idToLesson.get(r.lesson_id) || {}
-      return { ...r, wtl_lesson_id: info.wtl_lesson_id, title: info.title }
+    const items = (insertedRows || []).map((r: { lesson_id: string; position: number; required: boolean }) => {
+      const info = idToLesson.get(r.lesson_id)
+      return { ...r, wtl_lesson_id: info?.wtl_lesson_id, title: info?.title }
     })
 
     return NextResponse.json({ success: true, items })
@@ -147,9 +149,9 @@ export async function DELETE(
     const body = await request.json().catch(() => ({}))
     let lessonIds: string[] = []
     if (Array.isArray(body?.lesson_ids)) {
-      lessonIds = (body.lesson_ids as any[]).map((v) => String(v))
+      lessonIds = (body.lesson_ids as unknown[]).map((v) => String(v))
     } else if (Array.isArray(body?.lesson_id)) {
-      lessonIds = (body.lesson_id as any[]).map((v) => String(v))
+      lessonIds = (body.lesson_id as unknown[]).map((v) => String(v))
     } else if (body?.lesson_id) {
       lessonIds = [String(body.lesson_id)]
     }

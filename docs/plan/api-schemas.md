@@ -121,21 +121,21 @@ POST `/api/admin/lessons/sync`
 { "success": true, "lessons": { "created": 10, "updated": 25, "errors": 0 }, "errors": [] }
 ```
 
-## Teacher — Notes
+## Threads (Teacher)
 
-POST `/api/teacher/notes`
+POST `/api/threads?user_id={studentUserId}`
 ```json
-{ "student_id": "uuid", "course_id": "uuid", "lesson_id": "uuid(optional)", "content": "tekst notatki" }
+{ "title": "string", "content": "string", "lesson_ids": ["uuid"], "connection_types": ["primary"|"related"|"loose"] }
 ```
 - 201 Created
 ```json
-{ "success": true, "note": { "id": "uuid", "user_id": "student_id", "author_id": "teacher_id", "course_id": "uuid", "created_at": "ISO", "content": "..." } }
+{ "success": true, "thread": { "id": "uuid", "user_id": "student_id", "author_id": null, "created_at": "ISO", "title": "...", "content": "..." } }
 ```
 
-## Notatki — przegląd
+## Wątki - przegląd
 
-GET `/api/notes?student_id=&course_id=&lesson_id=&include_connections=true|false`
+GET `/api/threads?user_id=&owner_email=&course_id=&lesson_id=&include_connections=true|false`
 - 200 OK
 ```json
-{ "success": true, "notes": [ { "id": "uuid", "title": "...", "content": "...", "note_lesson_connections": [ { "lesson_id": "uuid", "connection_type": "related" } ] } ] }
+{ "success": true, "threads": [ { "id": "uuid", "title": "...", "content": "...", "lesson_connections": [ { "lesson_id": "uuid", "connection_type": "related" } ] } ] }
 ```

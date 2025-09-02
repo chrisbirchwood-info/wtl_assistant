@@ -19,10 +19,11 @@ export async function GET(request: NextRequest) {
       .select('user_id')
       .eq('role_code', 'teacher')
 
-    let teachers: any[] = []
+    type Teacher = { id: string; email: string; username?: string; first_name?: string; last_name?: string; is_active: boolean; created_at: string }
+    let teachers: Teacher[] = []
 
     if (!roleErr && roleRows && roleRows.length > 0) {
-      const userIds = roleRows.map((r: any) => r.user_id)
+      const userIds = roleRows.map((r: { user_id: string }) => r.user_id)
       let query = supabase
         .from('users')
         .select('id, email, username, first_name, last_name, is_active, created_at')
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
       if (usersErr) {
         return NextResponse.json({ success: false, message: 'Błąd pobierania nauczycieli', error: usersErr.message }, { status: 500 })
       }
-      teachers = (usersData || []).map((u: any) => ({
+      teachers = (usersData || []).map((u: { id: string; email: string; username?: string; first_name?: string; last_name?: string; is_active: boolean; created_at: string }) => ({
         id: u.id,
         email: u.email,
         username: u.username,
@@ -63,4 +64,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, message: 'Wystąpił błąd', error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 })
   }
 }
-

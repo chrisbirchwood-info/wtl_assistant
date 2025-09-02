@@ -46,7 +46,7 @@ export default function AddUser() {
       })
 
       if (response.ok) {
-        const result = await response.json()
+        await response.json()
         setSuccess('Użytkownik został utworzony pomyślnie!')
         
         // Automatycznie ukryj komunikat sukcesu po 3 sekundach

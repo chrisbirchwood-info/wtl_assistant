@@ -25,7 +25,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
       console.log('🚫 Access denied, redirecting to login')
       router.push('/auth/login')
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, router, user])
   
   if (isLoading) {
     return (
@@ -63,4 +63,3 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   
   return <>{children}</>
 }
-

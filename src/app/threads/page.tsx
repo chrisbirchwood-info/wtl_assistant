@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
-import CreateNoteForm from '@/components/notes/CreateNoteForm'
-import NotesList from '@/components/notes/NotesList'
-import { NoteWithConnections, Lesson } from '@/types/notes'
+import CreateThreadForm from '@/components/threads/CreateThreadForm'
+import ThreadsList from '@/components/threads/ThreadsList'
+import { ThreadWithConnections, Lesson } from '@/types/threads'
 
-export default function NotesPage() {
+export default function ThreadsPage() {
   const { user, isAuthenticated, initialize } = useAuthStore()
-  const [notes, setNotes] = useState<NoteWithConnections[]>([])
+  const [threads, setThreads] = useState<ThreadWithConnections[]>([])
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -21,7 +21,6 @@ export default function NotesPage() {
 
   useEffect(() => {
     if (!user || !isAuthenticated) return
-    
     fetchData()
   }, [user, isAuthenticated])
 
@@ -30,43 +29,30 @@ export default function NotesPage() {
       setIsLoading(true)
       setError(null)
 
-      // Pobierz notatki z powiązaniami
-      const notesResponse = await fetch('/api/notes?include_connections=true')
-      if (!notesResponse.ok) throw new Error('Błąd pobierania notatek')
-      const notesData = await notesResponse.json()
-      setNotes(notesData.notes || [])
+      const notesResponse = await fetch('/api/threads?include_connections=true')
+      if (!notesResponse.ok) throw new Error('Błąd pobierania wątków')
+      const data = await notesResponse.json()
+      setThreads(data.threads || [])
 
-      // Pobierz wszystkie lekcje z bazy danych
       try {
         const lessonsResponse = await fetch('/api/lessons')
         if (lessonsResponse.ok) {
           const lessonsData = await lessonsResponse.json()
           setLessons(lessonsData.lessons || [])
         }
-      } catch (err) {
-        console.log('Błąd pobierania lekcji, używam pustej listy')
+      } catch {
         setLessons([])
       }
-
     } catch (err) {
-      console.error('Error fetching data:', err)
       setError(err instanceof Error ? err.message : 'Wystąpił nieoczekiwany błąd')
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleNoteCreated = () => {
-    fetchData()
-  }
-
-  const handleNoteUpdated = () => {
-    fetchData()
-  }
-
-  const handleNoteDeleted = () => {
-    fetchData()
-  }
+  const handleThreadCreated = () => fetchData()
+  const handleThreadUpdated = () => fetchData()
+  const handleThreadDeleted = () => fetchData()
 
   if (isLoading) {
     return (
@@ -110,54 +96,47 @@ export default function NotesPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Moje notatki</h1>
+                <h1 className="text-3xl font-bold text-gray-900">Moje wątki</h1>
                 <p className="mt-2 text-gray-600">
-                  Zarządzaj swoimi notatkami - luźnymi lub powiązanymi z lekcjami
+                  Zarządzaj swoimi wątkami — luźnymi lub powiązanymi z lekcjami
                 </p>
                 <div className="mt-2 flex items-center space-x-2">
                   <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    📝 {notes.length} notatek
+                    🧵 {threads.length} wątków
                   </div>
-                  {lessons.length > 0 && (
-                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      📚 {lessons.length} lekcji dostępnych
-                    </div>
-                  )}
                 </div>
               </div>
-              
+
               <button
                 onClick={() => setShowCreateForm(!showCreateForm)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
-                {showCreateForm ? 'Ukryj formularz' : '➕ Nowa notatka'}
+                {showCreateForm ? 'Ukryj formularz' : '➕ Nowy wątek'}
               </button>
             </div>
           </div>
 
-          {/* Formularz tworzenia notatki */}
-                     {showCreateForm && (
-             <div className="mb-8">
-                                <CreateNoteForm
-                   onNoteCreated={handleNoteCreated}
-                   lessons={lessons}
-                   user={user || undefined}
-                 />
-             </div>
-           )}
+          {/* Formularz tworzenia wątku */}
+          {showCreateForm && (
+            <div className="mb-8">
+              <CreateThreadForm
+                onThreadCreated={handleThreadCreated}
+                lessons={lessons}
+                user={user || undefined}
+              />
+            </div>
+          )}
 
-          {/* Lista notatek */}
+          {/* Lista wątków */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Twoje notatki
-            </h2>
-                                      <NotesList
-                 notes={notes}
-                 lessons={lessons}
-                 onNoteUpdated={handleNoteUpdated}
-                 onNoteDeleted={handleNoteDeleted}
-                 user={user || undefined}
-               />
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Twoje wątki</h2>
+            <ThreadsList
+              threads={threads}
+              lessons={lessons}
+              onThreadUpdated={handleThreadUpdated}
+              onThreadDeleted={handleThreadDeleted}
+              user={user || undefined}
+            />
           </div>
         </div>
       </div>

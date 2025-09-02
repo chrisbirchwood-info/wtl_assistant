@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import Pagination from '@/components/ui/Pagination'
@@ -60,7 +60,7 @@ export default function AdminCoursesPage() {
   const [selectedLessonIds, setSelectedLessonIds] = useState<string[]>([])
   const [assignedLessonIds, setAssignedLessonIds] = useState<string[]>([])
   const [selectedLessonIdsToRemove, setSelectedLessonIdsToRemove] = useState<string[]>([])
-  const [isReordering, setIsReordering] = useState<boolean>(false)
+  // const [isReordering, setIsReordering] = useState<boolean>(false)
   const [isAddDropdownOpen, setIsAddDropdownOpen] = useState<boolean>(false)
   const [lessonSearch, setLessonSearch] = useState<string>('')
   const [dragIndex, setDragIndex] = useState<number | null>(null)
@@ -87,20 +87,12 @@ export default function AdminCoursesPage() {
     initialize()
   }, [initialize])
 
-  useEffect(() => {
-    if (!user || !isAuthenticated || user.role !== 'superadmin') {
-      setError('Dostęp tylko dla superadmin')
-      setIsLoading(false)
-      return
-    }
-
-    fetchData()
-  }, [user, isAuthenticated])
+  // fetch data when auth state is ready
 
   
 
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -122,7 +114,7 @@ export default function AdminCoursesPage() {
         const lessonsResponse = await fetch('/api/admin/lessons')
         if (lessonsResponse.ok) {
           const lessonsData = await lessonsResponse.json()
-          setAllLessons((lessonsData.lessons || []).map((l: any) => ({ id: l.id, wtl_lesson_id: l.wtl_lesson_id, title: l.title })))
+          setAllLessons((lessonsData.lessons || []).map((l: { id: string; wtl_lesson_id: string; title: string }) => ({ id: l.id, wtl_lesson_id: l.wtl_lesson_id, title: l.title })))
         }
       } catch {}
 
@@ -148,7 +140,16 @@ export default function AdminCoursesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [selectedCourse])
+
+  useEffect(() => {
+    if (!user || !isAuthenticated || user.role !== 'superadmin') {
+      setError('Dostęp tylko dla superadmin')
+      setIsLoading(false)
+      return
+    }
+    fetchData()
+  }, [user, isAuthenticated, fetchData])
 
   const fetchCourseTeachers = async (courseId: string) => {
     try {
@@ -368,6 +369,7 @@ export default function AdminCoursesPage() {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const reorderLessons = async (items: CourseLessonItem[]) => {
     try {
       const payload = { items: items.map((it, idx) => ({ lesson_id: it.lesson_id, position: idx + 1 })) }
@@ -986,10 +988,4 @@ export default function AdminCoursesPage() {
     </ProtectedRoute>
   )
 }
-
-
-
-
-
-
 

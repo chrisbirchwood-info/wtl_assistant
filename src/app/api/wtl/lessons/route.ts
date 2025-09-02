@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import wtlClient from '@/lib/wtl-client'
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(_request: NextRequest) {
+export async function POST() {
   // Synchronizacja lekcji tym endpointem jest wyłączona – użyj panelu admina
   return NextResponse.json(
     { error: 'Lesson sync disabled. Use admin admin/lessons sync.' },

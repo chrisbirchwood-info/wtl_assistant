@@ -22,8 +22,7 @@ export async function GET(request: NextRequest) {
     const limitRaw = Math.max(1, parseInt(limitParam || '20', 10))
     const limit = Math.min(100, limitRaw)
     
-    let courses: any[] = []
-    let total = 0
+    let courses: unknown[] = []
     
     if (teacherId) {
       // Dla nauczyciela - pobierz tylko kursy do których jest przypisany
@@ -31,7 +30,7 @@ export async function GET(request: NextRequest) {
       
       const start = (page - 1) * limit
       const end = start + limit - 1
-      const { data: courseTeachers, error: ctError, count } = await supabase
+      const { data: courseTeachers, error: ctError } = await supabase
         .from('course_teachers')
         .select(`
           course_id,
@@ -59,7 +58,7 @@ export async function GET(request: NextRequest) {
         teacher_role: ct.role, // Dodaj rolę nauczyciela w tym kursie
         assigned_at: ct.assigned_at // Data przypisania
       })) || []
-      total = count ?? courses.length
+      // count available when paging requested; not used in response for now
 
       console.log(`✅ Pobrano ${courses.length} kursów dla nauczyciela ${teacherId}`)
     } else {

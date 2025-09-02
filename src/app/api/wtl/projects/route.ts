@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import wtlClient from '@/lib/wtl-client'
@@ -72,7 +73,7 @@ export async function GET() {
     console.log('WTL API failed, trying Supabase cache...')
     
     // Jeśli WTL nie działa, spróbuj cache z Supabase
-    const { data: projects, error } = await supabase
+    const { data: projects } = await supabase
       .from('projects')
       .select('*')
       .order('created_at', { ascending: false })

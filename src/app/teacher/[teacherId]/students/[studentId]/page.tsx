@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { useParams, useSearchParams } from 'next/navigation'
-import CreateNoteForm from '@/components/notes/CreateNoteForm'
-import NotesList from '@/components/notes/NotesList'
-import { NoteWithConnections, Lesson as NoteLesson } from '@/types/notes'
+import CreateThreadForm from '@/components/threads/CreateThreadForm'
+import ThreadsList from '@/components/threads/ThreadsList'
+import { ThreadWithConnections as NoteWithConnections } from '@/types/threads'
 
 interface Lesson {
   id: string
@@ -66,31 +66,19 @@ export default function StudentLessonsPage() {
   const [student, setStudent] = useState<Student | null>(null)
   const [course, setCourse] = useState<Course | null>(null)
   const [lessonProgress, setLessonProgress] = useState<LessonProgress[]>([])
-  const [notes, setNotes] = useState<NoteWithConnections[]>([])
+  const [threads, setThreads] = useState<NoteWithConnections[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const [showCreateNoteForm, setShowCreateNoteForm] = useState(false)
-  const [selectedLessonForNote, setSelectedLessonForNote] = useState<string | null>(null)
+  const [showCreateThreadForm, setShowCreateThreadForm] = useState(false)
+  const [selectedLessonForThread, setSelectedLessonForThread] = useState<string | null>(null)
 
   useEffect(() => {
     initialize()
   }, [initialize])
 
-  useEffect(() => {
-    if (!user || !isAuthenticated || !courseId) return
 
-    // Sprawdź uprawnienia dostępu
-    if (!hasAccess()) {
-      setError('Brak uprawnień do przeglądania lekcji tego studenta')
-      setIsLoading(false)
-      return
-    }
-
-    fetchData()
-  }, [user, isAuthenticated, courseId, studentId, teacherId])
-
-  const hasAccess = (): boolean => {
+  const hasAccess = useCallback((): boolean => {
     if (!user) return false
     
     // Uczeń może przeglądać tylko swoje lekcje
@@ -110,9 +98,50 @@ export default function StudentLessonsPage() {
     }
     
     return false
-  }
+  }, [user, studentId, teacherId])
 
-  const fetchData = async () => {
+
+  const fetchNotes = useCallback(async () => {
+    try {
+      // Pobierz notatki powiązane z lekcjami tego kursu
+      const notesResponse = await fetch('/api/threads?include_connections=true')
+      if (notesResponse.ok) {
+        const notesData = await notesResponse.json()
+        // Filtruj wątki, które są powiązane z lekcjami tego kursu
+        const courseNotes = notesData.threads?.filter((note: NoteWithConnections) => 
+          note.lesson_connections?.some(conn => 
+            lessons.some(lesson => lesson.id === conn.lesson_id)
+          )
+        ) || []
+        setThreads(courseNotes)
+      }
+    } catch (err) {
+      console.log('Błąd pobierania notatek:', err)
+    }
+  }, [lessons])
+
+  const fetchLessonProgress = useCallback(async () => {
+    try {
+      // TODO: Implementować API do pobierania postępu w lekcjach
+      // Na razie używamy mock danych
+      const mockProgress: LessonProgress[] = lessons.map(lesson => ({
+        lesson_id: lesson.id,
+        student_id: studentId,
+        status: Math.random() > 0.7 ? 'completed' : Math.random() > 0.5 ? 'in_progress' : 'not_started',
+        progress_percentage: Math.floor(Math.random() * 100),
+        started_at: Math.random() > 0.5 ? new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+        completed_at: Math.random() > 0.7 ? new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+        last_activity: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString()
+      }))
+      
+      setLessonProgress(mockProgress)
+    } catch (err) {
+      console.error('Error fetching lesson progress:', err)
+    }
+  }, [lessons, studentId])
+
+
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -141,7 +170,7 @@ export default function StudentLessonsPage() {
           const wtlResp = await fetch(`/api/wtl/lessons?trainingId=${courseData.course.wtl_course_id}`)
           if (wtlResp.ok) {
             const wtlData = await wtlResp.json()
-            const wtlLessons = (wtlData.lessons || []).map((l: any) => ({
+            const wtlLessons = (wtlData.lessons || []).map((l: { id: string | number; name?: string; title?: string; description?: string; content?: string; order?: number; order_number?: number }) => ({
               id: String(l.id),
               title: l.name || l.title || 'Lekcja',
               description: l.description || '',
@@ -191,46 +220,19 @@ export default function StudentLessonsPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [courseId, studentId, fetchLessonProgress, fetchNotes])
+  // Po zdefiniowaniu callbacków uruchamiamy efekt ładowania danych
+  useEffect(() => {
+    if (!user || !isAuthenticated || !courseId) return
 
-  const fetchNotes = async () => {
-    try {
-      // Pobierz notatki powiązane z lekcjami tego kursu
-      const notesResponse = await fetch('/api/notes?include_connections=true')
-      if (notesResponse.ok) {
-        const notesData = await notesResponse.json()
-        // Filtruj notatki, które są powiązane z lekcjami tego kursu
-        const courseNotes = notesData.notes?.filter((note: NoteWithConnections) => 
-          note.lesson_connections?.some(conn => 
-            lessons.some(lesson => lesson.id === conn.lesson_id)
-          )
-        ) || []
-        setNotes(courseNotes)
-      }
-    } catch (err) {
-      console.log('Błąd pobierania notatek:', err)
+    if (!hasAccess()) {
+      setError('Brak uprawnień do przeglądania lekcji tego studenta')
+      setIsLoading(false)
+      return
     }
-  }
 
-  const fetchLessonProgress = async () => {
-    try {
-      // TODO: Implementować API do pobierania postępu w lekcjach
-      // Na razie używamy mock danych
-      const mockProgress: LessonProgress[] = lessons.map(lesson => ({
-        lesson_id: lesson.id,
-        student_id: studentId,
-        status: Math.random() > 0.7 ? 'completed' : Math.random() > 0.5 ? 'in_progress' : 'not_started',
-        progress_percentage: Math.floor(Math.random() * 100),
-        started_at: Math.random() > 0.5 ? new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString() : undefined,
-        completed_at: Math.random() > 0.7 ? new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString() : undefined,
-        last_activity: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString()
-      }))
-      
-      setLessonProgress(mockProgress)
-    } catch (err) {
-      console.error('Error fetching lesson progress:', err)
-    }
-  }
+    fetchData()
+  }, [user, isAuthenticated, courseId, studentId, teacherId, hasAccess, fetchData])
 
 
 
@@ -275,21 +277,21 @@ export default function StudentLessonsPage() {
     return 'text-red-600'
   }
 
-  const handleNoteCreated = () => {
+  const handleThreadCreated = () => {
     fetchNotes()
   }
 
-  const handleNoteUpdated = () => {
+  const handleThreadUpdated = () => {
     fetchNotes()
   }
 
-  const handleNoteDeleted = () => {
+  const handleThreadDeleted = () => {
     fetchNotes()
   }
 
-  const openCreateNoteForm = (lessonId?: string) => {
-    setSelectedLessonForNote(lessonId || null)
-    setShowCreateNoteForm(true)
+  const openCreateThreadForm = (lessonId?: string) => {
+    setSelectedLessonForThread(lessonId || null)
+    setShowCreateThreadForm(true)
   }
 
   if (isLoading) {
@@ -485,14 +487,14 @@ export default function StudentLessonsPage() {
                                 Otwórz
                               </button>
                               <button
-                                onClick={() => openCreateNoteForm(lesson.id)}
+                                onClick={() => openCreateThreadForm(lesson.id)}
                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-                                title="Dodaj notatkę do tej lekcji"
+                                title="Dodaj wątek do tej lekcji"
                               >
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
-                                Notatka
+                                Wątek
                               </button>
                             </div>
                           </td>
@@ -532,61 +534,61 @@ export default function StudentLessonsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-medium text-gray-900">
-                      📝 Notatki do lekcji ({notes.length})
+                      🧵 Wątki do lekcji ({threads.length})
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      Notatki powiązane z lekcjami tego kursu
+                      Wątki powiązane z lekcjami tego kursu
                     </p>
                   </div>
                   <button
-                    onClick={() => openCreateNoteForm()}
+                    onClick={() => openCreateThreadForm()}
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   >
-                    ➕ Nowa notatka
+                    ➕ Nowy wątek
                   </button>
                 </div>
               </div>
               
               <div className="p-6">
-                                 {showCreateNoteForm && (
+                                 {showCreateThreadForm && (
                    <div className="mb-6">
-                     <CreateNoteForm
-                       onNoteCreated={handleNoteCreated}
+                     <CreateThreadForm
+                       onThreadCreated={handleThreadCreated}
                         lessons={lessons.map(lesson => ({
                           id: lesson.wtl_lesson_id || lesson.id,
                           title: lesson.title,
                           description: lesson.description,
                           content: lesson.content,
                           order: lesson.order_number || lesson.order,
-                          status: lesson.status as any,
+                          status: lesson.status,
                           created_at: lesson.created_at,
                           updated_at: lesson.updated_at,
                           wtl_lesson_id: lesson.wtl_lesson_id || lesson.id,
                           sync_status: lesson.sync_status
                         }))}
                         
-                       preselectedLessonId={selectedLessonForNote || undefined}
+                       preselectedLessonId={selectedLessonForThread || undefined}
                        user={user || undefined}
                      />
                    </div>
                  )}
 
-                 <NotesList
-                   notes={notes}
-                    lessons={lessons.map(lesson => ({
+                 <ThreadsList
+                   threads={threads}
+                   lessons={lessons.map(lesson => ({
                       id: lesson.wtl_lesson_id || lesson.id,
                       title: lesson.title,
                       description: lesson.description,
                       content: lesson.content,
                       order: lesson.order_number || lesson.order,
-                      status: lesson.status as any,
+                      status: lesson.status,
                       created_at: lesson.created_at,
                       updated_at: lesson.updated_at,
                       wtl_lesson_id: lesson.wtl_lesson_id || lesson.id,
                       sync_status: lesson.sync_status
                     }))}
-                   onNoteUpdated={handleNoteUpdated}
-                   onNoteDeleted={handleNoteDeleted}
+                   onThreadUpdated={handleThreadUpdated}
+                   onThreadDeleted={handleThreadDeleted}
                    user={user || undefined}
                  />
               </div>
@@ -597,3 +599,5 @@ export default function StudentLessonsPage() {
     </ProtectedRoute>
   )
 }
+
+

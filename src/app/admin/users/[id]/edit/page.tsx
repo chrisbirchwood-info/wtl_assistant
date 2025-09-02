@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuthStore } from '@/store/auth-store'
 
@@ -33,19 +33,9 @@ export default function EditUser() {
     is_active: true
   })
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      router.push('/auth/login')
-      return
-    }
-    if (user.role !== 'superadmin') {
-      router.push('/')
-      return
-    }
-    fetchUser()
-  }, [isAuthenticated, user, router, userId])
+  // auth guard handled below after fetchUser is defined
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/admin/users/${userId}`)
@@ -67,7 +57,19 @@ export default function EditUser() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [userId])
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      router.push('/auth/login')
+      return
+    }
+    if (user.role !== 'superadmin') {
+      router.push('/')
+      return
+    }
+    fetchUser()
+  }, [isAuthenticated, user, router, userId, fetchUser])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target

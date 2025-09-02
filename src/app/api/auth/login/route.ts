@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyOTP, generateUserSession } from "@/lib/auth";
-import { wtlClient } from "@/lib/wtl-client";
+// import { wtlClient } from "@/lib/wtl-client";
 import { createUser, getUserByEmail } from "@/lib/supabase";
 import { UserSyncService } from "@/lib/user-sync-service";
 

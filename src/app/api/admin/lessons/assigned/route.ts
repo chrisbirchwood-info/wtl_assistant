@@ -18,11 +18,10 @@ export async function GET() {
       return NextResponse.json({ success: false, message: 'Błąd pobierania przypisań lekcji' }, { status: 500 })
     }
 
-    const lesson_ids = Array.from(new Set((data || []).map((r: any) => r.lesson_id)))
+    const lesson_ids = Array.from(new Set((data || []).map((r: { lesson_id: string }) => r.lesson_id)))
     return NextResponse.json({ success: true, lesson_ids })
   } catch (err) {
     console.error('GET /api/admin/lessons/assigned error:', err)
     return NextResponse.json({ success: false, message: 'Wystąpił błąd' }, { status: 500 })
   }
 }
-

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuthStore } from '@/store/auth-store'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { useParams } from 'next/navigation'
@@ -51,74 +51,34 @@ export default function StudentLessonsPage() {
     initialize()
   }, [initialize])
 
-  useEffect(() => {
-    if (!user || !isAuthenticated) return
 
-    // Sprawdź uprawnienia dostępu
-    if (!hasAccess()) {
-      setError('Brak uprawnień do przeglądania lekcji tego kursu')
-      setIsLoading(false)
-      return
-    }
-
-    fetchData()
-  }, [user, isAuthenticated, courseId])
-
-  const hasAccess = (): boolean => {
+  const hasAccess = useCallback((): boolean => {
     if (!user) return false
     
-    // Uczeń może przeglądać tylko swoje lekcje
+    // Ucze� mo�e przegl�da� tylko swoje lekcje
     if (user.role === 'student') {
-      // TODO: Sprawdzić czy student jest zapisany na ten kurs
+      // TODO: Sprawdzi� czy student jest zapisany na ten kurs
       return true
     }
     
-    // Nauczyciel może przeglądać lekcje swoich kursów
+    // Nauczyciel mo�e przegl�da� lekcje swoich kurs�w
     if (user.role === 'teacher') {
-      // TODO: Sprawdzić czy nauczyciel ma przypisany ten kurs
+      // TODO: Sprawdzi� czy nauczyciel ma przypisany ten kurs
       return true
     }
     
-    // Admin może wszystko
+    // Admin mo�e wszystko
     if (user.role && user.role === 'superadmin') {
       return true
     }
     
     return false
-  }
+  }, [user])
 
-  const fetchData = async () => {
+  const fetchLessonProgress = useCallback(async () => {
     try {
-      setIsLoading(true)
-      setError(null)
-
-      // Pobierz dane kursu
-      const courseResponse = await fetch(`/api/courses/local/${courseId}`)
-      if (!courseResponse.ok) throw new Error('Błąd pobierania danych kursu')
-      const courseData = await courseResponse.json()
-      setCourse(courseData.course)
-
-      // Pobierz lekcje kursu
-      const lessonsResponse = await fetch(`/api/lessons?courseId=${courseId}`)
-      if (!lessonsResponse.ok) throw new Error('Błąd pobierania lekcji')
-      const lessonsData = await lessonsResponse.json()
-      setLessons(lessonsData.lessons || [])
-
-      // Pobierz postęp studenta w lekcjach
-      await fetchLessonProgress()
-
-    } catch (err) {
-      console.error('Error fetching data:', err)
-      setError(err instanceof Error ? err.message : 'Wystąpił nieoczekiwany błąd')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const fetchLessonProgress = async () => {
-    try {
-      // TODO: Implementować API do pobierania postępu w lekcjach
-      // Na razie używamy mock danych
+      // TODO: Implementowa� API do pobierania post�pu w lekcjach
+      // Na razie u�ywamy mock danych
       const mockProgress: LessonProgress[] = lessons.map(lesson => ({
         lesson_id: lesson.id,
         student_id: user?.id || '',
@@ -133,7 +93,46 @@ export default function StudentLessonsPage() {
     } catch (err) {
       console.error('Error fetching lesson progress:', err)
     }
-  }
+  }, [lessons, user?.id])
+
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      // Pobierz dane kursu
+      const courseResponse = await fetch(`/api/courses/local/${courseId}`)
+      if (!courseResponse.ok) throw new Error('B��d pobierania danych kursu')
+      const courseData = await courseResponse.json()
+      setCourse(courseData.course)
+
+      // Pobierz lekcje kursu
+      const lessonsResponse = await fetch(`/api/lessons?courseId=${courseId}`)
+      if (!lessonsResponse.ok) throw new Error('B��d pobierania lekcji')
+      const lessonsData = await lessonsResponse.json()
+      setLessons(lessonsData.lessons || [])
+
+      // Pobierz post�p studenta w lekcjach
+      await fetchLessonProgress()
+
+    } catch (err) {
+      console.error('Error fetching data:', err)
+      setError(err instanceof Error ? err.message : 'Wyst�pi� nieoczekiwany b��d')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [courseId, fetchLessonProgress])
+  useEffect(() => {
+    if (!user || !isAuthenticated) return
+
+    if (!hasAccess()) {
+      setError('Brak uprawnień do przeglądania lekcji tego kursu')
+      setIsLoading(false)
+      return
+    }
+
+    fetchData()
+  }, [user, isAuthenticated, courseId, hasAccess, fetchData])
 
   const syncLessons = async () => {
     try {
@@ -141,17 +140,17 @@ export default function StudentLessonsPage() {
       setError(null)
 
       const response = await fetch(`/api/lessons?courseId=${courseId}`, { method: 'GET' })
-      if (!response.ok) throw new Error('Błąd synchronizacji lekcji')
+      if (!response.ok) throw new Error('B��d synchronizacji lekcji')
 
       const result = await response.json()
-      console.log('✅ Synchronizacja lekcji zakończona:', result)
+      console.log('? Synchronizacja lekcji zako�czona:', result)
       
-      // Odśwież dane po synchronizacji
+      // Od�wie� dane po synchronizacji
       await fetchData()
       
     } catch (err) {
       console.error('Error syncing lessons:', err)
-      setError(err instanceof Error ? err.message : 'Błąd podczas synchronizacji')
+      setError(err instanceof Error ? err.message : 'B��d podczas synchronizacji')
     } finally {
       setIsSyncing(false)
     }
@@ -182,11 +181,11 @@ export default function StudentLessonsPage() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'Ukończona'
+        return 'Uko�czona'
       case 'in_progress':
         return 'W trakcie'
       case 'not_started':
-        return 'Nie rozpoczęta'
+        return 'Nie rozpocz�ta'
       default:
         return status
     }
@@ -221,7 +220,7 @@ export default function StudentLessonsPage() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Błąd</h3>
+                  <h3 className="text-sm font-medium text-red-800">B��d</h3>
                   <div className="mt-2 text-sm text-red-700">{error}</div>
                 </div>
               </div>
@@ -238,8 +237,8 @@ export default function StudentLessonsPage() {
         <div className="min-h-screen bg-gray-50 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900">Dostęp ograniczony</h2>
-              <p className="mt-2 text-gray-600">Nie masz uprawnień do przeglądania lekcji tego kursu.</p>
+              <h2 className="text-2xl font-bold text-gray-900">Dost�p ograniczony</h2>
+              <p className="mt-2 text-gray-600">Nie masz uprawnie� do przegl�dania lekcji tego kursu.</p>
             </div>
           </div>
         </div>
@@ -251,7 +250,7 @@ export default function StudentLessonsPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Nagłówek */}
+          {/* Nag��wek */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
@@ -261,11 +260,11 @@ export default function StudentLessonsPage() {
                 </p>
                 <div className="mt-2 flex items-center space-x-2">
                   <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    📚 {lessons.length} lekcji
+                    ?? {lessons.length} lekcji
                   </div>
                   {user?.role === 'student' && (
                     <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                      👨‍🎓 Twój postęp
+                      ????? Tw�j post�p
                     </div>
                   )}
                 </div>
@@ -282,11 +281,11 @@ export default function StudentLessonsPage() {
               >
                 {isSyncing ? (
                   <>
-                    <span className="animate-spin mr-2">⟳</span>
-                    Synchronizuję...
+                    <span className="animate-spin mr-2">?</span>
+                    Synchronizuj�...
                   </>
                 ) : (
-                  '🔄 Synchronizuj lekcje'
+                  '?? Synchronizuj lekcje'
                 )}
               </button>
             </div>
@@ -300,7 +299,7 @@ export default function StudentLessonsPage() {
                   Lista lekcji ({lessons.length})
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Twój postęp w nauce - dane zsynchronizowane z WTL API
+                  Tw�j post�p w nauce - dane zsynchronizowane z WTL API
                 </p>
               </div>
               
@@ -318,10 +317,10 @@ export default function StudentLessonsPage() {
                         Status
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Postęp
+                        Post�p
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Ostatnia aktywność
+                        Ostatnia aktywno��
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Akcje
@@ -369,19 +368,19 @@ export default function StudentLessonsPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {progress.last_activity ? 
                               new Date(progress.last_activity).toLocaleDateString('pl-PL') :
-                              'Brak aktywności'
+                              'Brak aktywno�ci'
                             }
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button
                               onClick={() => alert(`Otwieranie lekcji: ${lesson.title}`)}
                               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-                              title="Otwórz lekcję"
+                              title="Otw�rz lekcj�"
                             >
                               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                               </svg>
-                              Otwórz
+                              Otw�rz
                             </button>
                           </td>
                         </tr>
@@ -399,14 +398,14 @@ export default function StudentLessonsPage() {
                 </svg>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Brak lekcji</h3>
                 <p className="text-sm text-gray-600">
-                  Ten kurs nie ma jeszcze żadnych lekcji.
+                  Ten kurs nie ma jeszcze �adnych lekcji.
                 </p>
                 <button style={{ display: 'none' }}
                   onClick={syncLessons}
                   disabled={isSyncing}
                   className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
                 >
-                  🔄 Synchronizuj lekcje z WTL
+                  ?? Synchronizuj lekcje z WTL
                 </button>
               </div>
             </div>
@@ -416,3 +415,5 @@ export default function StudentLessonsPage() {
     </ProtectedRoute>
   )
 }
+
+

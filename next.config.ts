@@ -26,6 +26,8 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+
+  // Brak globalnych redirectów /notes → /threads — ścieżki przeniesione na /threads
 }
 
 export default nextConfig

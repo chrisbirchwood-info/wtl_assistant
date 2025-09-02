@@ -178,7 +178,7 @@ export async function createUser(userData: { email: string; username?: string; r
   // Utwórz profil odpowiedni dla roli
   try {
     if (userDataWithRole.role === 'teacher') {
-      const { data: profileData, error: profileError } = await supabase
+      const { error: profileError } = await supabase
         .from('teacher_profiles')
         .insert([{ user_id: data.id }])
       
@@ -188,7 +188,7 @@ export async function createUser(userData: { email: string; username?: string; r
         console.log(`✅ Teacher profile created for user: ${data.id}`)
       }
     } else {
-      const { data: profileData, error: profileError } = await supabase
+      const { error: profileError } = await supabase
         .from('student_profiles')
         .insert([{ user_id: data.id }])
       

@@ -76,20 +76,20 @@ Cel: lokalne przypinanie lekcji (dowolnej) do kursu, różna kolejność dla ró
 - progress_percentage, last_activity
 - created_at, updated_at
 
-### notes (istnieje — rozszerzenie)
+### threads (po rename z `notes`)
 - id: uuid pk
-- user_id: uuid (właściciel – student)
-- author_id: uuid (nowe – kto dodał notatkę; typowo nauczyciel)
-- course_id: uuid (nowe – kontekst kursu)
+- user_id: uuid (właściciel - student)
+- author_id: uuid (kto dodał wpis; typowo nauczyciel)
+- course_id: uuid (kontekst kursu)
 - title: varchar(255)
 - content: text
 - created_at, updated_at
 
 RLS: odczyt student, nauczyciel przypisany do kursu, admin; zapis przez service-role API.
 
-### note_lesson_connections (istnieje — dostosowanie)
+### thread_lesson_connections (po rename z `note_lesson_connections`)
 - id: uuid pk
-- note_id: uuid fk -> notes(id)
+- thread_id: uuid fk -> threads(id)
 - lesson_id: uuid (ID WTL lub lokalny – rekomendacja: przejść na fk do lessons.id w kolejnym kroku)
 - connection_type: enum('primary','related','loose') default 'related'
 - unique(note_id, lesson_id)
@@ -111,8 +111,9 @@ RLS: odczyt student, nauczyciel przypisany do kursu, admin; zapis przez service-
    - Utworzyć `course_lessons`.
    - Nowe API i UI admin do przypinania/reorder (drag&drop).
    - Po wdrożeniu przepiąć widoki konsumenckie na `course_lessons` (wyłączyć zależność od `lessons.course_id`).
-3) Notatki:
-   - Dodać kolumny `author_id`, `course_id` w `notes`.
+3) Wątki:
+   - Rename `notes` -> `threads`, `note_lesson_connections` -> `thread_lesson_connections` (zaktualizować FKs, indeksy, triggery).
+   - Dodać kolumny `author_id`, `course_id` w `threads` (jeśli brak).
    - Dostosować polityki RLS; zapisy wykonywać przez service role.
 
 ## Indeksy i spójność

@@ -9,64 +9,52 @@ import { useAuthStore } from '@/store/auth-store'
 export default function Navigation() {
   const pathname = usePathname()
   const { user, isAuthenticated, initialize } = useAuthStore()
-  
+
   useEffect(() => {
-    // Inicjalizuj stan autoryzacji przy pierwszym renderowaniu
     initialize()
   }, [initialize])
-  
+
   if (!user || !isAuthenticated) return null
-  
-  // Debug: sprawdź rolę użytkownika
-  console.log('Navigation - User role:', user.role, 'User data:', user)
-  
+
   const navigation = [
     { name: 'Dashboard', href: '/wtl', current: pathname === '/wtl' },
     { name: 'Mój profil', href: '/profile', current: pathname === '/profile' },
   ]
 
-  // Dodaj link do lekcji TYLKO dla studentów
+  // Link do lekcji tylko dla studentów
   if (user.role && user.role === 'student') {
-    console.log('🔒 Navigation: User has student role, showing "Moje lekcje" link')
-    navigation.push({ 
-      name: 'Moje lekcje', 
-      href: '/wtl', // Przejdź do dashboard gdzie może wybrać kurs
-      current: pathname.startsWith('/lessons') 
+    navigation.push({
+      name: 'Moje lekcje',
+      href: '/wtl', // Dashboard z wyborem kursu
+      current: pathname.startsWith('/lessons')
     })
   }
 
-  // Dodaj link do notatek dla wszystkich zalogowanych użytkowników
-  navigation.push({ 
-    name: '📝 Notatki', 
-    href: '/notes', 
-    current: pathname === '/notes' 
+  // Wątki (threads) dla wszystkich zalogowanych użytkowników
+  navigation.push({
+    name: '🧵 Wątki',
+    href: '/threads',
+    current: pathname === '/threads'
   })
 
-  // Dodaj link do zarządzania studentami TYLKO dla nauczycieli
-  // Dodatkowe sprawdzenie czy rola jest zdefiniowana i równa 'teacher'
-  // Dodatkowe zabezpieczenie: upewnij się, że rola jest rzeczywiście 'teacher' w bazie
+  // Link do zarządzania studentami tylko dla nauczycieli
   if (user.role && user.role === 'teacher') {
-    console.log('🔒 Navigation: User has teacher role, showing "Moi studenci" link')
-    navigation.push({ 
-      name: 'Moi studenci', 
-      href: `/teacher/${user.id}/students`, 
-      current: pathname.startsWith('/teacher/') && pathname.includes('/students') 
+    navigation.push({
+      name: 'Moi studenci',
+      href: `/teacher/${user.id}/students`,
+      current: pathname.startsWith('/teacher/') && pathname.includes('/students')
     })
-  } else {
-    console.log('🔒 Navigation: User does NOT have teacher role, hiding "Moi studenci" link')
-    console.log('🔒 Navigation: User role is:', user.role)
   }
 
-  // Dodaj link do panelu admina TYLKO dla superadminów
+  // Link do panelu admina tylko dla superadminów
   if (user.role && user.role === 'superadmin') {
-    console.log('🔒 Navigation: User has superadmin role, showing "Panel Admina" link')
-    navigation.push({ 
-      name: 'Panel Admina', 
-      href: '/admin', 
-      current: pathname === '/admin' 
+    navigation.push({
+      name: 'Panel Admina',
+      href: '/admin',
+      current: pathname === '/admin'
     })
   }
-  
+
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,7 +65,7 @@ export default function Navigation() {
                 WTL Assistant
               </Link>
             </div>
-            
+
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               {navigation.map((item) => (
                 <Link
@@ -94,7 +82,7 @@ export default function Navigation() {
               ))}
             </div>
           </div>
-          
+
           <div className="flex items-center">
             <UserMenu />
           </div>
@@ -103,3 +91,4 @@ export default function Navigation() {
     </nav>
   )
 }
+

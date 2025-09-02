@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     console.log('🔍 [GET /api/admin/users] Rozpoczynam pobieranie użytkowników...');
     console.log('🌐 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     
     // Sprawdź połączenie z bazą
     console.log('🔌 Testuję połączenie z bazą...');
-    const { data: connectionTest, error: connectionError } = await supabase
+    const { error: connectionError } = await supabase
       .from('users')
       .select('count')
       .limit(1);
@@ -230,7 +230,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Przygotuj dane do aktualizacji
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
 

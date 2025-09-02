@@ -86,8 +86,14 @@ export default function UserProfile() {
           if (profileError && profileError.code !== 'PGRST116') {
             throw new Error(`Błąd pobierania profilu nauczyciela: ${profileError.message}`)
           }
-
           setProfile(teacherProfile)
+          // Ustaw edycję na podstawie pobranego profilu nauczyciela (bez zależności od stanu profile)
+          setEditData({
+            username: userData.username || '',
+            specialization: teacherProfile?.specialization || '',
+            experience_years: teacherProfile?.experience_years || 0,
+            bio: teacherProfile?.bio || ''
+          })
         } else {
           const { data: studentProfile, error: profileError } = await supabase
             .from('student_profiles')
@@ -98,17 +104,16 @@ export default function UserProfile() {
           if (profileError && profileError.code !== 'PGRST116') {
             throw new Error(`Błąd pobierania profilu kursanta: ${profileError.message}`)
           }
-
           setProfile(studentProfile)
+          // Ustaw edycję dla kursanta (pola specyficzne puste)
+          setEditData({
+            username: userData.username || '',
+            specialization: '',
+            experience_years: 0,
+            bio: ''
+          })
         }
 
-        // Inicjalizuj dane edycji
-        setEditData({
-          username: userData.username || '',
-          specialization: userData.role === 'teacher' && profile ? (profile as TeacherProfile).specialization || '' : '',
-          experience_years: userData.role === 'teacher' && profile ? (profile as TeacherProfile).experience_years || 0 : 0,
-          bio: userData.role === 'teacher' && profile ? (profile as TeacherProfile).bio || '' : ''
-        })
 
       } catch (err) {
         console.error('Error fetching profile:', err)
@@ -192,8 +197,9 @@ export default function UserProfile() {
 
       setIsEditing(false)
       
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Wyst�pi� nieoczekiwany b��d'
+      setError(message)
     }
   }
 

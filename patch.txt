@@ -1,0 +1,605 @@
+*** Begin Patch
+*** Update File: src/app/teacher/[teacherId]/students/[studentId]/page.tsx
+@@
+-'use\ client'\r\n\r\nimport\ \{\ useEffect,\ useState\ }\ from\ 'react'\r\nimport\ \{\ useParams\ }\ from\ 'next/navigation'\r\nimport\ ProtectedRoute\ from\ '@/components/auth/ProtectedRoute'\r\nimport\ \{\ useAuthStore\ }\ from\ '@/store/auth-store'\r\nimport\ CreateNoteForm\ from\ '@/components/notes/CreateNoteForm'\r\nimport\ \{\ NoteWithConnections\ }\ from\ '@/types/notes'\r\n\r\ninterface\ Lesson\ \{\r\n\ \ id:\ string\r\n\ \ title:\ string\r\n\ \ description\?:\ string\r\n\ \ content\?:\ string\r\n\ \ order_number\?:\ number\r\n\ \ order\?:\ number\r\n\ \ status:\ 'active'\ \|\ 'inactive'\ \|\ 'draft'\r\n\ \ created_at:\ string\r\n\ \ updated_at:\ string\r\n\ \ wtl_lesson_id\?:\ string\r\n\ \ sync_status\?:\ string\r\n}\r\n\r\ninterface\ Student\ \{\r\n\ \ id:\ string\r\n\ \ email:\ string\r\n\ \ username\?:\ string\r\n}\r\n\r\ninterface\ Course\ \{\r\n\ \ id:\ string\r\n\ \ title:\ string\r\n\ \ description\?:\ string\r\n\ \ status:\ string\r\n\ \ wtl_course_id\?:\ string\r\n}\r\n\r\nexport\ default\ function\ StudentNotesOnlyPage\(\)\ \{\r\n\ \ const\ \{\ user,\ isAuthenticated,\ initialize\ }\ =\ useAuthStore\(\)\r\n\ \ const\ params\ =\ useParams\(\)\r\n\ \ const\ teacherId\ =\ params\.teacherId\ as\ string\r\n\ \ const\ studentId\ =\ params\.studentId\ as\ string\r\n\r\n\ \ const\ \[student,\ setStudent]\ =\ useState<Student\ \|\ null>\(null\)\r\n\ \ const\ \[availableCourses,\ setAvailableCourses]\ =\ useState<Course\[]>\(\[]\)\r\n\ \ const\ \[lessons,\ setLessons]\ =\ useState<Lesson\[]>\(\[]\)\r\n\ \ const\ \[notes,\ setNotes]\ =\ useState<NoteWithConnections\[]>\(\[]\)\r\n\ \ const\ \[showCreateNoteForm,\ setShowCreateNoteForm]\ =\ useState\(false\)\r\n\ \ const\ \[selectedLessonForNote,\ setSelectedLessonForNote]\ =\ useState<string\ \|\ null>\(null\)\r\n\ \ const\ \[isLoading,\ setIsLoading]\ =\ useState\(true\)\r\n\ \ const\ \[error,\ setError]\ =\ useState<string\ \|\ null>\(null\)\r\n\r\n\ \ useEffect\(\(\)\ =>\ \{\r\n\ \ \ \ initialize\(\)\r\n\ \ },\ \[initialize]\)\r\n\r\n\ \ //\ Brak\ wyboru\ kursu\ —\ renderujemy\ jedną\ listę\ wszystkich\ notatek\r\n'use\ client'\r\n\r\nimport\ \{\ useEffect,\ useState\ }\ from\ 'react'\r\nimport\ \{\ useParams\ }\ from\ 'next/navigation'\r\nimport\ ProtectedRoute\ from\ '@/components/auth/ProtectedRoute'\r\nimport\ \{\ useAuthStore\ }\ from\ '@/store/auth-store'\r\nimport\ CreateNoteForm\ from\ '@/components/notes/CreateNoteForm'\r\nimport\ \{\ NoteWithConnections\ }\ from\ '@/types/notes'\r\n\r\ninterface\ Lesson\ \{\r\n\ \ id:\ string\r\n\ \ title:\ string\r\n\ \ description\?:\ string\r\n\ \ content\?:\ string\r\n\ \ order_number\?:\ number\r\n\ \ order\?:\ number\r\n\ \ status:\ 'active'\ \|\ 'inactive'\ \|\ 'draft'\r\n\ \ created_at:\ string\r\n\ \ updated_at:\ string\r\n\ \ wtl_lesson_id\?:\ string\r\n\ \ sync_status\?:\ string\r\n}\r\n\r\ninterface\ Student\ \{\r\n\ \ id:\ string\r\n\ \ email:\ string\r\n\ \ username\?:\ string\r\n}\r\n\r\ninterface\ Course\ \{\r\n\ \ id:\ string\r\n\ \ title:\ string\r\n\ \ description\?:\ string\r\n\ \ status:\ string\r\n\ \ wtl_course_id\?:\ string\r\n}\r\n\r\nexport\ default\ function\ StudentNotesOnlyPage\(\)\ \{\r\n\ \ const\ \{\ user,\ isAuthenticated,\ initialize\ }\ =\ useAuthStore\(\)\r\n\ \ const\ params\ =\ useParams\(\)\r\n\ \ const\ teacherId\ =\ params\.teacherId\ as\ string\r\n\ \ const\ studentId\ =\ params\.studentId\ as\ string\r\n\r\n\ \ const\ \[student,\ setStudent]\ =\ useState<Student\ \|\ null>\(null\)\r\n\ \ const\ \[availableCourses,\ setAvailableCourses]\ =\ useState<Course\[]>\(\[]\)\r\n\ \ const\ \[lessons,\ setLessons]\ =\ useState<Lesson\[]>\(\[]\)\r\n\ \ const\ \[notes,\ setNotes]\ =\ useState<NoteWithConnections\[]>\(\[]\)\r\n\ \ const\ \[showCreateNoteForm,\ setShowCreateNoteForm]\ =\ useState\(false\)\r\n\ \ const\ \[selectedLessonForNote,\ setSelectedLessonForNote]\ =\ useState<string\ \|\ null>\(null\)\r\n\ \ const\ \[isLoading,\ setIsLoading]\ =\ useState\(true\)\r\n\ \ const\ \[error,\ setError]\ =\ useState<string\ \|\ null>\(null\)\r\n\r\n\ \ //\ Brak\ wyboru\ kursu\ —\ lista\ skonsolidowana\r\n\r\n\ \ const\ hasAccess\ =\ \(\):\ boolean\ =>\ \{\r\n\ \ \ \ if\ \(!user\)\ return\ false\r\n\ \ \ \ if\ \(user\.role\ ===\ 'superadmin'\)\ return\ true\r\n\ \ \ \ if\ \(user\.role\ ===\ 'teacher'\)\ return\ user\.id\ ===\ teacherId\r\n\ \ \ \ if\ \(user\.role\ ===\ 'student'\)\ return\ user\.id\ ===\ studentId\r\n\ \ \ \ return\ false\r\n\ \ }\r\n\r\n\ \ const\ fetchBaseData\ =\ async\ \(\)\ =>\ \{\r\n\ \ \ \ try\ \{\r\n\ \ \ \ \ \ setIsLoading\(true\)\r\n\ \ \ \ \ \ setError\(null\)\r\n\r\n\ \ \ \ \ \ //\ Student\r\n\ \ \ \ \ \ const\ studentResp\ =\ await\ fetch\(`/api/teacher/students/\$\{studentId}`\)\r\n\ \ \ \ \ \ if\ \(!studentResp\.ok\)\ throw\ new\ Error\('Błąd\ pobierania\ danych\ studenta'\)\r\n\ \ \ \ \ \ const\ studentJson\ =\ await\ studentResp\.json\(\)\r\n\ \ \ \ \ \ setStudent\(studentJson\.user\)\r\n\r\n\ \ \ \ \ \ //\ Kursy\ ucznia\ oraz\ kursy\ nauczyciela\r\n\ \ \ \ \ \ const\ \[studentCoursesResp,\ teacherCoursesResp]\ =\ await\ Promise\.all\(\[\r\n\ \ \ \ \ \ \ \ fetch\(`/api/students/\$\{studentId}/courses/local`\),\r\n\ \ \ \ \ \ \ \ fetch\(`/api/courses/local\?teacherId=\$\{teacherId}`\)\r\n\ \ \ \ \ \ ]\)\r\n\r\n\ \ \ \ \ \ const\ studentCourses:\ Course\[]\ =\ studentCoursesResp\.ok\ \?\ \(await\ studentCoursesResp\.json\(\)\)\.courses\ \|\|\ \[]\ :\ \[]\r\n\ \ \ \ \ \ const\ teacherCourses:\ Course\[]\ =\ teacherCoursesResp\.ok\ \?\ \(await\ teacherCoursesResp\.json\(\)\)\.courses\ \|\|\ \[]\ :\ \[]\r\n\ \ \ \ \ \ const\ teacherCourseIds\ =\ new\ Set\(teacherCourses\.map\(c\ =>\ c\.id\)\)\r\n\ \ \ \ \ \ const\ available\ =\ studentCourses\.filter\(c\ =>\ teacherCourseIds\.has\(c\.id\)\)\r\n\ \ \ \ \ \ setAvailableCourses\(available\)\r\n\ \ \ \ \ \ //\ Ustaw\ tryb\ listy\ bez\ wyboru\ kursu\\nawait\ fetchCourseData\('ALL'\)\r\n\r\n\ \ \ \ }\ catch\ \(err\)\ \{\r\n\ \ \ \ \ \ console\.error\('Error\ fetching\ base\ data:',\ err\)\r\n\ \ \ \ \ \ setError\(err\ instanceof\ Error\ \?\ err\.message\ :\ 'Wystąpił\ nieoczekiwany\ błąd'\)\r\n\ \ \ \ }\ finally\ \{\r\n\ \ \ \ \ \ setIsLoading\(false\)\r\n\ \ \ \ }\r\n\ \ }\r\n\r\n\ \ const\ fetchCourseData\ =\ async\ \(courseId:\ string\)\ =>\ \{\r\n\ \ \ \ try\ \{\r\n\ \ \ \ \ \ setIsLoading\(true\)\r\n\ \ \ \ \ \ setError\(null\)\r\n\r\n\ \ \ \ \ \ if\ \(courseId\ ===\ 'ALL'\)\ \{\r\n\ \ \ \ \ \ \ \ const\ lessonsPromises\ =\ availableCourses\.map\(c\ =>\ fetch\(`/api/lessons\?courseId=\$\{c\.id}`\)\.then\(r\ =>\ r\.ok\ \?\ r\.json\(\)\ :\ \{\ lessons:\ \[]\ }\)\)\r\n\ \ \ \ \ \ \ \ const\ lessonsArrays\ =\ await\ Promise\.all\(lessonsPromises\)\r\n\ \ \ \ \ \ \ \ const\ allLessons:\ Lesson\[]\ =\ lessonsArrays\.flatMap\(\(j:\ any\)\ =>\ \(j\.lessons\ \|\|\ \[]\)\)\r\n\ \ \ \ \ \ \ \ setLessons\(allLessons\)\r\n\r\n\ \ \ \ \ \ \ \ const\ emailParam\ =\ student\?\.email\ \?\ `&owner_email=\$\{encodeURIComponent\(student\.email\)}`\ :\ ''\r\n\ \ \ \ \ \ \ \ const\ notesResp\ =\ await\ fetch\(`/api/notes\?include_connections=true&owner_student_id=\$\{studentId}\$\{emailParam}`\)\r\n\ \ \ \ \ \ \ \ const\ notesJson\ =\ notesResp\.ok\ \?\ await\ notesResp\.json\(\)\ :\ \{\ notes:\ \[]\ }\r\n\ \ \ \ \ \ \ \ setNotes\(Array\.isArray\(notesJson\.notes\)\ \?\ notesJson\.notes\ :\ \[]\)\r\n\ \ \ \ \ \ \ \ setIsLoading\(false\)\r\n\ \ \ \ \ \ \ \ return\r\n\ \ \ \ \ \ }\r\n\r\n\ \ \ \ \ \ //\ Kurs\r\n\ \ \ \ \ \ const\ courseResp\ =\ await\ fetch\(`/api/courses/local/\$\{courseId}`\)\r\n\ \ \ \ \ \ if\ \(!courseResp\.ok\)\ throw\ new\ Error\('Błąd\ pobierania\ danych\ kursu'\)\r\n\ \ \ \ \ \ const\ courseJson\ =\ await\ courseResp\.json\(\)\r\n\ \ \ \ \ \ setCourse\(courseJson\.course\)\r\n\r\n\ \ \ \ \ \ //\ Lekcje\ \(tylko\ do\ powiązywania\ notatek;\ nie\ wyświetlamy\ listy\ lekcji\)\r\n\ \ \ \ \ \ const\ lessonsResp\ =\ await\ fetch\(`/api/lessons\?courseId=\$\{courseId}`\)\r\n\ \ \ \ \ \ const\ lessonsJson\ =\ lessonsResp\.ok\ \?\ await\ lessonsResp\.json\(\)\ :\ \{\ lessons:\ \[]\ }\r\n\ \ \ \ \ \ setLessons\(lessonsJson\.lessons\ \|\|\ \[]\)\r\n\r\n\ \ \ \ \ \ //\ Notatki\ dla\ lekcji\ tego\ kursu\r\n\ \ \ \ \ \ await\ fetchNotesForCourse\(courseId,\ lessonsJson\.lessons\ \|\|\ \[]\)\r\n\r\n\ \ \ \ }\ catch\ \(err\)\ \{\r\n\ \ \ \ \ \ console\.error\('Error\ fetching\ course\ data:',\ err\)\r\n\ \ \ \ \ \ setError\(err\ instanceof\ Error\ \?\ err\.message\ :\ 'Wystąpił\ nieoczekiwany\ błąd'\)\r\n\ \ \ \ }\ finally\ \{\r\n\ \ \ \ \ \ setIsLoading\(false\)\r\n\ \ \ \ }\r\n\ \ }\r\n\r\n\ \ const\ fetchNotesForCourse\ =\ async\ \(courseId:\ string,\ lessonList:\ Lesson\[]\)\ =>\ \{\r\n\ \ \ \ try\ \{\r\n\ \ \ \ \ \ //\ Pobierz\ notatki\ z\ połączeniami\ dla\ konkretnego\ studenta\ i\ kursu\ \(server-side\ filtr\)\r\n\ \ \ \ \ \ const\ emailParam\ =\ student\?\.email\ \?\ `&owner_email=\$\{encodeURIComponent\(student\.email\)}`\ :\ ''\r\n\ \ \ \ \ \ const\ notesResp\ =\ await\ fetch\(`/api/notes\?include_connections=true&owner_student_id=\$\{studentId}&courseId=\$\{courseId}\$\{emailParam}`\)\r\n\ \ \ \ \ \ if\ \(!notesResp\.ok\)\ return\ setNotes\(\[]\)\r\n\ \ \ \ \ \ const\ notesJson\ =\ await\ notesResp\.json\(\)\r\n\ \ \ \ \ \ //\ Filtruj\ notatki\ po\ lokalnych\ ID\ lekcji;\ zachowaj\ kompatybilność\ z\ wpisami\ zapisanymi\ po\ WTL\ ID\r\n\ \ \ \ \ \ const\ allowedLocalIds\ =\ new\ Set\(\(lessonList\ \|\|\ \[]\)\.map\(\(l:\ Lesson\)\ =>\ l\.id\)\)\r\n\ \ \ \ \ \ const\ allowedWtlIds\ =\ new\ Set\(\(lessonList\ \|\|\ \[]\)\.map\(\(l:\ Lesson\)\ =>\ l\.wtl_lesson_id\)\.filter\(Boolean\)\ as\ string\[]\)\r\n\ \ \ \ \ \ //\ Serwer\ już\ filtruje\ po\ courseId\ i\ ownerze;\ zachowujemy\ prostotę\ po\ stronie\ klienta\r\n\ \ \ \ \ \ setNotes\(Array\.isArray\(notesJson\.notes\)\ \?\ notesJson\.notes\ :\ \[]\)\r\n\ \ \ \ }\ catch\ \(e\)\ \{\r\n\ \ \ \ \ \ console\.warn\('Błąd\ pobierania\ notatek\ dla\ kursu:',\ e\)\r\n\ \ \ \ \ \ setNotes\(\[]\)\r\n\ \ \ \ }\r\n\ \ }\r\n\r\n\ \ const\ openCreateNoteForm\ =\ \(lessonId\?:\ string\)\ =>\ \{\r\n\ \ \ \ setSelectedLessonForNote\(lessonId\ \|\|\ null\)\r\n\ \ \ \ setShowCreateNoteForm\(true\)\r\n\ \ }\r\n\r\n\ \ const\ handleNoteCreated\ =\ \(\)\ =>\ \{\r\n\ \ \ \ fetchBaseData\(\)\r\n\ \ }\r\n\ \ const\ handleNoteUpdated\ =\ \(\)\ =>\ \{\r\n\ \ \ \ fetchBaseData\(\)\r\n\ \ }\r\n\ \ const\ handleNoteDeleted\ =\ \(\)\ =>\ \{\r\n\ \ \ \ fetchBaseData\(\)\r\n\ \ }\r\n\r\n\ \ if\ \(isLoading\)\ \{\r\n\ \ \ \ return\ \(\r\n\ \ \ \ \ \ <ProtectedRoute>\r\n\ \ \ \ \ \ \ \ <div\ className="flex\ justify-center\ items-center\ min-h-screen">\r\n\ \ \ \ \ \ \ \ \ \ <div\ className="animate-spin\ rounded-full\ h-12\ w-12\ border-b-2\ border-blue-600"></div>\r\n\ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ </ProtectedRoute>\r\n\ \ \ \ \)\r\n\ \ }\r\n\r\n\ \ if\ \(error\)\ \{\r\n\ \ \ \ return\ \(\r\n\ \ \ \ \ \ <ProtectedRoute>\r\n\ \ \ \ \ \ \ \ <div\ className="min-h-screen\ bg-gray-50\ py-12">\r\n\ \ \ \ \ \ \ \ \ \ <div\ className="max-w-5xl\ mx-auto\ px-4\ sm:px-6\ lg:px-8">\r\n\ \ \ \ \ \ \ \ \ \ \ \ <div\ className="bg-red-50\ border\ border-red-200\ rounded-md\ p-4">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="flex">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="flex-shrink-0">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <svg\ className="h-5\ w-5\ text-red-400"\ viewBox="0\ 0\ 20\ 20"\ fill="currentColor">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <path\ fillRule="evenodd"\ d="M10\ 18a8\ 8\ 0\ 100-16\ 8\ 8\ 0\ 000\ 16zM8\.707\ 7\.293a1\ 1\ 0\ 00-1\.414\ 1\.414L8\.586\ 10l-1\.293\ 1\.293a1\ 1\ 0\ 101\.414\ 1\.414L10\ 11\.414l1\.293\ 1\.293a1\ 1\ 0\ 001\.414-1\.414L11\.414\ 10l1\.293-1\.293a1\ 1\ 0\ 00-1\.414-1\.414L10\ 8\.586\ 8\.707\ 7\.293z"\ clipRule="evenodd"\ />\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </svg>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="ml-3">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <h3\ className="text-sm\ font-medium\ text-red-800">Błąd</h3>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="mt-2\ text-sm\ text-red-700">\{error}</div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ </ProtectedRoute>\r\n\ \ \ \ \)\r\n\ \ }\r\n\r\n\ \ if\ \(!hasAccess\(\)\)\ \{\r\n\ \ \ \ return\ \(\r\n\ \ \ \ \ \ <ProtectedRoute>\r\n\ \ \ \ \ \ \ \ <div\ className="min-h-screen\ bg-gray-50\ py-12">\r\n\ \ \ \ \ \ \ \ \ \ <div\ className="max-w-5xl\ mx-auto\ px-4\ sm:px-6\ lg:px-8">\r\n\ \ \ \ \ \ \ \ \ \ \ \ <div\ className="text-center">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ <h2\ className="text-2xl\ font-bold\ text-gray-900">Dostęp\ ograniczony</h2>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ <p\ className="mt-2\ text-gray-600">Nie\ masz\ uprawnień\ do\ przeglądania\ tego\ widoku\.</p>\r\n\ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ </ProtectedRoute>\r\n\ \ \ \ \)\r\n\ \ }\r\n\r\n\ \ return\ \(\r\n\ \ \ \ <ProtectedRoute>\r\n\ \ \ \ \ \ <div\ className="min-h-screen\ bg-gray-50\ py-12">\r\n\ \ \ \ \ \ \ \ <div\ className="max-w-5xl\ mx-auto\ px-4\ sm:px-6\ lg:px-8">\r\n\ \ \ \ \ \ \ \ \ \ <div\ className="mb-8">\r\n\ \ \ \ \ \ \ \ \ \ \ \ <div\ className="flex\ items-center\ justify-between">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ <div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <h1\ className="text-3xl\ font-bold\ text-gray-900">Notatki\ studenta</h1>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <p\ className="mt-2\ text-gray-600">\{student\?\.username\ \|\|\ student\?\.email}</p>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="text-sm\ text-gray-600">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <p>Notatki\ są\ powiązane\ z\ lekcjami\ kursu</p>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <p>Lista\ lekcji\ nie\ jest\ wyświetlana\ w\ tym\ widoku</p>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ </div>\r\n\r\n\ \ \ \ \ \ \ \ \ \ \r\n\ \ \ \ \ \ \ \ \ \ \ \ <div\ className="bg-white\ shadow\ rounded-lg">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="px-6\ py-4\ border-b\ border-gray-200">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="flex\ items-center\ justify-between">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <h3\ className="text-lg\ font-medium\ text-gray-900">Notatki\ \(\{notes\.length}\)\{course\?\.title\ \?\ `\ –\ \$\{course\.title}`\ :\ ''}</h3>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <p\ className="mt-1\ text-sm\ text-gray-500">Notatki\ powiązane\ z\ lekcjami\ wybranego\ kursu</p>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <button\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ onClick=\{\(\)\ =>\ openCreateNoteForm\(\)}\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ className="px-4\ py-2\ bg-green-600\ text-white\ rounded-lg\ hover:bg-green-700\ focus:outline-none\ focus:ring-2\ focus:ring-green-500\ focus:ring-offset-2"\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ >\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \+\ Nowa\ notatka\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </button>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="p-6">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{showCreateNoteForm\ &&\ \(\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="mb-6">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <CreateNoteForm\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ onNoteCreated=\{handleNoteCreated}\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lessons=\{lessons\.map\(\(lesson\)\ =>\ \(\{\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ //\ Używamy\ lokalnego\ UUID\ z\ tabeli\ lessons\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ id:\ lesson\.id,\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ title:\ lesson\.title,\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description:\ lesson\.description,\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ content:\ lesson\.content,\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order:\ lesson\.order_number\ \|\|\ lesson\.order,\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ status:\ lesson\.status\ as\ any,\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ created_at:\ lesson\.created_at,\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated_at:\ lesson\.updated_at,\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ //\ Dodatkowo\ przekazujemy\ wtl_lesson_id\ tylko\ informacyjnie\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wtl_lesson_id:\ lesson\.wtl_lesson_id,\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sync_status:\ lesson\.sync_status\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\)\)}\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ preselectedLessonId=\{selectedLessonForNote\ \|\|\ undefined}\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ //\ Twórz\ notatki\ w\ imieniu\ studenta,\ nie\ zalogowanego\ nauczyciela\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user=\{\{\ id:\ studentId\ }}\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ />\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \)}\r\n\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="overflow-x-auto">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <table\ className="min-w-full\ divide-y\ divide-gray-200">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <thead\ className="bg-gray-50">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <tr>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <th\ className="px-6\ py-3\ text-left\ text-xs\ font-medium\ text-gray-500\ uppercase\ tracking-wider">Tytuł</th>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <th\ className="px-6\ py-3\ text-left\ text-xs\ font-medium\ text-gray-500\ uppercase\ tracking-wider">Kurs</th>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <th\ className="px-6\ py-3\ text-left\ text-xs\ font-medium\ text-gray-500\ uppercase\ tracking-wider">Lekcje</th>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <th\ className="px-6\ py-3\ text-left\ text-xs\ font-medium\ text-gray-500\ uppercase\ tracking-wider">Utworzono</th>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </tr>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </thead>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <tbody\ className="bg-white\ divide-y\ divide-gray-200">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{notes\.map\(\(note\)\ =>\ \{\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ conns:\ any\[]\ =\ \(note\ as\ any\)\.lesson_connections\ \|\|\ \[]\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ primary\ =\ conns\.find\(c\ =>\ c\.connection_type\ ===\ 'primary'\)\ \|\|\ conns\[0]\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ let\ courseTitle\ =\ '—'\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ lessonsCount\ =\ conns\.length\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ \(primary\)\ \{\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ lesson\ =\ lessons\.find\(l\ =>\ l\.id\ ===\ primary\.lesson_id\ \|\|\ l\.wtl_lesson_id\ ===\ primary\.lesson_id\)\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ \(lesson\)\ \{\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ course\ =\ availableCourses\.find\(c\ =>\ \(c\ as\ any\)\.id\ ===\ \(lesson\ as\ any\)\.course_id\)\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ courseTitle\ =\ course\?\.title\ \|\|\ courseTitle\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <tr\ key=\{note\.id}>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <td\ className="px-6\ py-4\ whitespace-nowrap">\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="text-sm\ font-medium\ text-gray-900">\{note\.title}</div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <div\ className="text-sm\ text-gray-500\ truncate\ max-w-xs">\{note\.content}</div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </td>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <td\ className="px-6\ py-4\ whitespace-nowrap\ text-sm\ text-gray-900">\{courseTitle}</td>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <td\ className="px-6\ py-4\ whitespace-nowrap\ text-sm\ text-gray-900">\{lessonsCount}</td>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <td\ className="px-6\ py-4\ whitespace-nowrap\ text-sm\ text-gray-500">\{new\ Date\(note\.created_at\)\.toLocaleDateString\('pl-PL'\)}</td>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </tr>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \)\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\)}\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{notes\.length\ ===\ 0\ &&\ \(\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <tr>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <td\ colSpan=\{4}\ className="px-6\ py-8\ text-center\ text-gray-500">Brak\ notatek</td>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </tr>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \)}\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </tbody>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </table>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ \ \ \ \ \)}\r\n\ \ \ \ \ \ \ \ </div>\r\n\ \ \ \ \ \ </div>\r\n\ \ \ \ </ProtectedRoute>\r\n\ \ \)\r\n}\r\n\r\n\r\n\r\n
++'use client'
+
+import { useState, useEffect } from 'react'
+import { useAuthStore } from '@/store/auth-store'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { useParams, useSearchParams } from 'next/navigation'
+import CreateNoteForm from '@/components/notes/CreateNoteForm'
+import NotesList from '@/components/notes/NotesList'
+import { NoteWithConnections, Lesson as NoteLesson } from '@/types/notes'
+
+interface Lesson {
+  id: string
+  title: string
+  description?: string
+  content?: string
+  order_number?: number
+  order?: number // dla kompatybilno┼Ťci wstecznej
+  status: 'active' | 'inactive' | 'draft'
+  created_at: string
+  updated_at: string
+  wtl_lesson_id?: string
+  sync_status?: string
+}
+
+interface Student {
+  id: string
+  email: string
+  username?: string
+  first_name?: string
+  last_name?: string
+  status: string
+  created_at: string
+  updated_at: string
+  last_sync_at?: string
+  sync_status?: string
+  wtl_student_id?: string
+}
+
+interface Course {
+  id: string
+  title: string
+  description?: string
+  status: string
+  wtl_course_id?: string
+}
+
+interface LessonProgress {
+  lesson_id: string
+  student_id: string
+  status: 'not_started' | 'in_progress' | 'completed'
+  progress_percentage: number
+  started_at?: string
+  completed_at?: string
+  last_activity?: string
+}
+
+export default function StudentLessonsPage() {
+  const { user, isAuthenticated, initialize } = useAuthStore()
+  const params = useParams()
+  const searchParams = useSearchParams()
+  const teacherId = params.teacherId as string
+  const studentId = params.studentId as string
+  const courseId = searchParams.get('courseId')
+  
+  const [lessons, setLessons] = useState<Lesson[]>([])
+  const [student, setStudent] = useState<Student | null>(null)
+  const [course, setCourse] = useState<Course | null>(null)
+  const [lessonProgress, setLessonProgress] = useState<LessonProgress[]>([])
+  const [notes, setNotes] = useState<NoteWithConnections[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const [showCreateNoteForm, setShowCreateNoteForm] = useState(false)
+  const [selectedLessonForNote, setSelectedLessonForNote] = useState<string | null>(null)
+
+  useEffect(() => {
+    initialize()
+  }, [initialize])
+
+  useEffect(() => {
+    if (!user || !isAuthenticated || !courseId) return
+
+    // Sprawd┼║ uprawnienia dost─Öpu
+    if (!hasAccess()) {
+      setError('Brak uprawnie┼ä do przegl─ůdania lekcji tego studenta')
+      setIsLoading(false)
+      return
+    }
+
+    fetchData()
+  }, [user, isAuthenticated, courseId, studentId, teacherId])
+
+  const hasAccess = (): boolean => {
+    if (!user) return false
+    
+    // Ucze┼ä mo┼╝e przegl─ůda─ç tylko swoje lekcje
+    if (user.role === 'student') {
+      return user.id === studentId
+    }
+    
+    // Nauczyciel mo┼╝e przegl─ůda─ç lekcje swoich student├│w
+    if (user.role === 'teacher') {
+      // Sprawd┼║ czy nauczyciel przegl─ůda swoje dane
+      return user.id === teacherId
+    }
+    
+    // Superadmin mo┼╝e wszystko
+    if (user.role && user.role === 'superadmin') {
+      return true
+    }
+    
+    return false
+  }
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      // Pobierz dane kursu
+      const courseResponse = await fetch(`/api/courses/local/${courseId}`)
+      if (!courseResponse.ok) throw new Error('B┼é─ůd pobierania danych kursu')
+      const courseData = await courseResponse.json()
+      setCourse(courseData.course)
+
+             // Pobierz dane studenta
+       const studentResponse = await fetch(`/api/teacher/students/${studentId}`)
+       if (!studentResponse.ok) throw new Error('B┼é─ůd pobierania danych studenta')
+       const studentData = await studentResponse.json()
+       setStudent(studentData.user)
+
+             // Pobierz lekcje kursu z bazy danych
+      const lessonsResponse = await fetch(`/api/lessons?courseId=${courseId}`)
+      if (!lessonsResponse.ok) throw new Error('B┼é─ůd pobierania lekcji')
+      const lessonsData = await lessonsResponse.json()
+      let fetchedLessons = lessonsData.lessons || []
+
+      // Fallback: je┼Ťli lokalnie brak lekcji, pobierz list─Ö lekcji z WTL (bez zapisu do bazy)
+      if (false && (!fetchedLessons || fetchedLessons.length === 0) && courseData?.course?.wtl_course_id) {
+        try {
+          const wtlResp = await fetch(`/api/wtl/lessons?trainingId=${courseData.course.wtl_course_id}`)
+          if (wtlResp.ok) {
+            const wtlData = await wtlResp.json()
+            const wtlLessons = (wtlData.lessons || []).map((l: any) => ({
+              id: String(l.id),
+              title: l.name || l.title || 'Lekcja',
+              description: l.description || '',
+              content: l.content || '',
+              order_number: l.order || l.order_number || 0,
+              status: 'active' as const,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              wtl_lesson_id: String(l.id),
+              sync_status: 'wtl-only'
+            }))
+            fetchedLessons = wtlLessons
+          }
+        } catch { /* ignore fallback errors */ }
+      }
+
+      // Je┼Ťli brak lekcji lokalnie, spr├│buj doci─ůgn─ů─ç z WTL i zsynchronizowa─ç
+      // Synchronizacja lekcji nie jest wywo┼éywana z tego widoku (admin only)
+      if (false && (!fetchedLessons || fetchedLessons.length === 0) && courseData?.course?.wtl_course_id) {
+        try {
+          console.log('Brak lekcji lokalnie ÔÇô pr├│buj─Ö zsynchronizowa─ç z WTL...')
+          const wtlSync = await fetch(`/api/lessons?courseId=${courseId}`)
+          if (wtlSync.ok) {
+            // Po syncu pobierz ponownie z lokalnej bazy
+            const refetch = await fetch(`/api/lessons?courseId=${courseId}`)
+            if (refetch.ok) {
+              const refetchData = await refetch.json()
+              fetchedLessons = refetchData.lessons || []
+            }
+          }
+        } catch (syncErr) {
+          console.warn('Auto-sync lekcji z WTL nie powi├│d┼é si─Ö:', syncErr)
+        }
+      }
+
+      setLessons(fetchedLessons)
+
+      // Pobierz post─Öp studenta w lekcjach
+      await fetchLessonProgress()
+
+      // Pobierz notatki dla tego kursu
+      await fetchNotes()
+
+    } catch (err) {
+      console.error('Error fetching data:', err)
+      setError(err instanceof Error ? err.message : 'Wyst─ůpi┼é nieoczekiwany b┼é─ůd')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchNotes = async () => {
+    try {
+      // Pobierz notatki powi─ůzane z lekcjami tego kursu
+      const notesResponse = await fetch('/api/notes?include_connections=true')
+      if (notesResponse.ok) {
+        const notesData = await notesResponse.json()
+        // Filtruj notatki, kt├│re s─ů powi─ůzane z lekcjami tego kursu
+        const courseNotes = notesData.notes?.filter((note: NoteWithConnections) => 
+          note.lesson_connections?.some(conn => 
+            lessons.some(lesson => lesson.id === conn.lesson_id)
+          )
+        ) || []
+        setNotes(courseNotes)
+      }
+    } catch (err) {
+      console.log('B┼é─ůd pobierania notatek:', err)
+    }
+  }
+
+  const fetchLessonProgress = async () => {
+    try {
+      // TODO: Implementowa─ç API do pobierania post─Öpu w lekcjach
+      // Na razie u┼╝ywamy mock danych
+      const mockProgress: LessonProgress[] = lessons.map(lesson => ({
+        lesson_id: lesson.id,
+        student_id: studentId,
+        status: Math.random() > 0.7 ? 'completed' : Math.random() > 0.5 ? 'in_progress' : 'not_started',
+        progress_percentage: Math.floor(Math.random() * 100),
+        started_at: Math.random() > 0.5 ? new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+        completed_at: Math.random() > 0.7 ? new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+        last_activity: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString()
+      }))
+      
+      setLessonProgress(mockProgress)
+    } catch (err) {
+      console.error('Error fetching lesson progress:', err)
+    }
+  }
+
+
+
+  const getProgressStatus = (lessonId: string) => {
+    const progress = lessonProgress.find(p => p.lesson_id === lessonId)
+    return progress || {
+      status: 'not_started',
+      progress_percentage: 0,
+      last_activity: undefined
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-100 text-green-800'
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800'
+      case 'not_started':
+        return 'bg-gray-100 text-gray-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'Uko┼äczona'
+      case 'in_progress':
+        return 'W trakcie'
+      case 'not_started':
+        return 'Nie rozpocz─Öta'
+      default:
+        return status
+    }
+  }
+
+  const getProgressColor = (progress: number) => {
+    if (progress >= 80) return 'text-green-600'
+    if (progress >= 50) return 'text-yellow-600'
+    return 'text-red-600'
+  }
+
+  const handleNoteCreated = () => {
+    fetchNotes()
+  }
+
+  const handleNoteUpdated = () => {
+    fetchNotes()
+  }
+
+  const handleNoteDeleted = () => {
+    fetchNotes()
+  }
+
+  const openCreateNoteForm = (lessonId?: string) => {
+    setSelectedLessonForNote(lessonId || null)
+    setShowCreateNoteForm(true)
+  }
+
+  if (isLoading) {
+    return (
+      <ProtectedRoute>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      </ProtectedRoute>
+    )
+  }
+
+  if (error) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">B┼é─ůd</h3>
+                  <div className="mt-2 text-sm text-red-700">{error}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    )
+  }
+
+  if (!hasAccess()) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900">Dost─Öp ograniczony</h2>
+              <p className="mt-2 text-gray-600">Nie masz uprawnie┼ä do przegl─ůdania lekcji tego studenta.</p>
+            </div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    )
+  }
+
+  if (!courseId) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900">Brak informacji o kursie</h2>
+              <p className="mt-2 text-gray-600">Nie podano ID kursu w parametrach URL.</p>
+            </div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    )
+  }
+
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Nag┼é├│wek */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Lekcje studenta</h1>
+                <p className="mt-2 text-gray-600">
+                  {course?.title} - {student?.username || student?.email}
+                </p>
+                <div className="mt-2 flex items-center space-x-2">
+                  <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    ­čôÜ {lessons.length} lekcji
+                  </div>
+                  {user?.role === 'teacher' && (
+                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      ­čĹĘÔÇŹ­čĆź Widok nauczyciela
+                    </div>
+                  )}
+                  {user?.role === 'student' && (
+                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      ­čĹĘÔÇŹ­čÄô Tw├│j post─Öp
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+                             <div className="text-sm text-gray-600">
+                 <p>Lekcje s─ů synchronizowane automatycznie</p>
+                 <p>wraz z kursami w panelu &quot;Zarz─ůdzanie kursami&quot;</p>
+               </div>
+            </div>
+          </div>
+
+          {/* Lista lekcji */}
+          {lessons.length > 0 ? (
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">
+                  Lista lekcji ({lessons.length})
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Post─Öp w nauce - dane zsynchronizowane z WTL API
+                </p>
+              </div>
+              
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Nr
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Lekcja
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Post─Öp
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Ostatnia aktywno┼Ť─ç
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Akcje
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {lessons.map((lesson, index) => {
+                      const progress = getProgressStatus(lesson.id)
+                      return (
+                        <tr key={lesson.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {index + 1}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {lesson.title}
+                              </div>
+                              {lesson.description && (
+                                <div className="text-sm text-gray-500 truncate max-w-xs">
+                                  {lesson.description}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(progress.status)}`}>
+                              {getStatusLabel(progress.status)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                <div 
+                                  className={`h-2 rounded-full ${getProgressColor(progress.progress_percentage)}`}
+                                  style={{ width: `${progress.progress_percentage}%` }}
+                                ></div>
+                              </div>
+                              <span className={`text-sm font-medium ${getProgressColor(progress.progress_percentage)}`}>
+                                {progress.progress_percentage}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {progress.last_activity ? 
+                              new Date(progress.last_activity).toLocaleDateString('pl-PL') :
+                              'Brak aktywno┼Ťci'
+                            }
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => alert(`Otwieranie lekcji: ${lesson.title}`)}
+                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                                title="Otw├│rz lekcj─Ö"
+                              >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                Otw├│rz
+                              </button>
+                              <button
+                                onClick={() => openCreateNoteForm(lesson.id)}
+                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                                title="Dodaj notatk─Ö do tej lekcji"
+                              >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Notatka
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white shadow rounded-lg p-6 text-center">
+              <div className="text-gray-500">
+                <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 5.477 5.754 5 7.5 5s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.523 18.246 19 16.5 19c-1.746 0-3.332-.477-4.5-1.253" />
+                </svg>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Brak lekcji</h3>
+                <p className="text-sm text-gray-600">
+                  Ten kurs nie ma jeszcze ┼╝adnych lekcji.
+                </p>
+                                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                   <p className="text-sm text-blue-800">
+                     ­čĺí <strong>Lekcje s─ů synchronizowane automatycznie</strong>
+                   </p>
+                   <p className="text-sm text-blue-700 mt-1">
+                     U┼╝yj przycisku &quot;­čöä Synchronizuj kursy z WTL&quot; w panelu &quot;Zarz─ůdzanie kursami&quot;
+                   </p>
+                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sekcja notatek */}
+          <div className="mt-8">
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      ­čôŁ Notatki do lekcji ({notes.length})
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Notatki powi─ůzane z lekcjami tego kursu
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => openCreateNoteForm()}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  >
+                    Ô×Ľ Nowa notatka
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                                 {showCreateNoteForm && (
+                   <div className="mb-6">
+                     <CreateNoteForm
+                       onNoteCreated={handleNoteCreated}
+                        lessons={lessons.map(lesson => ({
+                          id: lesson.wtl_lesson_id || lesson.id,
+                          title: lesson.title,
+                          description: lesson.description,
+                          content: lesson.content,
+                          order: lesson.order_number || lesson.order,
+                          status: lesson.status as any,
+                          created_at: lesson.created_at,
+                          updated_at: lesson.updated_at,
+                          wtl_lesson_id: lesson.wtl_lesson_id || lesson.id,
+                          sync_status: lesson.sync_status
+                        }))}
+                        
+                       preselectedLessonId={selectedLessonForNote || undefined}
+                       user={user || undefined}
+                     />
+                   </div>
+                 )}
+
+                 <NotesList
+                   notes={notes}
+                    lessons={lessons.map(lesson => ({
+                      id: lesson.wtl_lesson_id || lesson.id,
+                      title: lesson.title,
+                      description: lesson.description,
+                      content: lesson.content,
+                      order: lesson.order_number || lesson.order,
+                      status: lesson.status as any,
+                      created_at: lesson.created_at,
+                      updated_at: lesson.updated_at,
+                      wtl_lesson_id: lesson.wtl_lesson_id || lesson.id,
+                      sync_status: lesson.sync_status
+                    }))}
+                   onNoteUpdated={handleNoteUpdated}
+                   onNoteDeleted={handleNoteDeleted}
+                   user={user || undefined}
+                 />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  )
+}
+
+*** End Patch

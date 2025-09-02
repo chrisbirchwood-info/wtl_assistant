@@ -1,0 +1,167 @@
+'use client'
+
+import { useEffect, useState, useCallback } from 'react'
+import { useParams } from 'next/navigation'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { useAuthStore } from '@/store/auth-store'
+
+interface ThreadConnection {
+  id: string
+  note_id: string
+  lesson_id: string
+  connection_type: 'primary' | 'related' | 'loose'
+  created_at: string
+}
+
+interface Thread {
+  id: string
+  title: string
+  content: string
+  user_id: string
+  created_at: string
+  updated_at: string
+  lesson_connections?: ThreadConnection[]
+}
+
+interface Lesson { id: string; title: string; wtl_lesson_id?: string; course_id?: string }
+interface Course { id: string; title: string }
+
+export default function ThreadDetailsPage() {
+  const { user, isAuthenticated, initialize } = useAuthStore()
+  const params = useParams()
+  const teacherId = params.teacherId as string
+  const studentId = params.studentId as string
+  const threadId = params.threadId as string
+
+  const [thread, setThread] = useState<Thread | null>(null)
+  const [lessons, setLessons] = useState<Lesson[]>([])
+  const [courses, setCourses] = useState<Course[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => { initialize() }, [initialize])
+
+
+  const hasAccess = useCallback((): boolean => {
+    if (!user) return false
+    if (user.role === 'superadmin') return true
+    if (user.role === 'teacher') return user.id === teacherId
+    if (user.role === 'student') return user.id === studentId
+    return false
+  }, [user, teacherId, studentId])
+
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const noteResp = await fetch(`/api/threads/${threadId}`, { cache: 'no-store' })
+      if (!noteResp.ok) throw new Error('Błąd pobierania wątku')
+      const noteJson = await noteResp.json()
+      setThread(noteJson.thread)
+
+      const [studentCoursesResp, teacherCoursesResp] = await Promise.all([
+        fetch(`/api/students/${studentId}/courses/local`, { cache: 'no-store' }),
+        fetch(`/api/courses/local?teacherId=${teacherId}`, { cache: 'no-store' })
+      ])
+      const studentCourses = studentCoursesResp.ok ? (await studentCoursesResp.json()).courses || [] : []
+      const teacherCourses = teacherCoursesResp.ok ? (await teacherCoursesResp.json()).courses || [] : []
+      const teacherCourseIds = new Set((teacherCourses || []).map((c: Course) => c.id))
+      const available = (studentCourses || []).filter((c: Course) => teacherCourseIds.has(c.id))
+      setCourses(available.map((c: Course) => ({ id: c.id, title: c.title })))
+
+      const lessonsPromises = available.map((c: Course) => fetch(`/api/lessons?courseId=${c.id}`, { cache: 'no-store' }).then(r => r.ok ? r.json() : { lessons: [] }))
+      const lessonsArrays = await Promise.all(lessonsPromises)
+      const allLessons: Lesson[] = lessonsArrays.flatMap((j: { lessons?: Lesson[] }) => (j.lessons || []))
+      setLessons(allLessons)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Wystąpił nieoczekiwany błąd')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [teacherId, studentId, threadId])
+  useEffect(() => {
+    if (!user || !isAuthenticated) return
+    if (!hasAccess()) { setError('Brak uprawnień do przeglądania wątku'); setIsLoading(false); return }
+    fetchData()
+  }, [user, isAuthenticated, teacherId, studentId, threadId, hasAccess, fetchData])
+
+  const courseTitleForLesson = (lessonId: string): string => {
+    const lesson = lessons.find(l => l.id === lessonId || l.wtl_lesson_id === lessonId)
+    if (!lesson) return '—'
+    const course = courses.find(c => c.id === lesson.course_id)
+    return course?.title || '—'
+  }
+
+  if (isLoading) {
+    return (
+      <ProtectedRoute>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        </div>
+      </ProtectedRoute>
+    )
+  }
+
+  if (error) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">{error}</div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    )
+  }
+
+  if (!thread) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50 py-12">
+          <div className="max-w-4xl mx-auto px-4">Nie znaleziono wątku.</div>
+        </div>
+      </ProtectedRoute>
+    )
+  }
+
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{thread.title}</h1>
+              <p className="text-sm text-gray-500 mt-1">Utworzono: {new Date(thread.created_at).toLocaleString('pl-PL')}{thread.updated_at && (` • Zaktualizowano: ${new Date(thread.updated_at).toLocaleString('pl-PL')}`)}</p>
+            </div>
+            <a href={`/teacher/${teacherId}/students/${studentId}/threads`} className="text-sm text-blue-600 hover:text-blue-800">← Wróć do wątków</a>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="prose max-w-none whitespace-pre-wrap">{thread.content}</div>
+
+            <div className="mt-6 border-t pt-4">
+              <h2 className="text-sm font-semibold text-gray-700 mb-2">Powiążane lekcje</h2>
+              {thread.lesson_connections && thread.lesson_connections.length > 0 ? (
+                <ul className="space-y-2">
+                  {thread.lesson_connections.map((c) => (
+                    <li key={c.id} className="flex items-center justify-between text-sm">
+                      <span>
+                        <span className="inline-block px-2 py-0.5 mr-2 rounded-full text-xs bg-gray-100 text-gray-800">{c.connection_type}</span>
+                        {courseTitleForLesson(c.lesson_id)}
+                      </span>
+                      <span className="text-gray-500">ID lekcji: {c.lesson_id}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-500">Brak powiązań — luźny wątek.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  )
+}
+

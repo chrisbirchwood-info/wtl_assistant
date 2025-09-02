@@ -24,9 +24,10 @@ export async function PATCH(
     if (!course) return NextResponse.json({ success: false, message: 'Kurs nie istnieje' }, { status: 404 })
 
     // Batch upsert positions using composite unique (course_id, lesson_id)
-    const rows = items
-      .filter((it: any) => it.lesson_id && typeof it.position === 'number')
-      .map((it: any) => ({ course_id: courseId, lesson_id: it.lesson_id, position: it.position }))
+    type ReorderItem = { lesson_id: string; position: number }
+    const rows = (items as ReorderItem[])
+      .filter((it) => it.lesson_id && typeof it.position === 'number')
+      .map((it) => ({ course_id: courseId, lesson_id: it.lesson_id, position: it.position }))
 
     const { error } = await supabase
       .from('course_lessons')
@@ -42,4 +43,3 @@ export async function PATCH(
     return NextResponse.json({ success: false, message: 'Wystąpił błąd', error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 })
   }
 }
-
