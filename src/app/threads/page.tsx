@@ -94,13 +94,13 @@ export default function ThreadsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Nagłówek */}
           <div className="mb-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Moje wątki</h1>
                 <p className="mt-2 text-gray-600">
                   Zarządzaj swoimi wątkami — luźnymi lub powiązanymi z lekcjami
                 </p>
-                <div className="mt-2 flex items-center space-x-2">
+                <div className="mt-2 flex items-center flex-wrap gap-2">
                   <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     🧵 {threads.length} wątków
                   </div>

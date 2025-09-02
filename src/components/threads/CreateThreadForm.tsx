@@ -201,7 +201,7 @@ export default function CreateThreadForm({ onThreadCreated, lessons = [], presel
                   const lesson = lessons.find((l) => l.id === lessonId)
                   if (!lesson) return null
                   return (
-                    <div key={lessonId} className="flex items-center space-x-3 bg-gray-50 p-2 rounded">
+                    <div key={lessonId} className="flex flex-wrap items-center gap-2 bg-gray-50 p-2 rounded">
                       <span className="flex-1 text-sm text-gray-700">{lesson.title}</span>
                       <select
                         value={connectionTypes[index] || 'related'}
@@ -233,7 +233,7 @@ export default function CreateThreadForm({ onThreadCreated, lessons = [], presel
         </div>
 
         <div className="bg-gray-50 rounded-md p-3">
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className={`w-3 h-3 rounded-full ${isLooseNote ? 'bg-gray-400' : 'bg-blue-500'}`} />
             <span className="text-sm text-gray-600">
               {isLooseNote ? '🧵 Luźny wątek (nie powiązany z żadną lekcją)' : `🔗 Wątek powiązany z ${selectedLessonIds.length} lekcją/lekcjami`}

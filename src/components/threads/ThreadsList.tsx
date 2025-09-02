@@ -180,7 +180,7 @@ export default function ThreadsList({ threads, lessons = [], onThreadUpdated, on
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Powiąż lekcje:</label>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col md:flex-row md:items-start gap-3">
                   <select
                     onChange={(e) => {
                       const val = e.target.value
@@ -201,7 +201,7 @@ export default function ThreadsList({ threads, lessons = [], onThreadUpdated, on
                   </select>
 
                   {editLessonIds.length > 0 && (
-                    <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-md p-3">
+                    <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-md p-3 w-full md:w-auto">
                       {editLessonIds.map((lessonId, index) => {
                         const lesson = lessons.find(l => l.id === lessonId || l.wtl_lesson_id === lessonId)
                         if (!lesson) return null
@@ -232,7 +232,7 @@ export default function ThreadsList({ threads, lessons = [], onThreadUpdated, on
                 </div>
               </div>
 
-              <div className="flex space-x-3">
+              <div className="flex flex-wrap gap-2">
                 <button onClick={() => handleUpdate(thread.id)} disabled={isSubmitting} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400">
                   {isSubmitting ? 'Zapisuję...' : 'Zapisz'}
                 </button>
@@ -241,9 +241,9 @@ export default function ThreadsList({ threads, lessons = [], onThreadUpdated, on
             </div>
           ) : (
             <div>
-              <div className="flex items-start justify-between mb-3">
-                <h4 className="text-lg font-semibold text-gray-900">{thread.title}</h4>
-                <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
+                <h4 className="text-lg font-semibold text-gray-900 break-words">{thread.title}</h4>
+                <div className="flex flex-wrap gap-2 shrink-0">
                   <button onClick={() => startEditing(thread)} className="text-blue-600 hover:text-blue-800 text-sm font-medium">Edytuj</button>
                   <button onClick={() => handleDelete(thread.id)} className="text-red-600 hover:text-red-800 text-sm font-medium">Usuń</button>
                 </div>
