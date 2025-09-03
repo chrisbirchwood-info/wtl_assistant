@@ -68,6 +68,24 @@ export async function GET(
       )
     }
 
+    // Enrich lesson connections with lesson metadata in a separate, safe query
+    const connections = (note as any)?.lesson_connections || []
+    if (Array.isArray(connections) && connections.length > 0) {
+      const ids = Array.from(new Set(connections.map((c: any) => String(c.lesson_id)).filter(Boolean)))
+      if (ids.length > 0) {
+        const [{ data: lessonsById }, { data: lessonsByWtl }] = await Promise.all([
+          supabase.from('lessons').select('id, title, wtl_lesson_id, course_id').in('id', ids),
+          supabase.from('lessons').select('id, title, wtl_lesson_id, course_id').in('wtl_lesson_id', ids)
+        ])
+        const byIdMap = new Map<string, any>((lessonsById || []).map((l: any) => [String(l.id), l]))
+        const byWtlMap = new Map<string, any>((lessonsByWtl || []).map((l: any) => [String(l.wtl_lesson_id), l]))
+        ;(note as any).lesson_connections = connections.map((c: any) => {
+          const l = byIdMap.get(String(c.lesson_id)) || byWtlMap.get(String(c.lesson_id))
+          return l ? { ...c, lesson: { id: l.id, title: l.title, wtl_lesson_id: l.wtl_lesson_id, course_id: l.course_id } } : c
+        })
+      }
+    }
+
     return NextResponse.json({ thread: note })
   } catch {
     return NextResponse.json(

@@ -1,81 +1,203 @@
-                  </select>
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@supabase/supabase-js"
+import { UpdateThreadRequest as UpdateNoteRequest } from "@/types/threads"
 
-                  {editLessonIds.length > 0 && (
-                    <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-md p-3">
-                      {editLessonIds.map((lessonId, index) => {
-                        const lesson = lessons.find(l => l.id === lessonId || l.wtl_lesson_id === lessonId)
-                        if (!lesson) return null
-                        return (
-                          <div key={lessonId} className="flex items-center space-x-3 bg-gray-50 p-2 rounded">
-                            <span className="flex-1 text-sm text-gray-700">{lesson.title}</span>
-                            <select
-                              value={editConnectionTypes[index] || 'related'}
-                              onChange={(e) => handleConnectionTypeChange(lessonId, e.target.value as 'primary' | 'related' | 'loose')}
-                              className="text-xs border border-gray-300 rounded px-2 py-1"
-                            >
-                              <option value="primary">Główne</option>
-                              <option value="related">Powiązane</option>
-                              <option value="loose">Luźne</option>
-                            </select>
-                            <button
-                              type="button"
-                              onClick={() => handleLessonSelection(lessonId, false)}
-                              className="text-red-600 hover:text-red-800 text-sm font-medium"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
-              <div className="flex space-x-3">
-                <button onClick={() => handleUpdate(thread.id)} disabled={isSubmitting} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400">
-                  {isSubmitting ? 'Zapisuję...' : 'Zapisz'}
-                </button>
-                <button onClick={cancelEditing} className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Anuluj</button>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <div className="flex items-start justify-between mb-3">
-                <h4 className="text-lg font-semibold text-gray-900">{thread.title}</h4>
-                <div className="flex space-x-2">
-                  <button onClick={() => startEditing(thread)} className="text-blue-600 hover:text-blue-800 text-sm font-medium">Edytuj</button>
-                  <button onClick={() => handleDelete(thread.id)} className="text-red-600 hover:text-red-800 text-sm font-medium">Usuń</button>
-                </div>
-              </div>
+// Helper: resolve array of lesson identifiers to local lessons.id (uuid)
+async function resolveLessonIdsToLocal(lessonIds: string[] | undefined | null): Promise<string[]> {
+  if (!lessonIds || lessonIds.length === 0) return []
 
-              <p className="text-gray-700 mb-4 whitespace-pre-wrap">{thread.content}</p>
+  const unique = Array.from(new Set(lessonIds.filter(Boolean)))
 
-              {getConnections(thread).length > 0 ? (
-                <div className="border-t pt-3">
-                  <h5 className="text-sm font-medium text-gray-700 mb-2">Powiązane lekcje:</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {getConnections(thread).map((connection: ThreadLessonConnection) => (
-                      <span key={connection.id} className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getConnectionTypeColor(connection.connection_type)}`}>
-                        {getConnectionTypeLabel(connection.connection_type)}: {(lessons.find(l => l.id === connection.lesson_id || l.wtl_lesson_id === connection.lesson_id)?.title) || connection.lesson_id}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="border-t pt-3">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">🧵 Luźny wątek</span>
-                </div>
-              )}
+  let { data: byId } = await supabase
+    .from('lessons')
+    .select('id, wtl_lesson_id')
+    .in('id', unique as string[])
 
-              <div className="text-xs text-gray-500 mt-3">
-                Utworzono: {new Date(thread.created_at).toLocaleDateString('pl-PL')}
-                {thread.updated_at !== thread.created_at && ` • Zaktualizowano: ${new Date(thread.updated_at).toLocaleDateString('pl-PL')}`}
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  )
+  byId = byId || []
+  const matchedById = new Map((byId as any[]).map((r) => [String(r.id), String(r.id)]))
+  const unresolved = unique.filter((x) => !matchedById.has(x))
+
+  let byWtl: any[] = []
+  if (unresolved.length > 0) {
+    const resp = await supabase
+      .from('lessons')
+      .select('id, wtl_lesson_id')
+      .in('wtl_lesson_id', unresolved as string[])
+    byWtl = resp.data || []
+  }
+
+  const wtlMap = new Map(byWtl.map((r) => [String(r.wtl_lesson_id), String(r.id)]))
+
+  const resolved: string[] = unique.map((orig) => matchedById.get(orig) || wtlMap.get(orig) || orig)
+  return resolved
+}
+
+// GET: pojedynczy wątek (czyta z `threads`)
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params
+
+    const { data: note, error } = await supabase
+      .from('threads')
+      .select(`
+        *,
+        lesson_connections:thread_lesson_connections(
+          id,
+          thread_id,
+          lesson_id,
+          connection_type,
+          created_at,
+          lesson:lessons(id, title, wtl_lesson_id, course_id)
+        )
+      `)
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: "Wątek nie został znaleziony" },
+          { status: 404 }
+        )
+      }
+      return NextResponse.json(
+        { error: "Błąd podczas pobierania wątku" },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ thread: note })
+  } catch {
+    return NextResponse.json(
+      { error: "Wystąpił nieoczekiwany błąd" },
+      { status: 500 }
+    )
+  }
+}
+
+// PUT: aktualizuj wątek
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params
+    const { title, content, lesson_ids, connection_types }: UpdateNoteRequest = await request.json()
+
+    const { data: existingNote, error: checkError } = await supabase
+      .from('threads')
+      .select('id')
+      .eq('id', id)
+      .single()
+
+    if (checkError || !existingNote) {
+      return NextResponse.json(
+        { error: "Wątek nie został znaleziony" },
+        { status: 404 }
+      )
+    }
+
+    const updateData: Record<string, unknown> = {}
+    if (title !== undefined) updateData.title = title
+    if (content !== undefined) updateData.content = content
+
+    if (Object.keys(updateData).length > 0) {
+      const { error: updateError } = await supabase
+        .from('threads')
+        .update(updateData)
+        .eq('id', id)
+
+      if (updateError) {
+        return NextResponse.json(
+          { error: "Błąd podczas aktualizacji wątku" },
+          { status: 500 }
+        )
+      }
+    }
+
+    if (lesson_ids !== undefined) {
+      const resolvedLessonIds = await resolveLessonIdsToLocal(lesson_ids)
+      await supabase
+        .from('thread_lesson_connections')
+        .delete()
+        .eq('thread_id', id)
+
+      if (resolvedLessonIds.length > 0) {
+        const connections = resolvedLessonIds.map((lesson_id: string, index: number) => ({
+          thread_id: id,
+          lesson_id,
+          connection_type: connection_types?.[index] || 'related'
+        }))
+
+        const { error: connectionError } = await supabase
+          .from('thread_lesson_connections')
+          .insert(connections)
+
+        if (connectionError) {
+          return NextResponse.json(
+            { error: "Błąd podczas aktualizacji powiązań z lekcjami" },
+            { status: 500 }
+          )
+        }
+      }
+    }
+
+    return NextResponse.json({ message: "Wątek został zaktualizowany pomyślnie" })
+  } catch {
+    return NextResponse.json(
+      { error: "Wystąpił nieoczekiwany błąd" },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE: usuń wątek
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params
+
+    const { data: existingNote, error: checkError } = await supabase
+      .from('threads')
+      .select('id')
+      .eq('id', id)
+      .single()
+
+    if (checkError || !existingNote) {
+      return NextResponse.json(
+        { error: "Wątek nie został znaleziony" },
+        { status: 404 }
+      )
+    }
+
+    const { error: deleteError } = await supabase
+      .from('threads')
+      .delete()
+      .eq('id', id)
+
+    if (deleteError) {
+      return NextResponse.json(
+        { error: "Błąd podczas usuwania wątku" },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ message: "Wątek został usunięty pomyślnie" })
+  } catch {
+    return NextResponse.json(
+      { error: "Wystąpił nieoczekiwany błąd" },
+      { status: 500 }
+    )
+  }
 }

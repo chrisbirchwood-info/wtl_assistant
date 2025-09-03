@@ -86,11 +86,18 @@ export default function ThreadDetailsPage() {
     fetchData()
   }, [user, isAuthenticated, teacherId, studentId, threadId, hasAccess, fetchData])
 
-  const courseTitleForLesson = (lessonId: string): string => {
+  const courseTitleForLesson = (lessonId: string, lessonFromConn?: { course_id?: string } | null): string => {
+    // Prefer course_id delivered with the connection (joined lesson)
+    const byConnCourseId = lessonFromConn?.course_id
+    if (byConnCourseId) {
+      const course = courses.find(c => c.id === byConnCourseId)
+      if (course?.title) return course.title
+    }
+    // Fallback: try to match from locally fetched lessons
     const lesson = lessons.find(l => l.id === lessonId || l.wtl_lesson_id === lessonId)
-    if (!lesson) return '—'
-    const course = courses.find(c => c.id === lesson.course_id)
-    return course?.title || '—'
+    if (!lesson) return '-'
+    const course = courses.find(c => c.id === (lesson as any).course_id)
+    return course?.title || '-'
   }
 
   if (isLoading) {
@@ -145,12 +152,10 @@ export default function ThreadDetailsPage() {
               {thread.lesson_connections && thread.lesson_connections.length > 0 ? (
                 <ul className="space-y-2">
                   {thread.lesson_connections.map((c) => (
-                    <li key={c.id} className="flex items-center justify-between text-sm">
-                      <span>
-                        <span className="inline-block px-2 py-0.5 mr-2 rounded-full text-xs bg-gray-100 text-gray-800">{c.connection_type}</span>
-                        {courseTitleForLesson(c.lesson_id)}
-                      </span>
-                      <span className="text-gray-500">ID lekcji: {c.lesson_id}</span>
+                    <li key={c.id} className="flex items-center gap-2 text-sm text-gray-700">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-800">{c.connection_type}</span>
+                      <span className="text-gray-400">–</span>
+                      <span className="flex-1 break-words">{((c as any).lesson?.title) ? (c as any).lesson.title : `ID lekcji: ${c.lesson_id}`}</span>
                     </li>
                   ))}
                 </ul>
