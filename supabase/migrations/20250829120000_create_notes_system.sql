@@ -62,14 +62,16 @@ CREATE POLICY "Users can update their own notes" ON notes
 CREATE POLICY "Users can delete their own notes" ON notes
   FOR DELETE USING (auth.uid() = user_id);
 
--- Dodatkowe polityki dla nauczycieli (mogą widzieć notatki swoich studentów)
+-- Dodatkowe polityki dla nauczycieli (mogą widzieć notatki studentów zapisanych na ich kursy)
 CREATE POLICY "Teachers can view student notes" ON notes
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM course_teachers ct
-      JOIN students s ON s.wtl_student_id = ct.student_wtl_id
+      JOIN course_enrollments ce ON ce.course_id = ct.course_id
       WHERE ct.teacher_id = auth.uid() 
-      AND s.id = notes.user_id
+      AND ct.is_active = true
+      AND ce.student_id = notes.user_id
+      AND ce.status = 'enrolled'
     )
   );
 
@@ -110,13 +112,17 @@ CREATE POLICY "Users can delete connections for their notes" ON note_lesson_conn
     )
   );
 
--- Dodatkowe polityki dla nauczycieli (mogą widzieć powiązania notatek swoich studentów)
+-- Dodatkowe polityki dla nauczycieli (mogą widzieć powiązania notatek studentów zapisanych na ich kursy)
 CREATE POLICY "Teachers can view student note connections" ON note_lesson_connections
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM notes n
-      JOIN course_teachers ct ON ct.student_wtl_id = n.user_id
+      JOIN course_teachers ct ON ct.course_id IN (
+        SELECT ce.course_id FROM course_enrollments ce 
+        WHERE ce.student_id = n.user_id AND ce.status = 'enrolled'
+      )
       WHERE n.id = note_lesson_connections.note_id 
       AND ct.teacher_id = auth.uid()
+      AND ct.is_active = true
     )
   );

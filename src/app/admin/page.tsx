@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/auth-store'
+import toast from 'react-hot-toast'
 
 export default function AdminDashboard() {
   const { user, isAuthenticated } = useAuthStore()
@@ -12,6 +13,14 @@ export default function AdminDashboard() {
     totalCourses: 0,
     activeUsers: 0
   })
+  // Usunięto panel ankiet z admina – tymczasowe stuby, by nie psuć buildu
+  const surveyLink: string | null = null
+  const surveyAddedAt: string | null = null
+  const surveySyncedAt: string | null = null
+  const handleAddSurveyLink = () => {}
+  const handleRefreshSurvey = () => {}
+  const formatDate = (_iso: string | null) => '-'
+  
 
   useEffect(() => {
     // Sprawdź czy użytkownik jest zalogowany i ma rolę superadmin
@@ -45,14 +54,63 @@ export default function AdminDashboard() {
     return <div>Ładowanie...</div>
   }
 
+  
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Nagłówek */}
-        <div className="mb-8">
+        <div className="mb-8 relative">
           <h1 className="text-3xl font-bold text-gray-900">
             Panel Administracyjny
           </h1>
+          <div className="absolute right-0 top-0 flex items-center gap-2">
+            {/* Ankieta: dodanie/link + daty + odśwież */}
+            {!surveyLink ? (
+              <button
+                onClick={handleAddSurveyLink}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Dodaj link do ankiety
+              </button>
+            ) : (
+              <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-3 py-2 shadow-sm">
+                <div className="text-sm">
+                  <div className="text-gray-800 truncate max-w-[220px]">
+                    <a href={surveyLink} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                      {surveyLink}
+                    </a>
+                  </div>
+                  <div className="text-gray-500">Dodano: {formatDate(surveyAddedAt)}</div>
+                  <div className="text-gray-500">Ostatnia synchronizacja: {formatDate(surveySyncedAt)}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleRefreshSurvey}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    title="Odśwież"
+                  >
+                    Odśwież
+                  </button>
+                </div>
+              </div>
+            )}
+            <button
+              onClick={() => {
+                // Placeholder do integracji OAuth Google
+                // W przyszłości można przekierować na endpoint OAuth, np. /api/auth/google
+                toast('Uwierzytelnianie Google w przygotowaniu', { icon: '🔒' })
+              }}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <span className="mr-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-white">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21.35 11.1H12v2.9h5.35c-.25 1.5-1.6 4.4-5.35 4.4-3.25 0-5.9-2.7-5.9-6s2.65-6 5.9-6c1.85 0 3.1.8 3.8 1.5l2.6-2.5C17.3 3.4 15.05 2.4 12 2.4 6.9 2.4 2.8 6.5 2.8 11.6S6.9 20.8 12 20.8c6.95 0 9.2-4.85 9.2-7.3 0-.5-.05-1-.15-1.4z" fill="#4285F4"/>
+                </svg>
+              </span>
+              Uwierzytelnij przez Google
+            </button>
+          </div>
           <p className="mt-2 text-gray-600">
             Witaj, {user.email} - masz pełny dostęp do systemu
           </p>
@@ -161,7 +219,7 @@ export default function AdminDashboard() {
               </button>
 
               <button
-                onClick={() => router.push('/admin/features')}
+                onClick={() => router.push('/admin/users')}
                 className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,7 +229,7 @@ export default function AdminDashboard() {
               </button>
 
               <button
-                onClick={() => router.push('/admin/users')}
+                onClick={() => router.push('/admin/features')}
                 className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

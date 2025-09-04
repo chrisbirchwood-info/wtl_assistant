@@ -45,6 +45,11 @@ export default function Navigation() {
       href: `/teacher/${user.id}/students`,
       current: pathname.startsWith('/teacher/') && pathname.includes('/students')
     })
+    navigation.push({
+      name: 'Ankiety',
+      href: `/teacher/${user.id}/surveys`,
+      current: pathname.startsWith('/teacher/') && pathname.includes('/surveys')
+    })
   }
 
   // Link do panelu admina tylko dla superadminów
