@@ -1,15 +1,19 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/auth-store'
+import AddSurveyForm from '@/components/surveys/AddSurveyForm'
 import toast from 'react-hot-toast'
 
-type SurveyItem = {
-  id: string
-  link: string
-  addedAt: string
-  syncedAt?: string | null
+type DbForm = {
+  form_id: string
+  title?: string | null
+  description?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  last_synced_at?: string | null
+  total_responses?: number | null
 }
 
 export default function TeacherSurveysConfigPage() {
@@ -18,7 +22,9 @@ export default function TeacherSurveysConfigPage() {
   const teacherId = params.teacherId as string
   const { user, isAuthenticated, initialize } = useAuthStore()
 
-  const [surveys, setSurveys] = useState<SurveyItem[]>([])
+  const [dbForms, setDbForms] = useState<DbForm[]>([])
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [googleConnected, setGoogleConnected] = useState<boolean | null>(null)
 
   useEffect(() => {
     initialize()
@@ -32,72 +38,31 @@ export default function TeacherSurveysConfigPage() {
     }
   }, [isAuthenticated, user, teacherId, router])
 
-  // Lista ankiet w localStorage (per nauczyciel)
-  const lsListKey = useMemo(() => `teacher_${teacherId}_surveys`, [teacherId])
-
-  useEffect(() => {
+  const fetchSurveysFromDatabase = async () => {
     try {
-      const raw = localStorage.getItem(lsListKey)
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        if (Array.isArray(parsed)) setSurveys(parsed)
-      } else {
-        // Migracja ze starego formatu (pojedyncze klucze)
-        const link = localStorage.getItem(`teacher_${teacherId}_survey_link`)
-        const added = localStorage.getItem(`teacher_${teacherId}_survey_added_at`)
-        const synced = localStorage.getItem(`teacher_${teacherId}_survey_synced_at`)
-        if (link && added) {
-          const migrated: SurveyItem[] = [
-            { id: String(Date.now()), link, addedAt: added, syncedAt: synced || null },
-          ]
-          localStorage.setItem(lsListKey, JSON.stringify(migrated))
-          setSurveys(migrated)
-          localStorage.removeItem(`teacher_${teacherId}_survey_link`)
-          localStorage.removeItem(`teacher_${teacherId}_survey_added_at`)
-          localStorage.removeItem(`teacher_${teacherId}_survey_synced_at`)
-        }
+      const response = await fetch(`/api/surveys/forms?teacher_id=${teacherId}`)
+      const data = await response.json()
+      if (response.ok) {
+        setDbForms(data.forms || [])
       }
-    } catch {}
-  }, [lsListKey, teacherId])
-
-  const saveSurveys = (items: SurveyItem[]) => {
-    setSurveys(items)
-    try {
-      localStorage.setItem(lsListKey, JSON.stringify(items))
-    } catch {}
-  }
-
-  const handleAddSurveyLink = () => {
-    const input = window.prompt('Podaj link do ankiety (URL):')
-    if (!input) return
-    try {
-      const url = new URL(input)
-      const now = new Date().toISOString()
-      const newItem: SurveyItem = {
-        id: String(Date.now()),
-        link: url.toString(),
-        addedAt: now,
-        syncedAt: null,
-      }
-      saveSurveys([...(surveys || []), newItem])
-      toast.success('Dodano ankietę')
-    } catch {
-      toast.error('Nieprawidłowy adres URL')
+    } catch (error) {
+      console.error('Error fetching surveys from database:', error)
     }
   }
 
-  const handleRefreshSurvey = (id: string) => {
-    const now = new Date().toISOString()
-    const next = (surveys || []).map((s: SurveyItem) => (s.id === id ? { ...s, syncedAt: now } : s))
-    saveSurveys(next)
-    toast.success('Zsynchronizowano ankietę')
-  }
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchSurveysFromDatabase()
+      // Check Google OAuth status
+      setGoogleConnected(null)
+      fetch(`/api/surveys/google/status?teacher_id=${teacherId}`)
+        .then((r) => r.json())
+        .then((d) => setGoogleConnected(!!d.connected))
+        .catch(() => setGoogleConnected(null))
+    }
+  }, [isAuthenticated, user, teacherId])
 
-  const handleRemoveSurvey = (id: string) => {
-    const next = (surveys || []).filter((s: SurveyItem) => s.id !== id)
-    saveSurveys(next)
-    toast('Usunięto ankietę', { icon: '🗑️' })
-  }
+  const handleAddSurveyLink = () => setShowAddForm(true)
 
   const formatDate = (iso?: string | null) => (iso ? new Date(iso).toLocaleString('pl-PL') : '-')
 
@@ -110,11 +75,48 @@ export default function TeacherSurveysConfigPage() {
         params.delete('google')
         const url = `${window.location.pathname}`
         window.history.replaceState({}, '', url)
+        setGoogleConnected(true)
       } else if (params.get('google') === 'error') {
         toast.error('Błąd łączenia z Google: ' + (params.get('message') || ''))
+        setGoogleConnected(false)
       }
     } catch {}
   }, [])
+
+  // Synchronizacja ankiet zapisanych w bazie (po formId)
+  const handleGoogleSyncDbForm = async (formId: string) => {
+    try {
+      const res = await fetch('/api/surveys/google/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ teacherId, formId }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error || 'Błąd synchronizacji')
+      }
+      const data = await res.json()
+      toast.success(`Zsynchronizowano odpowiedzi (${data.count || 0})`)
+      fetchSurveysFromDatabase()
+    } catch (e: any) {
+      toast.error(e.message || 'Nie udało się zsynchronizować')
+    }
+  }
+
+  const handleDeleteDbForm = async (formId: string) => {
+    try {
+      if (!confirm('Na pewno usunąć tę ankietę oraz wszystkie jej dane i powiązania?')) return
+      const res = await fetch(`/api/surveys/forms?teacher_id=${teacherId}&form_id=${encodeURIComponent(formId)}`, {
+        method: 'DELETE',
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.error || 'Nie udało się usunąć ankiety')
+      toast.success('Usunięto ankietę i powiązane dane')
+      fetchSurveysFromDatabase()
+    } catch (e: any) {
+      toast.error(e.message || 'Błąd podczas usuwania ankiety')
+    }
+  }
 
   if (!isAuthenticated || !user) {
     return (
@@ -130,29 +132,6 @@ export default function TeacherSurveysConfigPage() {
         <div className="text-gray-600">Brak dostępu</div>
       </div>
     )
-  }
-
-  const handleGoogleSyncSurvey = async (id: string) => {
-    try {
-      const target = surveys.find((s) => s.id === id)
-      if (!target) return
-      const res = await fetch('/api/surveys/google/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teacherId, link: target.link }),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err?.error || 'Błąd synchronizacji')
-      }
-      const data = await res.json()
-      const now = data.syncedAt || new Date().toISOString()
-      const next = (surveys || []).map((s: SurveyItem) => (s.id === id ? { ...s, syncedAt: now } : s))
-      saveSurveys(next)
-      toast.success(`Zsynchronizowano odpowiedzi (${data.count || 0})`)
-    } catch (e: any) {
-      toast.error(e.message || 'Nie udało się zsynchronizować')
-    }
   }
 
   return (
@@ -178,61 +157,79 @@ export default function TeacherSurveysConfigPage() {
               }}
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              <span className="mr-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-white">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <span className="mr-2 inline-flex items-center">
+                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M21.35 11.1H12v2.9h5.35c-.25 1.5-1.6 4.4-5.35 4.4-3.25 0-5.9-2.7-5.9-6s2.65-6 5.9-6c1.85 0 3.1.8 3.8 1.5l2.6-2.5C17.3 3.4 15.05 2.4 12 2.4 6.9 2.4 2.8 6.5 2.8 11.6S6.9 20.8 12 20.8c6.95 0 9.2-4.85 9.2-7.3 0-.5-.05-1-.15-1.4z" fill="#4285F4"/>
                 </svg>
+                <span
+                  className={`inline-block w-2.5 h-2.5 rounded-full ${
+                    googleConnected === null
+                      ? 'bg-yellow-400 animate-pulse'
+                      : googleConnected
+                      ? 'bg-green-500'
+                      : 'bg-red-500'
+                  }`}
+                  title={
+                    googleConnected === null
+                      ? 'Sprawdzam status połączenia z Google...'
+                      : googleConnected
+                      ? 'Połączono z Google'
+                      : 'Brak połączenia z Google'
+                  }
+                />
               </span>
-              Połącz z Google
+              {googleConnected ? 'Połączono z Google' : 'Połącz z Google'}
             </button>
           </div>
         </div>
 
-        <div className="mb-4">
-          <a
-            href={`/api/surveys/google/authorize?teacherId=${teacherId}&returnTo=${encodeURIComponent('/teacher/' + teacherId + '/surveys')}`}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            Połącz z Google (OAuth)
-          </a>
-        </div>
 
         <div className="bg-white shadow rounded-lg p-6 text-gray-500">
           Tutaj w przyszłości: mapowanie ankiet na kursy, wysyłka przypomnień itd.
         </div>
 
-        {/* Lista ankiet na dole */}
+        {/* Lista ankiet z bazy danych */}
         <div className="mt-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Twoje ankiety</h2>
-          {surveys.length === 0 ? (
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Ankiety w bazie</h2>
+          {dbForms.length === 0 ? (
             <div className="bg-white shadow rounded-md p-6 text-gray-600">
-              Brak dodanych ankiet. Użyj przycisku „Dodaj ankietę” u góry.
+              Brak ankiet w bazie dla tego nauczyciela.
             </div>
           ) : (
             <div className="space-y-3">
-              {surveys.map((s) => (
-                <div key={s.id} className="flex items-center justify-between bg-white border border-gray-200 rounded-md px-3 py-2 shadow-sm">
+              {dbForms.map((f) => (
+                <div key={f.form_id} className="flex items-center justify-between bg-white border border-gray-200 rounded-md px-3 py-2 shadow-sm">
                   <div className="text-sm">
-                    <div className="text-gray-800 truncate max-w-[680px]">
-                      <a href={s.link} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                        {s.link}
-                      </a>
+                    <div className="text-gray-900 font-medium truncate max-w-[680px]">
+                      {f.title || `Ankieta ${f.form_id.substring(0, 8)}...`}
                     </div>
-                    <div className="text-gray-500">Dodano: {formatDate(s.addedAt)}</div>
-                    <div className="text-gray-500">Ostatnia synchronizacja: {formatDate(s.syncedAt)}</div>
+                    <div className="text-gray-500">ID formularza: {f.form_id}</div>
+                    <div className="text-gray-500">Utworzono: {formatDate(f.created_at || undefined)}</div>
+                    <div className="text-gray-500">Ostatnia synchronizacja: {formatDate(f.last_synced_at || undefined)}</div>
+                    {typeof f.total_responses === 'number' && (
+                      <div className="text-gray-500">Liczba odpowiedzi: {f.total_responses}</div>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
+                    <a
+                      href={`https://docs.google.com/forms/d/e/${f.form_id}/viewform`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-blue-700 bg-white hover:bg-gray-50"
+                    >
+                      Otwórz formularz
+                    </a>
                     <button
-                      onClick={() => handleGoogleSyncSurvey(s.id)}
+                      onClick={() => handleGoogleSyncDbForm(f.form_id)}
                       className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                      title="Odśwież"
+                      title="Odśwież odpowiedzi"
                     >
                       Odśwież
                     </button>
                     <button
-                      onClick={() => handleRemoveSurvey(s.id)}
+                      onClick={() => handleDeleteDbForm(f.form_id)}
                       className="inline-flex items-center px-3 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
-                      title="Usuń"
+                      title="Usuń ankietę"
                     >
                       Usuń
                     </button>
@@ -243,6 +240,18 @@ export default function TeacherSurveysConfigPage() {
           )}
         </div>
       </div>
+
+      {/* Add Survey Form Dialog */}
+      {showAddForm && (
+        <AddSurveyForm
+          teacherId={teacherId}
+          onSurveyAdded={() => {
+            setShowAddForm(false)
+            fetchSurveysFromDatabase()
+          }}
+          onCancel={() => setShowAddForm(false)}
+        />
+      )}
     </div>
   )
 }

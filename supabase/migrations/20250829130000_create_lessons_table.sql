@@ -12,13 +12,11 @@ CREATE TABLE IF NOT EXISTS lessons (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   last_sync_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
 -- Indeksy dla lepszej wydajności
 CREATE INDEX IF NOT EXISTS idx_lessons_course_id ON lessons(course_id);
 CREATE INDEX IF NOT EXISTS idx_lessons_wtl_lesson_id ON lessons(wtl_lesson_id);
 CREATE INDEX IF NOT EXISTS idx_lessons_order_number ON lessons(order_number);
 CREATE INDEX IF NOT EXISTS idx_lessons_status ON lessons(status);
-
 -- Funkcja do automatycznej aktualizacji updated_at
 CREATE OR REPLACE FUNCTION update_lessons_updated_at()
 RETURNS TRIGGER AS $$
@@ -27,16 +25,13 @@ BEGIN
   RETURN NEW;
 END;
 $$ language 'plpgsql';
-
 -- Trigger dla tabeli lessons
 CREATE TRIGGER update_lessons_updated_at 
   BEFORE UPDATE ON lessons 
   FOR EACH ROW 
   EXECUTE FUNCTION update_lessons_updated_at();
-
 -- RLS (Row Level Security)
 ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
-
 -- Polityki dla lessons
 CREATE POLICY "Users can view lessons for their courses" ON lessons
   FOR SELECT USING (
@@ -63,7 +58,6 @@ CREATE POLICY "Users can view lessons for their courses" ON lessons
       )
     )
   );
-
 -- Polityka INSERT dla synchronizacji lekcji
 CREATE POLICY "Users can insert lessons for their courses" ON lessons
   FOR INSERT WITH CHECK (
@@ -83,7 +77,6 @@ CREATE POLICY "Users can insert lessons for their courses" ON lessons
       )
     )
   );
-
 -- Polityka UPDATE dla aktualizacji lekcji
 CREATE POLICY "Users can update lessons for their courses" ON lessons
   FOR UPDATE USING (
@@ -103,7 +96,6 @@ CREATE POLICY "Users can update lessons for their courses" ON lessons
       )
     )
   );
-
 -- Dodatkowe polityki dla superadmin
 CREATE POLICY "Superadmin can manage all lessons" ON lessons
   FOR ALL USING (

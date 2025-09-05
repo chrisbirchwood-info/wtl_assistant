@@ -1,0 +1,4887 @@
+{
+  "forms": {
+    "7f22b763-65c5-4921-a2a0-cc9469638fab-12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es": {
+      "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+      "teacher_id": "7f22b763-65c5-4921-a2a0-cc9469638fab",
+      "title": "Ankieta 12L_HRCZ...",
+      "description": null,
+      "questions": null,
+      "created_at": "2025-09-04T15:11:04.804+00:00",
+      "updated_at": "2025-09-04T15:11:04.804+00:00",
+      "total_responses": 55
+    },
+    "7f22b763-65c5-4921-a2a0-cc9469638fab-1VPUjsaLD4jmEpP3XZSr4FolHd1d1uXAQCHv3qx6atgU": {
+      "form_id": "1VPUjsaLD4jmEpP3XZSr4FolHd1d1uXAQCHv3qx6atgU",
+      "teacher_id": "7f22b763-65c5-4921-a2a0-cc9469638fab",
+      "title": "Ankieta 1VPUjsaL...",
+      "description": null,
+      "questions": null,
+      "created_at": "2025-09-04T15:13:42.386+00:00",
+      "updated_at": "2025-09-04T15:13:42.386+00:00",
+      "total_responses": 1
+    }
+  },
+  "responses": {
+    "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es": [
+      {
+        "response_id": "ACYDBNgpguA8-BlZdgOcCoLsjtU8Qkf1qHwtIdsH7KF7Aix3WwXcXj79a6o8d7ky7QRcZcU",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T18:25:24.053631+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "createTime": "2023-08-30T18:25:24.053Z",
+          "responseId": "ACYDBNgpguA8-BlZdgOcCoLsjtU8Qkf1qHwtIdsH7KF7Aix3WwXcXj79a6o8d7ky7QRcZcU",
+          "lastSubmittedTime": "2023-08-30T18:25:24.053631Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhJUwOentU706agDCpVWZgAxNkn04u19cCEexwmQKo5nrbOW9FZH2hWLTymPenc2mo",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T12:32:08.290335+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Gramatyki i nadmiaru pisania"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Umiejętność komunikacji "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstaw"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak odpowiedniego kursu"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "33"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę nauczyć się kolejnego języka obcego"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Kurs z native speaker "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T12:32:08.290Z",
+          "responseId": "ACYDBNhJUwOentU706agDCpVWZgAxNkn04u19cCEexwmQKo5nrbOW9FZH2hWLTymPenc2mo",
+          "lastSubmittedTime": "2024-02-19T12:32:08.290335Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjrYbPS3dttZgC-nUZm3Wq8Vxw-5dB535JaHq_CR50xVNVRD_oU1jBbFekVi8HszDs",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-20T17:17:20.789484+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Stresu. Nadmiaru/natłoku wiadomości, kumulacji zaległości..."
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Mówić i umieć się porozumieć w danym języku."
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstawowego sposobu porozumiewania się."
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu, nienormowane godziny pracy, brak wypoczynku, wysoka cena kursu."
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "48"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie mam pojęcia..."
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-20T17:17:20.789Z",
+          "responseId": "ACYDBNjrYbPS3dttZgC-nUZm3Wq8Vxw-5dB535JaHq_CR50xVNVRD_oU1jBbFekVi8HszDs",
+          "lastSubmittedTime": "2024-02-20T17:17:20.789484Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhkMk1EYdl0JOpPo0Z562sFpfXNsxuzQRJM75Us71g8TR8P5rro4eWj-oWU6Tcyw3s",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T17:04:59.130959+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie wiem"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Umiejętność porozumienia się"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Rozmawiać"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie ma przeszkód"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "52"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie wiem"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T17:04:59.130Z",
+          "responseId": "ACYDBNhkMk1EYdl0JOpPo0Z562sFpfXNsxuzQRJM75Us71g8TR8P5rro4eWj-oWU6Tcyw3s",
+          "lastSubmittedTime": "2024-02-19T17:04:59.130959Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhQMjHPsNQTgV19Y5-idKOPwyyB3RLPrrAk5BacBvbFcj_XDbIWuN0Woweuv0Ap6HQ",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T14:03:54.269494+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T14:03:54.269Z",
+          "responseId": "ACYDBNhQMjHPsNQTgV19Y5-idKOPwyyB3RLPrrAk5BacBvbFcj_XDbIWuN0Woweuv0Ap6HQ",
+          "lastSubmittedTime": "2023-08-30T14:03:54.269494Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjGJIg4lYQokdvyHWP-TFjq0UG3rWwDUNwG1Huv8kusSY88UnXKc-pPHO2MVxPo2y0",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-18T13:29:41.608975+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Błędów w gramatyce"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikacja "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Gramatyka"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "56"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Konwersacja"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-18T13:29:41.608Z",
+          "responseId": "ACYDBNjGJIg4lYQokdvyHWP-TFjq0UG3rWwDUNwG1Huv8kusSY88UnXKc-pPHO2MVxPo2y0",
+          "lastSubmittedTime": "2024-02-18T13:29:41.608975Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNg9uwiYpKArrHKLFvkj0pprHi8z8PnSwKPs34O-FEa4Zz6npDrrZtpofD_oe0z2i-M",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-15T17:39:51.896274+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Czasów "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Dogadać się za granicą"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Słownictwo "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "30"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zajęcia online "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-15T17:39:51.896Z",
+          "responseId": "ACYDBNg9uwiYpKArrHKLFvkj0pprHi8z8PnSwKPs34O-FEa4Zz6npDrrZtpofD_oe0z2i-M",
+          "lastSubmittedTime": "2024-02-15T17:39:51.896274Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhbmJn2ZFRPfDCitg8I63XoAy04ImsFaX1VEgvD2HolT39PeqckXSwaLVRPA8KrNVo",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T11:26:04.256175+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zbędnych wiadomości dla osoby początkujacej"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Porozumieć się za granicą"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Proste zwroty potrzebne w komunikacji np. Na wakacjach"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wiele wymówek np. Brak czasu, słaba motywacja"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "34"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę nauczyć się kolejnego języka obcego"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Przypominajki, że teraz czas na naukę "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T11:26:04.256Z",
+          "responseId": "ACYDBNhbmJn2ZFRPfDCitg8I63XoAy04ImsFaX1VEgvD2HolT39PeqckXSwaLVRPA8KrNVo",
+          "lastSubmittedTime": "2024-02-19T11:26:04.256175Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjcMujOWZi8pbU0z6WHbx0Q2h7fCUErMyK9P30e3bVCkziFFs2IoPamEW7E-c1EPnk",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T13:38:36.149988+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nauka gramatyki i rzeczy niepraktycznych w codziennej komunikacji "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podróże "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikatywność werbalna "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak systematyczności "
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Motywacja do regularnej nauki"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T13:38:36.149Z",
+          "responseId": "ACYDBNjcMujOWZi8pbU0z6WHbx0Q2h7fCUErMyK9P30e3bVCkziFFs2IoPamEW7E-c1EPnk",
+          "lastSubmittedTime": "2023-08-30T13:38:36.149988Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNg_eBriJaWZ_TNWAyHpmDCM5r7cAVLZraaNsdA75--CX8khK0lzGtqTVTDLP1FP8jc",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T21:25:29.606959+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Niepotrzebnej wiedzy na podstawowym poziomie"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Ułatwienie komunikacji podczas wyjazdow"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zwroty potrzebne np. Podczas wakacji"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak systematyczności, Brak czasu, co jest jedynie wymówką"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę nauczyć się kolejnego języka obcego"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Darmowy kurs"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T21:25:29.606Z",
+          "responseId": "ACYDBNg_eBriJaWZ_TNWAyHpmDCM5r7cAVLZraaNsdA75--CX8khK0lzGtqTVTDLP1FP8jc",
+          "lastSubmittedTime": "2023-08-30T21:25:29.606959Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNiHgSPjm0fF4VZCUX2eRbzV3B9Z7QAVxusXWzxsR-Jjsbp4Y51Co5j5Nn94nYjEuUU",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-23T20:31:04.790249+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Stresu "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Na wakacje "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstaw w komunikacji "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Małe dziecko"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "36 "
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Rutyna "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-23T20:31:04.790Z",
+          "responseId": "ACYDBNiHgSPjm0fF4VZCUX2eRbzV3B9Z7QAVxusXWzxsR-Jjsbp4Y51Co5j5Nn94nYjEuUU",
+          "lastSubmittedTime": "2024-02-23T20:31:04.790249Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjohyUz2vpCJJGT4dWToXUFWXTVfVMQenjlaokXRTpC8RH7ndciFTKw-1rv9g9mzDQ",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T14:40:52.612009+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie ma"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Porozumienie w obcych krajach"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Możliwość ogarnięcia scenenek sytuacyjnych"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu i cierpliwości i systematycznosci"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Systematycznosc"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T14:40:52.612Z",
+          "responseId": "ACYDBNjohyUz2vpCJJGT4dWToXUFWXTVfVMQenjlaokXRTpC8RH7ndciFTKw-1rv9g9mzDQ",
+          "lastSubmittedTime": "2023-08-30T14:40:52.612009Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhT49lgT15vTeJkFS5AkiStN1t_SfqF5EIV5JvEqU-oZ9YcsCoh86v8x-_YVvq1UY8",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T14:25:08.767071+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Odrabiania zadań domowych,  czytania tektow z podręczników "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikacja"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Konwersacja"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wie"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Za dużo..."
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Dostępność "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T14:25:08.767Z",
+          "responseId": "ACYDBNhT49lgT15vTeJkFS5AkiStN1t_SfqF5EIV5JvEqU-oZ9YcsCoh86v8x-_YVvq1UY8",
+          "lastSubmittedTime": "2024-02-19T14:25:08.767071Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNgFtM8soMyf5lHkywOdCRjnvqwPDQDoExmF1JhzX2DAt0_o9ZyZ-6jHNBwZI9EaDgg",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-07T13:45:30.966607+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wkuwania zbędnej gramatyki."
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Dobra komunikacja."
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstawowej komunikacji aby umieć się po prostu dogadać. "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie znalazłam sposobu na efektywne zapamiętywanie słówek."
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "30"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Możliwość prowadzenia konwersacji."
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-07T13:45:30.966Z",
+          "responseId": "ACYDBNgFtM8soMyf5lHkywOdCRjnvqwPDQDoExmF1JhzX2DAt0_o9ZyZ-6jHNBwZI9EaDgg",
+          "lastSubmittedTime": "2024-02-07T13:45:30.966607Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNh1AogFiKIpAFcs4ju8_y8Z7uCp86gl8IMlXh_TlN4OBEY7f79fnrAvhgCXRedCse8",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-20T06:15:30.514423+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "wracania do podstaw a jak już to tylko wtedy kiedy to jest potrzebne"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Swobodna komunikacja"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "poprawnego zadawania pytań, takiego automatycznego bez namysłu czy użyłem dobrego czasu i szyku zdania."
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak kontaktu z językiem"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "35"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Lekcje z native speakerem"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-20T06:15:30.514Z",
+          "responseId": "ACYDBNh1AogFiKIpAFcs4ju8_y8Z7uCp86gl8IMlXh_TlN4OBEY7f79fnrAvhgCXRedCse8",
+          "lastSubmittedTime": "2024-02-20T06:15:30.514423Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNgtbb1t5I3CScWfZo5cYkqxe54yrbc41Hp-HhaB1e-DxkeStvaQN_xUaGJUuEwzVE0",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-20T12:10:29.114681+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "nudy"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "komunikacja"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "rozumienia"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "wymówki"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "45"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę nauczyć się kolejnego języka obcego"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "kontakt ze środowiskiem naturalnym tego języka"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-20T12:10:29.114Z",
+          "responseId": "ACYDBNgtbb1t5I3CScWfZo5cYkqxe54yrbc41Hp-HhaB1e-DxkeStvaQN_xUaGJUuEwzVE0",
+          "lastSubmittedTime": "2024-02-20T12:10:29.114681Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjcKAXjhtdURDcBNtmiJT1MDJzgocGcBDLsrH8jlm8yS4bFqAI3VZALgivzc5OI7P8",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T19:02:15.296655+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wkuwania słówek bez kontekstu"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Rozumieć książki, rozmowy i wiadomości. "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Proste zwroty życia codziennego"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Ooogrom czasu, który trzeba na to poświęcić. "
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Słuchanie native speakerów "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T19:02:15.296Z",
+          "responseId": "ACYDBNjcKAXjhtdURDcBNtmiJT1MDJzgocGcBDLsrH8jlm8yS4bFqAI3VZALgivzc5OI7P8",
+          "lastSubmittedTime": "2023-08-30T19:02:15.296655Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNh92pUvGf6yPJ3qie6cA6J3i85Nc12m34k0auhjP4iA0MF-dc5SscvvfYlb188K3Ig",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T12:34:47.415535+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zniechęcenia"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikacja z obcokrajowcami"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstawowej komunikacji "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu i słabe predyspozycje"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "63"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wyjazd zagranicę "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T12:34:47.415Z",
+          "responseId": "ACYDBNh92pUvGf6yPJ3qie6cA6J3i85Nc12m34k0auhjP4iA0MF-dc5SscvvfYlb188K3Ig",
+          "lastSubmittedTime": "2024-02-19T12:34:47.415535Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNixD5YtVNI_VTREeMVEyVX9mej_bXlBsNUPHKd0TP_vDV2Sn1lX2yWStJur84OtOEI",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T19:36:28.015972+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "nudy i monotonni"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikacja z innymi ludzmi"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "gramatyki "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "lenistwo"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "jakas fajna aplikacja "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T19:36:28.015Z",
+          "responseId": "ACYDBNixD5YtVNI_VTREeMVEyVX9mej_bXlBsNUPHKd0TP_vDV2Sn1lX2yWStJur84OtOEI",
+          "lastSubmittedTime": "2023-08-30T19:36:28.015972Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNgkUrRSDvUiCneMhCjlXC00Tgn-PSeg7o1N3TQQTf_y0ZZlTC-4RmYsj4NjqlVhyOs",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T14:58:43.557664+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Obniżenia motywacji"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikacja"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstawowych zwrotów "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak predyspozycji"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wyjazd na dłużej za granicę "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T14:58:43.557Z",
+          "responseId": "ACYDBNgkUrRSDvUiCneMhCjlXC00Tgn-PSeg7o1N3TQQTf_y0ZZlTC-4RmYsj4NjqlVhyOs",
+          "lastSubmittedTime": "2023-08-30T14:58:43.557664Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNgBWeZE8EhgzygpZCJL7gx6CQuoJ7SL42e_FHXsNW2yRfgBrSr-6s2dRUbdVQhMDKo",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-07T17:13:19.391391+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nauki miliona słówek na pamięć "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Rozmawiać swobodnie"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Poprawne używanie czasów "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Bariera językowa, nie używam angielskiego na co dzień "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "35"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Regularność "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-07T17:13:19.391Z",
+          "responseId": "ACYDBNgBWeZE8EhgzygpZCJL7gx6CQuoJ7SL42e_FHXsNW2yRfgBrSr-6s2dRUbdVQhMDKo",
+          "lastSubmittedTime": "2024-02-07T17:13:19.391391Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhP-3J99wpbiSlwXbXCQeMP459dNL4o7ItDK8nA0TUDBy1B1UohVIzaNVg7Ke2_wZg",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-08T10:10:15.421375+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Przymusu jeżdżenia na kurs,najlepiej gdyby był zdalny"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Lepsza praca"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Dokształcić angielski "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Mam małe dzieci, jedno ma 5 miesięcy "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "34"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Więcej wolnego czasu dla siebie "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-08T10:10:15.421Z",
+          "responseId": "ACYDBNhP-3J99wpbiSlwXbXCQeMP459dNL4o7ItDK8nA0TUDBy1B1UohVIzaNVg7Ke2_wZg",
+          "lastSubmittedTime": "2024-02-08T10:10:15.421375Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNgtmFflUBjDgAkfXcIa8iQV4WdLLRQpHnCirBwDyH5OuGK_oVxxRTl440D_A0-KDiY",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-18T14:44:00.918367+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zniechęceniem z braku efektów"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nauka języka w celach zawodowych"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wymawiać podstawowe zwroty"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Ciężko idzie mi nauka języka"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "32"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Odpowiedni system nauki"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-18T14:44:00.918Z",
+          "responseId": "ACYDBNgtmFflUBjDgAkfXcIa8iQV4WdLLRQpHnCirBwDyH5OuGK_oVxxRTl440D_A0-KDiY",
+          "lastSubmittedTime": "2024-02-18T14:44:00.918367Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNg-s7sTT0W-S71Voljh3ycqic0DtVQi7GnjSH_12LNDxgbDn1RnkRq9mFu2qeNLpII",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T17:49:22.857873+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Stresu"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Swobodna rozmowa z obcokrajowcem lub w obcym kraju."
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Prawidłowa wymowa"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak chęci, chyba że zmusza mnie do tego sytuacja lub ciekawość. "
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Systematyczność "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T17:49:22.857Z",
+          "responseId": "ACYDBNg-s7sTT0W-S71Voljh3ycqic0DtVQi7GnjSH_12LNDxgbDn1RnkRq9mFu2qeNLpII",
+          "lastSubmittedTime": "2023-08-30T17:49:22.857873Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhl7kN5wNLE-w8MGT5cN0g6RTr3NOn3hMxi30DKfibfcRRBlw05yp5qARUT-KLC4RI",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-07T14:18:30.649599+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Błędów "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Dogadywanie się w obcym języku z ludźmi. "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Płynności, używania odpowiednich zwrotów oraz czasów. "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Żadna "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "25"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Fraszki, lekcje "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-07T14:18:30.649Z",
+          "responseId": "ACYDBNhl7kN5wNLE-w8MGT5cN0g6RTr3NOn3hMxi30DKfibfcRRBlw05yp5qARUT-KLC4RI",
+          "lastSubmittedTime": "2024-02-07T14:18:30.649599Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjjZX5QwUDOJ4nuI1xWvifswd-2ENuGxDV_jqoRAaF7FD9TlTaV1gupxRC5_SqWmXc",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T15:08:25.091688+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nudnych czytanek"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Satysfakcja"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Konwersacji"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak samozaparci"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Ciekawe zajecia"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T15:08:25.091Z",
+          "responseId": "ACYDBNjjZX5QwUDOJ4nuI1xWvifswd-2ENuGxDV_jqoRAaF7FD9TlTaV1gupxRC5_SqWmXc",
+          "lastSubmittedTime": "2023-08-30T15:08:25.091688Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNguu9p0W9o8208GX2Wa0dc4NrYRQ14j8_mMC-hgB9Muzzr75MSjsuaa4gk5Uc41Q3Y",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-29T12:14:25.168273+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "nawału materiału do przyswojenia (głównie teorii) "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Rozumienie innych anglojęzycznych osób i swobodna komunikacja z nimi"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "słownictwo "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Sposób nauki, który był w szkole skutecznie zniechęcił do dalszej pracy z tym językiem  "
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "książki, filmy po angielsku "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-29T12:14:25.168Z",
+          "responseId": "ACYDBNguu9p0W9o8208GX2Wa0dc4NrYRQ14j8_mMC-hgB9Muzzr75MSjsuaa4gk5Uc41Q3Y",
+          "lastSubmittedTime": "2023-08-29T12:14:25.168273Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNi3_sMt31qqgpR7pcOw6N2Ae8QveLMRjs1aB_VzOPuoT0tybW_stp5DeQqFeBObrw0",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T17:45:58.228623+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie wiem. "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zrozumienie rozmówcy...duży zasób słów...poprawna odmiana i czas"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Słówkanie "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "W grupie raźniej...przynajmniej w parze."
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Ktoś, kto zna dobrze język obcy."
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T17:45:58.228Z",
+          "responseId": "ACYDBNi3_sMt31qqgpR7pcOw6N2Ae8QveLMRjs1aB_VzOPuoT0tybW_stp5DeQqFeBObrw0",
+          "lastSubmittedTime": "2023-08-30T17:45:58.228623Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhETtVlo7Zf2ocoo9E9wYdmc9xvtTY5xRENAZAJjp8oKCA1JLjkk5y_NUfDoT8yO3E",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T19:46:35.83813+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "nudy"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Umieć się porozumieć i swobodnie słuchać wypowiedzi rodzimych użytkowników"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "rozumienia tekstu mówionego"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "niestabilna sytuacja zawodowa"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę nauczyć się kolejnego języka obcego"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "zdobycie stabilnego zatrudnienia"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T19:46:35.838Z",
+          "responseId": "ACYDBNhETtVlo7Zf2ocoo9E9wYdmc9xvtTY5xRENAZAJjp8oKCA1JLjkk5y_NUfDoT8yO3E",
+          "lastSubmittedTime": "2023-08-30T19:46:35.838130Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhrGvt1jlhVPDQETk_9rg3uiB-F7fMK_wHFVQAEwhQaxWGGfqX6Q1NuuplNXIEj4Zg",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-18T20:00:56.661391+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Monotonii "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Swoboda w mówieniu i rozumieniu "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Rozumie ze słuchu "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Odkładanie na później "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "39"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zdyscyplinowanie "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-18T20:00:56.661Z",
+          "responseId": "ACYDBNhrGvt1jlhVPDQETk_9rg3uiB-F7fMK_wHFVQAEwhQaxWGGfqX6Q1NuuplNXIEj4Zg",
+          "lastSubmittedTime": "2024-02-18T20:00:56.661391Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjotVehwV6EJPzNG49dmZM2EnabIMdtTUcwBTsx6XTNXuLq_jGxBm_sfvfpMIJq0FU",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-24T07:58:42.045904+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Gramatyki - sama przyjdzie z czasem"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Praca i możliwości "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Pewność siebie - rozmawianie po angielsku, potem czytanie artykułów "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Czas"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Więcej czasu, lepsza organizacja nauki "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-24T07:58:42.045Z",
+          "responseId": "ACYDBNjotVehwV6EJPzNG49dmZM2EnabIMdtTUcwBTsx6XTNXuLq_jGxBm_sfvfpMIJq0FU",
+          "lastSubmittedTime": "2023-08-24T07:58:42.045904Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNi2q9XCOjQa1Xgru2LzywjhX5xJBH23_FCgBmgdMoYF9ULgK0qZAu-NuhQr27inWcM",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-18T13:26:06.502911+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zbytecznego zagłębiania się w gramatykę która nie jest używana w codziennych sytuacjach i rozmowach "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Doskonała komunikacja"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Sprawnego porozumiewania się na każdy temat bez zacinania się "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu blokada językowa "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "27"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Systematycznosc "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-18T13:26:06.502Z",
+          "responseId": "ACYDBNi2q9XCOjQa1Xgru2LzywjhX5xJBH23_FCgBmgdMoYF9ULgK0qZAu-NuhQr27inWcM",
+          "lastSubmittedTime": "2024-02-18T13:26:06.502911Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhbOR0deruMJ0Pb_xQqa52tKwFkitobIqGfRJ8yRc2TBihVqeuonqFCXITEcRnF-vA",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-31T06:21:13.881857+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "nudy"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "umieć się dogadac"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "trudno powiedzieć "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "brak motywacj"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie wiem"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-31T06:21:13.881Z",
+          "responseId": "ACYDBNhbOR0deruMJ0Pb_xQqa52tKwFkitobIqGfRJ8yRc2TBihVqeuonqFCXITEcRnF-vA",
+          "lastSubmittedTime": "2023-08-31T06:21:13.881857Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjLHjWmQA2V99RBefOBPOlbhFshGVUWuwOiMZZI4h_z2lnk2on-ymrjqv4rAPH5gxc",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-07T17:48:09.076863+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zakuwania słówek "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Swoboda w rozmowie w języku którego się uczę "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zasób słownictwa i komunikacja "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu. Brak funduszy na naukę z native speaker "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "41"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Dofinansowanie "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-07T17:48:09.076Z",
+          "responseId": "ACYDBNjLHjWmQA2V99RBefOBPOlbhFshGVUWuwOiMZZI4h_z2lnk2on-ymrjqv4rAPH5gxc",
+          "lastSubmittedTime": "2024-02-07T17:48:09.076863Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjchkwtcl1ruBztYqdjqZGx7zBv4QkIs8H6juQIaVzINvh9IyYtNSsGceKbwBaV3u0",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-15T16:18:57.406575+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Egzaminów "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Umiejętność swobodnego porozumienia się w tym języku "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstaw języka "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Blokada językowa, stres, trudność w zapamiętaniu tego języka "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "24"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Lekcje ale nie sposobem szkolnym (podręcznikowym)"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-15T16:18:57.406Z",
+          "responseId": "ACYDBNjchkwtcl1ruBztYqdjqZGx7zBv4QkIs8H6juQIaVzINvh9IyYtNSsGceKbwBaV3u0",
+          "lastSubmittedTime": "2024-02-15T16:18:57.406575Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNh5rpfue_g1CUVqV_wuQ246upuSAq6R_-Ls1HKu5sz8rdaf47eu7op5r024tJaQIg8",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T12:22:46.239679+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Złych przywyczek "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zrobic to szybko "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Mowę u rozumienie że słuchu"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak pomocy i materiałów "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "30"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Aplikacja lub audiobooki "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T12:22:46.239Z",
+          "responseId": "ACYDBNh5rpfue_g1CUVqV_wuQ246upuSAq6R_-Ls1HKu5sz8rdaf47eu7op5r024tJaQIg8",
+          "lastSubmittedTime": "2024-02-19T12:22:46.239679Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhquKf9AgrqxOaRgwxRTIACHd1sxw7Wp-aOi3b165Ii7GSsPm56AfMFDSP6ZZn0IhY",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-07T12:02:34.644536+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Konieczności przyswajania suchych faktów, regułek, itd."
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Płynność w komunikowaniu się i odbiorze tekstu słyszanego (bo czytany jest znacznie łatwiejszy do opanowania). Chciałabym płynnie opanować min. 2 języki obe, być może 3."
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chciałabym nauczyć się od postaw hiszpańskiego i poprawić rozumienie tekstu słuchanego w języku duńskim."
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu na naukę i lenistwo."
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "28"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę nauczyć się kolejnego języka obcego"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Filmy/seriale, filmiki i podcasty na interesujące mnie tematy (w pełni w języku obcym)."
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-07T12:02:34.644Z",
+          "responseId": "ACYDBNhquKf9AgrqxOaRgwxRTIACHd1sxw7Wp-aOi3b165Ii7GSsPm56AfMFDSP6ZZn0IhY",
+          "lastSubmittedTime": "2024-02-07T12:02:34.644536Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNg-dmVSVvi0Pa7nwYKJ6XszmeUHmeH3If80Ld7NKweQzm7cdLcuR8WEoDAInV3S8lM",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T18:23:15.652415+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "createTime": "2023-08-30T18:23:15.652Z",
+          "responseId": "ACYDBNg-dmVSVvi0Pa7nwYKJ6XszmeUHmeH3If80Ld7NKweQzm7cdLcuR8WEoDAInV3S8lM",
+          "lastSubmittedTime": "2023-08-30T18:23:15.652415Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjIsvfLQ1IEk8c8euH-tpGmIHeP-HfNMIPVkvBttFHka_CPTrEf1q37dqiJbxtlE-A",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-26T14:41:52.660127+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zapominania tego, co się nauczyłem :)"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Dobre rozumienie, sprawna komunikacja."
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zasób słownictwa, automatyzm w mowie."
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Lenistwo, prokrastynacja :)"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Motywacja, usystematyzowanie powtórek."
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-26T14:41:52.660Z",
+          "responseId": "ACYDBNjIsvfLQ1IEk8c8euH-tpGmIHeP-HfNMIPVkvBttFHka_CPTrEf1q37dqiJbxtlE-A",
+          "lastSubmittedTime": "2023-08-26T14:41:52.660127Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjvAulgow84oqaQnVFx1Sha_csHwqAlhrTaE5bQB91cgWdKIjN5Kk2J19LoGdwFWQ8",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-26T15:38:56.854815+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie wiem"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Lepsza komunikacja"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Rozumieć obcy jezyk"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wiek"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "59"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Systematyczność "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-26T15:38:56.854Z",
+          "responseId": "ACYDBNjvAulgow84oqaQnVFx1Sha_csHwqAlhrTaE5bQB91cgWdKIjN5Kk2J19LoGdwFWQ8",
+          "lastSubmittedTime": "2024-02-26T15:38:56.854815Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjhfy58GvKUaW7FBTeFop3SVrNAeRrWA7I-Qc0ogMrWL7_dKUBHDxqXxj2G3aiXxOs",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T16:22:30.454367+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Niepotrzebuje słownictwa branżowego ponieważ nie mam zamiaru podejmować pracy za granicą "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Potrafić się dogadać bez jakiej kolwiek pomocy przy wyjazdach za granicę "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstawy porozumienia się "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Z powodu braku czasu "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "34"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Odpowiednie podejście "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T16:22:30.454Z",
+          "responseId": "ACYDBNjhfy58GvKUaW7FBTeFop3SVrNAeRrWA7I-Qc0ogMrWL7_dKUBHDxqXxj2G3aiXxOs",
+          "lastSubmittedTime": "2024-02-19T16:22:30.454367Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNh0BB6Vd2__BsxywbPf6KHdftTF_9nMErF2csp56phX51hrT1QhZPILg809gDmkD7Q",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-14T23:53:21.660223+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Straty czasu "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Umieć mówić po angielsku bez wstydu"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Poprawnie mówić "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "W większości lekcji przewija się gramatyka its niż nacisk na wymowę "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "32"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Może Ty?"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-14T23:53:21.660Z",
+          "responseId": "ACYDBNh0BB6Vd2__BsxywbPf6KHdftTF_9nMErF2csp56phX51hrT1QhZPILg809gDmkD7Q",
+          "lastSubmittedTime": "2024-02-14T23:53:21.660223Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjiRpyUvDQ0xpL82xwK4UF4czTabTzMthQ4uvGwycMV-78UjZ2Ewiq_mcFwJ_mwfF8",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-07T16:45:56.147439+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zbędnych   rzeczy w życiu codziennym"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Umiejętność porozumiewania się "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Słówek "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "45"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Więcej wolnego czasu "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-07T16:45:56.147Z",
+          "responseId": "ACYDBNjiRpyUvDQ0xpL82xwK4UF4czTabTzMthQ4uvGwycMV-78UjZ2Ewiq_mcFwJ_mwfF8",
+          "lastSubmittedTime": "2024-02-07T16:45:56.147439Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNinTm3cBPFFY99teb4tWSOKRipWL97dr9nsg8Vn48CyIJd-9NKss8fNMN991hRSu3c",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-07T11:43:18.894671+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wstydu"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Aby umieć mowic"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstaw "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Ceny kursów "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "37"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Gdyby były darmowe"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-07T11:43:18.894Z",
+          "responseId": "ACYDBNinTm3cBPFFY99teb4tWSOKRipWL97dr9nsg8Vn48CyIJd-9NKss8fNMN991hRSu3c",
+          "lastSubmittedTime": "2024-02-07T11:43:18.894671Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNiFKknDJxGE3jE0_lRe4eXCP5Ka_NtvHjLWfTt-3wV6LQBPLcotFtX0xWLAl4y-io4",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T15:15:27.813967+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nieskuteczności "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikatywność "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Pisać "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nic"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "50"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Lektor"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T15:15:27.813Z",
+          "responseId": "ACYDBNiFKknDJxGE3jE0_lRe4eXCP5Ka_NtvHjLWfTt-3wV6LQBPLcotFtX0xWLAl4y-io4",
+          "lastSubmittedTime": "2024-02-19T15:15:27.813967Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjLzUFU3wQzO_QqONBZ_0jsYhKiWs1QezqKqrlw6sYCc6mn8HbanlgwmlhhQdlM3ic",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T19:19:27.687515+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Bezsensownej nauki gramatyki lub kaligrafii "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Porozumiewanie się "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Podstawowej komunikacji "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak możliwości użycia języka w praktyce "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "35"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak, idzie mi całkiem nieźle"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Rozmowy z native speakerami"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T19:19:27.687Z",
+          "responseId": "ACYDBNjLzUFU3wQzO_QqONBZ_0jsYhKiWs1QezqKqrlw6sYCc6mn8HbanlgwmlhhQdlM3ic",
+          "lastSubmittedTime": "2024-02-19T19:19:27.687515Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjekb87-dc8L_lH8GjNSh-ISP27_4vTaLNcc3CRuJOXO7iqF4Q8yKDjTm6rVQNLcHY",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-13T14:15:45.047327+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nudnej gramatyki"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Porozumiewanie się w tym jezyku"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Mówienia w danym języku "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie używam języka na codzień. Wiek "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "49"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie wiem"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-13T14:15:45.047Z",
+          "responseId": "ACYDBNjekb87-dc8L_lH8GjNSh-ISP27_4vTaLNcc3CRuJOXO7iqF4Q8yKDjTm6rVQNLcHY",
+          "lastSubmittedTime": "2024-02-13T14:15:45.047327Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNgunSw66-76mpubMpvX6tHASSajmPqx9Sy9HZpWIfYy7UeOWxx0u8pG2EpYgfHQuMw",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-07T14:28:40.523103+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wysokich kosztów "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Niedrogo i efektywnie "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nauka słówek zdań gramatyka "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Cena "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "35"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę nauczyć się kolejnego języka obcego"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Aplikacja "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-07T14:28:40.523Z",
+          "responseId": "ACYDBNgunSw66-76mpubMpvX6tHASSajmPqx9Sy9HZpWIfYy7UeOWxx0u8pG2EpYgfHQuMw",
+          "lastSubmittedTime": "2024-02-07T14:28:40.523103Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNheEjcQXcQpVmjd5dgI_nYBvdS5K0Nl2s4WkscaZS-kpJOogEVrWNfrUhk57UpCeUk",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-19T18:40:34.520639+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Dobrze, by było, aby to nie przypominało metod nauczania rodem ze szkoły. One nie działały. Nie u mnie. "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Przede wszystkim chcę umieć mówić w wybranym języku."
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chciałbym nauczyć się mówić."
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Moją przeszkodą jest słomiany zapał. To co mnie hamuje to fakt, że nie wiadomo do końca jak działać, by były efekty. Można oczywiście robić cokolwiek, ale takie błądzenie prędzej, czy później zniechęca do dalszego działania."
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "30"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Instrukcja jak się uczyć, by się nauczyć."
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-19T18:40:34.520Z",
+          "responseId": "ACYDBNheEjcQXcQpVmjd5dgI_nYBvdS5K0Nl2s4WkscaZS-kpJOogEVrWNfrUhk57UpCeUk",
+          "lastSubmittedTime": "2024-02-19T18:40:34.520639Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNh6FwqHRd4_6CwYN9hlCT9GCfgHK5wXTtOyssGJaYYJ_XOBeonD597yBNMXmE-aktQ",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T20:14:36.376863+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczenia się  zbędnych  słówek i wyrażeń "
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikacja na wajachach i podróży "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikacja w podróży i wakacjach"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak odpowiwdniej motywacji"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Odpowiednia motywacja"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T20:14:36.376Z",
+          "responseId": "ACYDBNh6FwqHRd4_6CwYN9hlCT9GCfgHK5wXTtOyssGJaYYJ_XOBeonD597yBNMXmE-aktQ",
+          "lastSubmittedTime": "2023-08-30T20:14:36.376863Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNg60zlglbGK_-DxdCWq6aiu8UkdDuqARIyZ5WAXeTSKx1tCjLlfNi7kDnlVfFOEqOo",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-03-01T15:46:56.521647+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Pisania"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Porozumieć się z inną osobą "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Zwrotów w pracy w transporcie drogowym"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "55"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Kurs słuchania w trasie "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-03-01T15:46:56.521Z",
+          "responseId": "ACYDBNg60zlglbGK_-DxdCWq6aiu8UkdDuqARIyZ5WAXeTSKx1tCjLlfNi7kDnlVfFOEqOo",
+          "lastSubmittedTime": "2024-03-01T15:46:56.521647Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNhI5GCp80fgtkjTA97AIgWeoQwNrGxf48Oi9hrCwnFjfrq-AmQrUBRSiamZvZGNfnc",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-07T11:38:07.219375+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Monotonni"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikacja "
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Komunikacja "
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wydaje mi się że brak odpowiednich narzędzi do nauki "
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "24"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Uczę się od lat ale nieskutecznie"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Odpowiednie narzędzia "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-07T11:38:07.219Z",
+          "responseId": "ACYDBNhI5GCp80fgtkjTA97AIgWeoQwNrGxf48Oi9hrCwnFjfrq-AmQrUBRSiamZvZGNfnc",
+          "lastSubmittedTime": "2024-02-07T11:38:07.219375Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNgjADZE7PWRCHh2UW4qq8QQdjtgZgSngHfBK5KmeeFERcNg4ucSx7B8-l51bTtVSeE",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-18T21:16:54.383259+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nauki zbędnych rzeczy, których nigdy nie wykorzystam"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Umieć się porozumieć, wzbogacić slownictwo"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Formułować poprawnie zdania"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Brak czasu"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "32"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Kurs internetowy"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-18T21:16:54.383Z",
+          "responseId": "ACYDBNgjADZE7PWRCHh2UW4qq8QQdjtgZgSngHfBK5KmeeFERcNg4ucSx7B8-l51bTtVSeE",
+          "lastSubmittedTime": "2024-02-18T21:16:54.383259Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNiZCq0OmV4XjM2vJXE5-E4_8klotZFvvGpaJVYAkePMafifAwibTV0n_heeBs0g-vE",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2024-02-20T13:45:50.137733+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "błędów"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "komunikatywność"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "słów"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "brak motywacji"
+                  }
+                ]
+              }
+            },
+            "3247aca0": {
+              "questionId": "3247aca0",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "36"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "odpowiednia motywacja"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2024-02-20T13:45:50.137Z",
+          "responseId": "ACYDBNiZCq0OmV4XjM2vJXE5-E4_8klotZFvvGpaJVYAkePMafifAwibTV0n_heeBs0g-vE",
+          "lastSubmittedTime": "2024-02-20T13:45:50.137733Z"
+        }
+      },
+      {
+        "response_id": "ACYDBNjkNLDsIK0jpBn8LgNXC2gT-pMi890TRYnjhWNtq1sohllVm_PGLlFG_DTuceWMxik",
+        "form_id": "12L_HRCZTcY5-8xC5txiVaJxF99oIe3Pp0vmYq65q5es",
+        "respondent_email": null,
+        "submitted_at": "2023-08-30T14:03:15.801104+00:00",
+        "created_at": "2025-09-04T15:11:04.804+00:00",
+        "updated_at": "2025-09-04T15:11:04.804+00:00",
+        "original_payload": {
+          "answers": {
+            "144b8767": {
+              "questionId": "144b8767",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Wstydu"
+                  }
+                ]
+              }
+            },
+            "146c0af9": {
+              "questionId": "146c0af9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Tak"
+                  }
+                ]
+              }
+            },
+            "169b229d": {
+              "questionId": "169b229d",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Porozumiewać się z innymi"
+                  }
+                ]
+              }
+            },
+            "1d5b3ea1": {
+              "questionId": "1d5b3ea1",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nauczyć się mówić i sklecić całe zdania"
+                  }
+                ]
+              }
+            },
+            "27ceab57": {
+              "questionId": "27ceab57",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Nie mam chęci"
+                  }
+                ]
+              }
+            },
+            "42e4d1d6": {
+              "questionId": "42e4d1d6",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Chcę dopiero zacząć"
+                  }
+                ]
+              }
+            },
+            "6603f7d9": {
+              "questionId": "6603f7d9",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "Przebywanie z ludźmi którzy mówią w innym języku "
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2023-08-30T14:03:15.801Z",
+          "responseId": "ACYDBNjkNLDsIK0jpBn8LgNXC2gT-pMi890TRYnjhWNtq1sohllVm_PGLlFG_DTuceWMxik",
+          "lastSubmittedTime": "2023-08-30T14:03:15.801104Z"
+        }
+      }
+    ],
+    "1VPUjsaLD4jmEpP3XZSr4FolHd1d1uXAQCHv3qx6atgU": [
+      {
+        "response_id": "ACYDBNgO-2E23oxZm-Hgv-2D9nqmP1_ZA5cEDEOt0hm-wb7XtMvCMXh-UR-lfn-8Nl9iso4",
+        "form_id": "1VPUjsaLD4jmEpP3XZSr4FolHd1d1uXAQCHv3qx6atgU",
+        "respondent_email": "brzakalikoskar@gmail.com",
+        "submitted_at": "2025-09-04T15:13:32.013202+00:00",
+        "created_at": "2025-09-04T15:13:42.386+00:00",
+        "updated_at": "2025-09-04T15:13:42.386+00:00",
+        "original_payload": {
+          "answers": {
+            "1c634879": {
+              "questionId": "1c634879",
+              "textAnswers": {
+                "answers": [
+                  {
+                    "value": "w koncu wziąć sie do roboty"
+                  }
+                ]
+              }
+            }
+          },
+          "createTime": "2025-09-04T15:13:32.013Z",
+          "responseId": "ACYDBNgO-2E23oxZm-Hgv-2D9nqmP1_ZA5cEDEOt0hm-wb7XtMvCMXh-UR-lfn-8Nl9iso4",
+          "respondentEmail": "brzakalikoskar@gmail.com",
+          "lastSubmittedTime": "2025-09-04T15:13:32.013202Z"
+        }
+      }
+    ]
+  }
+}

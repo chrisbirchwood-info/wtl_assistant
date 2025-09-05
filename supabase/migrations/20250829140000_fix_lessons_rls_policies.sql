@@ -5,7 +5,6 @@
 DROP POLICY IF EXISTS "Users can view lessons for their courses" ON lessons;
 DROP POLICY IF EXISTS "Users can insert lessons for their courses" ON lessons;
 DROP POLICY IF EXISTS "Users can update lessons for their courses" ON lessons;
-
 -- Polityka SELECT - odczyt lekcji
 CREATE POLICY "Users can view lessons for their courses" ON lessons
   FOR SELECT USING (
@@ -32,7 +31,6 @@ CREATE POLICY "Users can view lessons for their courses" ON lessons
       )
     )
   );
-
 -- Polityka INSERT - wstawianie lekcji (dla synchronizacji)
 CREATE POLICY "Users can insert lessons for their courses" ON lessons
   FOR INSERT WITH CHECK (
@@ -58,7 +56,6 @@ CREATE POLICY "Users can insert lessons for their courses" ON lessons
       AND users.role = 'superadmin'
     )
   );
-
 -- Polityka UPDATE - aktualizacja lekcji
 CREATE POLICY "Users can update lessons for their courses" ON lessons
   FOR UPDATE USING (
@@ -84,7 +81,6 @@ CREATE POLICY "Users can update lessons for their courses" ON lessons
       AND users.role = 'superadmin'
     )
   );
-
 -- Polityka DELETE - usuwanie lekcji (tylko dla nauczycieli)
 CREATE POLICY "Users can delete lessons for their courses" ON lessons
   FOR DELETE USING (

@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { useAuthStore } from '@/store/auth-store'
+import ThreadSurveyLinker from '@/components/threads/ThreadSurveyLinker'
+import { ThreadSurveyData } from '@/types/threads'
 
 interface ThreadConnection {
   id: string
@@ -21,6 +23,7 @@ interface Thread {
   created_at: string
   updated_at: string
   lesson_connections?: ThreadConnection[]
+  survey_connections?: any[]
 }
 
 interface Lesson { id: string; title: string; wtl_lesson_id?: string; course_id?: string }
@@ -36,6 +39,8 @@ export default function ThreadDetailsPage() {
   const [thread, setThread] = useState<Thread | null>(null)
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [courses, setCourses] = useState<Course[]>([])
+  const [surveyData, setSurveyData] = useState<ThreadSurveyData[]>([])
+  const [studentEmail, setStudentEmail] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -74,6 +79,22 @@ export default function ThreadDetailsPage() {
       const lessonsArrays = await Promise.all(lessonsPromises)
       const allLessons: Lesson[] = lessonsArrays.flatMap((j: { lessons?: Lesson[] }) => (j.lessons || []))
       setLessons(allLessons)
+
+      // Fetch student email and survey data
+      if (noteJson.thread?.user_id) {
+        const userResponse = await fetch(`/api/admin/users/${noteJson.thread.user_id}`, { cache: 'no-store' })
+        if (userResponse.ok) {
+          const userData = await userResponse.json()
+          setStudentEmail(userData.user?.email || '')
+        }
+      }
+      
+      // Fetch survey data for this thread
+      const surveyResponse = await fetch(`/api/threads/survey-connections?thread_id=${threadId}`, { cache: 'no-store' })
+      if (surveyResponse.ok) {
+        const surveyJson = await surveyResponse.json()
+        setSurveyData(surveyJson.survey_data || [])
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Wystąpił nieoczekiwany błąd')
     } finally {
@@ -163,6 +184,23 @@ export default function ThreadDetailsPage() {
                 <p className="text-sm text-gray-500">Brak powiązań — luźny wątek.</p>
               )}
             </div>
+
+            {/* Survey connections section */}
+            {user?.role === 'teacher' && (
+              <div className="mt-6 border-t pt-4">
+                <h2 className="text-sm font-semibold text-gray-700 mb-4">Ankiety</h2>
+                <ThreadSurveyLinker
+                  threadId={threadId}
+                  teacherId={teacherId}
+                  studentEmail={studentEmail}
+                  existingConnections={surveyData}
+                  onLinked={() => {
+                    // Refresh survey data after linking
+                    fetchData()
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

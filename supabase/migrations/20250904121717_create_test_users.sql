@@ -26,7 +26,6 @@ INSERT INTO public.users (
 ) ON CONFLICT (email) DO UPDATE SET
   role = EXCLUDED.role,
   updated_at = now();
-
 -- 2. Dodaj krzysztof.brzezina@gmail.com jako teacher
 INSERT INTO public.users (
   id,
@@ -51,7 +50,6 @@ INSERT INTO public.users (
 ) ON CONFLICT (email) DO UPDATE SET
   role = EXCLUDED.role,
   updated_at = now();
-
 -- 3. Dodaj odpowiednie role do tabeli user_roles (nowy system ról)
 -- Dla admin@example.com
 INSERT INTO public.user_roles (user_id, role_code)
@@ -59,14 +57,12 @@ SELECT u.id, 'superadmin'
 FROM public.users u
 WHERE u.email = 'admin@example.com'
 ON CONFLICT (user_id, role_code) DO NOTHING;
-
 -- Dla krzysztof.brzezina@gmail.com
 INSERT INTO public.user_roles (user_id, role_code)
 SELECT u.id, 'teacher'
 FROM public.users u
 WHERE u.email = 'krzysztof.brzezina@gmail.com'
 ON CONFLICT (user_id, role_code) DO NOTHING;
-
 -- 4. Utwórz profil nauczyciela dla Krzysztofa
 INSERT INTO public.teacher_profiles (
   user_id,

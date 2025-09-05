@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         user_id: teacherId,
         provider: 'google',
         refresh_token: refreshToken,
-        scope: 'forms.responses.readonly userinfo.email',
+        scope: 'forms.body.readonly forms.responses.readonly userinfo.email',
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id,provider' })
 

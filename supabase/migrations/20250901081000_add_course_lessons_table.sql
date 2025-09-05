@@ -2,7 +2,6 @@
 -- Date: 2025-09-01 08:10:00
 
 SET check_function_bodies = false;
-
 -- 1) course_lessons mapping table
 CREATE TABLE IF NOT EXISTS public.course_lessons (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -14,10 +13,8 @@ CREATE TABLE IF NOT EXISTS public.course_lessons (
   updated_at timestamptz DEFAULT now(),
   UNIQUE (course_id, lesson_id)
 );
-
 CREATE INDEX IF NOT EXISTS idx_course_lessons_course_pos
   ON public.course_lessons (course_id, position);
-
 -- 2) Ensure updated_at trigger function exists
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS trigger AS $$
@@ -26,12 +23,10 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 DROP TRIGGER IF EXISTS trg_update_course_lessons_updated_at ON public.course_lessons;
 CREATE TRIGGER trg_update_course_lessons_updated_at
   BEFORE UPDATE ON public.course_lessons
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-
 -- 3) Backfill from lessons.course_id/order_number where applicable
 INSERT INTO public.course_lessons (id, course_id, lesson_id, position, required)
 SELECT gen_random_uuid(), l.course_id, l.id,
@@ -42,4 +37,3 @@ SELECT gen_random_uuid(), l.course_id, l.id,
 FROM public.lessons l
 WHERE l.course_id IS NOT NULL
 ON CONFLICT (course_id, lesson_id) DO NOTHING;
-

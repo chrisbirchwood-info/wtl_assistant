@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS notes (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
 -- Tabela powiązań notatka-lekcja (many-to-many)
 CREATE TABLE IF NOT EXISTS note_lesson_connections (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -22,14 +21,12 @@ CREATE TABLE IF NOT EXISTS note_lesson_connections (
   -- Unikalne połączenie notatka-lekcja
   UNIQUE(note_id, lesson_id)
 );
-
 -- Indeksy dla lepszej wydajności
 CREATE INDEX IF NOT EXISTS idx_notes_user_id ON notes(user_id);
 CREATE INDEX IF NOT EXISTS idx_notes_created_at ON notes(created_at);
 CREATE INDEX IF NOT EXISTS idx_note_lesson_connections_note_id ON note_lesson_connections(note_id);
 CREATE INDEX IF NOT EXISTS idx_note_lesson_connections_lesson_id ON note_lesson_connections(lesson_id);
 CREATE INDEX IF NOT EXISTS idx_note_lesson_connections_type ON note_lesson_connections(connection_type);
-
 -- Funkcja do automatycznej aktualizacji updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -38,30 +35,23 @@ BEGIN
   RETURN NEW;
 END;
 $$ language 'plpgsql';
-
 -- Trigger dla tabeli notes
 CREATE TRIGGER update_notes_updated_at 
   BEFORE UPDATE ON notes 
   FOR EACH ROW 
   EXECUTE FUNCTION update_updated_at_column();
-
 -- RLS (Row Level Security)
 ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE note_lesson_connections ENABLE ROW LEVEL SECURITY;
-
 -- Polityki dla notes
 CREATE POLICY "Users can view their own notes" ON notes
   FOR SELECT USING (auth.uid() = user_id);
-
 CREATE POLICY "Users can create their own notes" ON notes
   FOR INSERT WITH CHECK (auth.uid() = user_id);
-
 CREATE POLICY "Users can update their own notes" ON notes
   FOR UPDATE USING (auth.uid() = user_id);
-
 CREATE POLICY "Users can delete their own notes" ON notes
   FOR DELETE USING (auth.uid() = user_id);
-
 -- Dodatkowe polityki dla nauczycieli (mogą widzieć notatki studentów zapisanych na ich kursy)
 CREATE POLICY "Teachers can view student notes" ON notes
   FOR SELECT USING (
@@ -74,7 +64,6 @@ CREATE POLICY "Teachers can view student notes" ON notes
       AND ce.status = 'enrolled'
     )
   );
-
 -- Polityki dla note_lesson_connections
 CREATE POLICY "Users can view connections for their notes" ON note_lesson_connections
   FOR SELECT USING (
@@ -84,7 +73,6 @@ CREATE POLICY "Users can view connections for their notes" ON note_lesson_connec
       AND notes.user_id = auth.uid()
     )
   );
-
 CREATE POLICY "Users can create connections for their notes" ON note_lesson_connections
   FOR INSERT WITH CHECK (
     EXISTS (
@@ -93,7 +81,6 @@ CREATE POLICY "Users can create connections for their notes" ON note_lesson_conn
       AND notes.user_id = auth.uid()
     )
   );
-
 CREATE POLICY "Users can update connections for their notes" ON note_lesson_connections
   FOR UPDATE USING (
     EXISTS (
@@ -102,7 +89,6 @@ CREATE POLICY "Users can update connections for their notes" ON note_lesson_conn
       AND notes.user_id = auth.uid()
     )
   );
-
 CREATE POLICY "Users can delete connections for their notes" ON note_lesson_connections
   FOR DELETE USING (
     EXISTS (
@@ -111,7 +97,6 @@ CREATE POLICY "Users can delete connections for their notes" ON note_lesson_conn
       AND notes.user_id = auth.uid()
     )
   );
-
 -- Dodatkowe polityki dla nauczycieli (mogą widzieć powiązania notatek studentów zapisanych na ich kursy)
 CREATE POLICY "Teachers can view student note connections" ON note_lesson_connections
   FOR SELECT USING (

@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const lessonId = searchParams.get('lesson_id')
     const includeConnections = searchParams.get('include_connections') === 'true'
+    const includeLoose = searchParams.get('include_loose') === 'true'
     const courseId = searchParams.get('courseId') || searchParams.get('course_id')
     const ownerStudentId = searchParams.get('owner_student_id')
     const ownerUserIdParam = searchParams.get('user_id')
@@ -144,14 +145,40 @@ export async function GET(request: NextRequest) {
       query = query.eq('user_id', ownerUserId)
     }
 
-    if (includeConnections || lessonId || courseId) {
-      const { data: threads, error } = await supabase
+    if (includeConnections || lessonId || courseId || includeLoose) {
+      const selectQuery = `
+        *,
+        lesson_connections:thread_lesson_connections(*),
+                  survey_connections:thread_survey_connections(
+            *,
+            survey_responses(
+              id,
+              form_id,
+              respondent_email,
+              submitted_at,
+              survey_forms(
+                form_id,
+                title
+              )
+            )
+          )
+      `
+      
+      let threadsQuery = supabase
         .from('threads')
-        .select(`
-          *,
-          lesson_connections:thread_lesson_connections(*)
-        `)
+        .select(selectQuery)
         .order('created_at', { ascending: false })
+      
+      if (ownerUserId) {
+        threadsQuery = threadsQuery.eq('user_id', ownerUserId)
+      }
+      
+      if (includeLoose) {
+        // Get threads that have no lesson connections (loose threads)
+        threadsQuery = threadsQuery.is('thread_lesson_connections.thread_id', null)
+      }
+      
+      const { data: threads, error } = await threadsQuery
       if (error) throw error
       return NextResponse.json({ threads: threads || [] })
     }

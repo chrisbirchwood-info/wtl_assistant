@@ -25,4 +25,3 @@ BEGIN
   )
   AND course_id <> v_primary;
 END $$;
-

@@ -25,6 +25,7 @@ export function buildGoogleAuthUrl(params: {
   const scope = (params.scope && params.scope.length
     ? params.scope
     : [
+        'https://www.googleapis.com/auth/forms.body.readonly',
         'https://www.googleapis.com/auth/forms.responses.readonly',
         'https://www.googleapis.com/auth/userinfo.email',
       ]
@@ -109,6 +110,21 @@ export function extractFormIdFromUrl(urlString: string): string | null {
   }
 }
 
+export async function getFormMetadata(args: {
+  formId: string
+  accessToken: string
+}): Promise<{ title?: string; description?: string; items?: any[] }>
+{
+  const res = await fetch(`https://forms.googleapis.com/v1/forms/${args.formId}`, {
+    headers: { Authorization: `Bearer ${args.accessToken}` },
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Forms metadata API error: ${res.status} ${text}`)
+  }
+  return res.json()
+}
+
 export async function listFormResponses(args: {
   formId: string
   accessToken: string
@@ -128,3 +144,17 @@ export async function listFormResponses(args: {
   return res.json()
 }
 
+export async function getFormResponse(args: {
+  formId: string
+  responseId: string
+  accessToken: string
+}): Promise<any> {
+  const res = await fetch(`https://forms.googleapis.com/v1/forms/${args.formId}/responses/${args.responseId}`, {
+    headers: { Authorization: `Bearer ${args.accessToken}` },
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Forms response get error: ${res.status} ${text}`)
+  }
+  return res.json()
+}

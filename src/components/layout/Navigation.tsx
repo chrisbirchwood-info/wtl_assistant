@@ -50,6 +50,11 @@ export default function Navigation() {
       href: `/teacher/${user.id}/surveys`,
       current: pathname.startsWith('/teacher/') && pathname.includes('/surveys')
     })
+    navigation.push({
+      name: 'Wątki z ankiet',
+      href: `/teacher/${user.id}/survey-threads`,
+      current: pathname.startsWith('/teacher/') && pathname.includes('/survey-threads')
+    })
   }
 
   // Link do panelu admina tylko dla superadminów

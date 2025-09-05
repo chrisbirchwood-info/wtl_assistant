@@ -7,7 +7,6 @@ USING public.course_lessons older
 WHERE cl.lesson_id = older.lesson_id
   AND cl.id <> older.id
   AND cl.created_at > older.created_at;
-
 -- 2) Ensure each lesson can belong to only one course
 DO $$
 BEGIN

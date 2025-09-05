@@ -2,7 +2,6 @@
 -- Sets position per course based on lessons.wtl_lesson_id
 
 BEGIN;
-
 -- Re-rank positions within each course by numeric value of wtl_lesson_id
 WITH ranked AS (
   SELECT
@@ -21,6 +20,4 @@ SET position = r.rn,
     updated_at = now()
 FROM ranked r
 WHERE cl.id = r.id;
-
 COMMIT;
-

@@ -4,7 +4,6 @@
 -- Drop incorrect policies if exist
 DROP POLICY IF EXISTS "Teachers can view student notes" ON notes;
 DROP POLICY IF EXISTS "Teachers can view student note connections" ON note_lesson_connections;
-
 -- Recreate teacher view policy for notes based on course assignments
 -- A teacher can view notes of students who are enrolled in any course where the teacher is assigned
 CREATE POLICY "Teachers can view student notes" ON notes
@@ -22,7 +21,6 @@ CREATE POLICY "Teachers can view student notes" ON notes
       WHERE u.id = auth.uid() AND ur.role_code IN ('admin','superadmin')
     )
   );
-
 -- Recreate teacher view policy for note->lesson connections in the same spirit
 CREATE POLICY "Teachers can view student note connections" ON note_lesson_connections
   FOR SELECT USING (
@@ -40,4 +38,3 @@ CREATE POLICY "Teachers can view student note connections" ON note_lesson_connec
       WHERE u.id = auth.uid() AND ur.role_code IN ('admin','superadmin')
     )
   );
-

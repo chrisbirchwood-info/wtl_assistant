@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS public.survey_forms (
   last_synced_at timestamptz,
   total_responses integer DEFAULT 0
 );
-
 -- Individual responses (normalized)
 CREATE TABLE IF NOT EXISTS public.survey_responses_v2 (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -25,7 +24,6 @@ CREATE TABLE IF NOT EXISTS public.survey_responses_v2 (
   updated_at timestamptz DEFAULT now(),
   UNIQUE(response_id, form_id)
 );
-
 -- Individual answers (key-value pairs)
 CREATE TABLE IF NOT EXISTS public.survey_answers (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -37,23 +35,19 @@ CREATE TABLE IF NOT EXISTS public.survey_answers (
   answer_value jsonb, -- For complex answers (arrays, objects)
   created_at timestamptz DEFAULT now()
 );
-
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_survey_forms_teacher_id ON public.survey_forms(teacher_id);
 CREATE INDEX IF NOT EXISTS idx_survey_responses_v2_form_id ON public.survey_responses_v2(form_id);
 CREATE INDEX IF NOT EXISTS idx_survey_responses_v2_submitted_at ON public.survey_responses_v2(submitted_at);
 CREATE INDEX IF NOT EXISTS idx_survey_answers_response_id ON public.survey_answers(response_id);
 CREATE INDEX IF NOT EXISTS idx_survey_answers_question_id ON public.survey_answers(question_id);
-
 -- RLS Policies
 ALTER TABLE public.survey_forms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.survey_responses_v2 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.survey_answers ENABLE ROW LEVEL SECURITY;
-
 -- Teachers can only see their own forms
 CREATE POLICY "Teachers can manage their own forms" ON public.survey_forms
   FOR ALL USING (auth.uid() = teacher_id);
-
 -- Teachers can only see responses to their forms
 CREATE POLICY "Teachers can view responses to their forms" ON public.survey_responses_v2
   FOR ALL USING (
@@ -63,7 +57,6 @@ CREATE POLICY "Teachers can view responses to their forms" ON public.survey_resp
       AND survey_forms.teacher_id = auth.uid()
     )
   );
-
 -- Teachers can only see answers to their form responses
 CREATE POLICY "Teachers can view answers to their form responses" ON public.survey_answers
   FOR ALL USING (
@@ -74,7 +67,6 @@ CREATE POLICY "Teachers can view answers to their form responses" ON public.surv
       AND survey_forms.teacher_id = auth.uid()
     )
   );
-
 -- Note: Superadmin policies will be added after users table is created in later migration
 
 -- Function to get form statistics
