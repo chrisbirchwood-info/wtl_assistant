@@ -43,6 +43,15 @@ export default function ThreadDetailsPage() {
   const [studentEmail, setStudentEmail] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [showSurveySection, setShowSurveySection] = useState(false)
+  const [surveyCollapsed, setSurveyCollapsed] = useState(false)
+  const [forceOpenSelector, setForceOpenSelector] = useState(false)
+
+  // Derive a primary survey title (first connection) if any
+  const primarySurveyTitle = (surveyData && surveyData.length > 0)
+    ? (surveyData[0].form_title || `Ankieta ${surveyData[0].form_id}`)
+    : null
 
   useEffect(() => { initialize() }, [initialize])
 
@@ -162,7 +171,56 @@ export default function ThreadDetailsPage() {
               <h1 className="text-2xl font-bold text-gray-900">{thread.title}</h1>
               <p className="text-sm text-gray-500 mt-1">Utworzono: {new Date(thread.created_at).toLocaleString('pl-PL')}{thread.updated_at && (` • Zaktualizowano: ${new Date(thread.updated_at).toLocaleString('pl-PL')}`)}</p>
             </div>
-            <a href={`/teacher/${teacherId}/students/${studentId}/threads`} className="text-sm text-blue-600 hover:text-blue-800">← Wróć do wątków</a>
+            <div className="flex items-center gap-2 relative">
+              <a
+                href={`/teacher/${teacherId}/students/${studentId}/threads`}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                ← Wróć do wątków
+              </a>
+              {user?.role === 'teacher' && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    aria-haspopup="menu"
+                    aria-expanded={menuOpen}
+                    onClick={() => setMenuOpen((v) => !v)}
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    title="Opcje"
+                  >
+                    <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </button>
+                  {menuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                      <button
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => {
+                          setShowSurveySection(true)
+                          setSurveyCollapsed(false)
+                          setForceOpenSelector(true)
+                          setMenuOpen(false)
+                        }}
+                      >
+                        Dodaj ankietę
+                      </button>
+                      {showSurveySection && (surveyData?.length || 0) === 0 && (
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => {
+                            setShowSurveySection(false)
+                            setMenuOpen(false)
+                          }}
+                        >
+                          Ukryj sekcję ankiet
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
@@ -185,20 +243,62 @@ export default function ThreadDetailsPage() {
               )}
             </div>
 
-            {/* Survey connections section */}
-            {user?.role === 'teacher' && (
+            {/* Survey connections section - hidden until requested unless existing connections present */}
+            {user?.role === 'teacher' && (showSurveySection || (surveyData?.length || 0) > 0) && (
               <div className="mt-6 border-t pt-4">
-                <h2 className="text-sm font-semibold text-gray-700 mb-4">Ankiety</h2>
-                <ThreadSurveyLinker
-                  threadId={threadId}
-                  teacherId={teacherId}
-                  studentEmail={studentEmail}
-                  existingConnections={surveyData}
-                  onLinked={() => {
-                    // Refresh survey data after linking
-                    fetchData()
-                  }}
-                />
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-gray-700">
+                    {primarySurveyTitle ? (
+                      <>Ankieta: <span className="font-semibold">{primarySurveyTitle}</span></>
+                    ) : (
+                      'Ankiety'
+                    )}
+                  </h2>
+                  {(surveyData?.length || 0) > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setSurveyCollapsed(v => !v)}
+                      className="inline-flex items-center gap-2 text-xs text-gray-600 hover:text-gray-800"
+                      aria-expanded={!surveyCollapsed}
+                      aria-controls="survey-section"
+                    >
+                      <svg
+                        className={`w-4 h-4 transition-transform ${surveyCollapsed ? '' : 'rotate-180'}`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+                      </svg>
+                      {surveyCollapsed ? 'Rozwiń' : 'Zwiń'}
+                    </button>
+                  )}
+                </div>
+                {!surveyCollapsed && (
+                  <div id="survey-section">
+                    <ThreadSurveyLinker
+                      threadId={threadId}
+                      teacherId={teacherId}
+                      studentEmail={studentEmail}
+                      existingConnections={surveyData}
+                      defaultOpen={showSurveySection && (surveyData?.length || 0) === 0}
+                      forceOpen={forceOpenSelector}
+                      onCancel={() => {
+                        if ((surveyData?.length || 0) > 0) {
+                          setSurveyCollapsed(true)
+                        } else {
+                          setShowSurveySection(false)
+                        }
+                        setForceOpenSelector(false)
+                      }}
+                      onLinked={() => {
+                        // Refresh survey data after linking
+                        setForceOpenSelector(false)
+                        fetchData()
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>

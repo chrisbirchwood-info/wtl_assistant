@@ -10,6 +10,9 @@ interface ThreadSurveyLinkerProps {
   studentEmail?: string
   onLinked?: (result: any) => void
   existingConnections?: ThreadSurveyData[]
+  defaultOpen?: boolean
+  onCancel?: () => void
+  forceOpen?: boolean
 }
 
 export default function ThreadSurveyLinker({
@@ -17,12 +20,15 @@ export default function ThreadSurveyLinker({
   teacherId,
   studentEmail,
   onLinked,
-  existingConnections = []
+  existingConnections = [],
+  defaultOpen = false,
+  onCancel,
+  forceOpen = false
 }: ThreadSurveyLinkerProps) {
   const [availableForms, setAvailableForms] = useState<SurveyForm[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedFormId, setSelectedFormId] = useState<string>('')
-  const [showLinker, setShowLinker] = useState(false)
+  const [showLinker, setShowLinker] = useState(!!defaultOpen)
 
   // Get form IDs that are already connected
   const connectedFormIds = new Set(existingConnections.map(conn => conn.form_id))
@@ -51,6 +57,17 @@ export default function ThreadSurveyLinker({
       fetchAvailableForms()
     }
   }, [showLinker])
+
+  // If we already have a connection, ensure the selector stays hidden
+  useEffect(() => {
+    if (forceOpen) {
+      setShowLinker(true)
+      return
+    }
+    if ((existingConnections?.length || 0) > 0) {
+      setShowLinker(false)
+    }
+  }, [forceOpen, existingConnections?.length])
 
   const handleLinkToForm = async () => {
     if (!selectedFormId) {
@@ -157,7 +174,6 @@ export default function ThreadSurveyLinker({
       {/* Existing connections */}
       {existingConnections.length > 0 && (
         <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-medium text-gray-900 mb-3">Połączone ankiety</h4>
           <div className="space-y-4">
             {existingConnections.map((connection) => {
               const status = getConnectionStatus(connection)
@@ -220,16 +236,18 @@ export default function ThreadSurveyLinker({
 
       {/* Controls */}
       <div className="flex items-center space-x-3">
-        <button
-          onClick={() => setShowLinker(!showLinker)}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.1m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-          </svg>
-          {showLinker ? 'Anuluj' : 'Połącz z ankietą'}
-        </button>
-        
+        {(existingConnections?.length || 0) === 0 && (
+          <button
+            onClick={() => setShowLinker(!showLinker)}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.1m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+            {showLinker ? 'Anuluj' : 'Połącz z ankietą'}
+          </button>
+        )}
+
         {existingConnections.some(conn => conn.connection_type === 'waiting') && (
           <button
             onClick={handleSyncConnections}
@@ -245,7 +263,7 @@ export default function ThreadSurveyLinker({
       </div>
 
       {/* Form selector */}
-      {showLinker && (
+      {showLinker && (((existingConnections?.length || 0) === 0) || forceOpen) && (
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <h4 className="font-medium text-gray-900 mb-3">Wybierz ankietę do połączenia</h4>
           
@@ -290,7 +308,7 @@ export default function ThreadSurveyLinker({
               
               <div className="flex justify-end space-x-3">
                 <button
-                  onClick={() => setShowLinker(false)}
+                  onClick={() => { onCancel?.(); setShowLinker(false) }}
                   className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Anuluj
