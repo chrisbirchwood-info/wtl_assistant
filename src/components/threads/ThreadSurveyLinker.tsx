@@ -13,6 +13,7 @@ interface ThreadSurveyLinkerProps {
   defaultOpen?: boolean
   onCancel?: () => void
   forceOpen?: boolean
+  viewerRole?: 'teacher' | 'student' | 'admin' | 'superadmin'
 }
 
 export default function ThreadSurveyLinker({
@@ -23,7 +24,8 @@ export default function ThreadSurveyLinker({
   existingConnections = [],
   defaultOpen = false,
   onCancel,
-  forceOpen = false
+  forceOpen = false,
+  viewerRole
 }: ThreadSurveyLinkerProps) {
   const [availableForms, setAvailableForms] = useState<SurveyForm[]>([])
   const [loading, setLoading] = useState(false)

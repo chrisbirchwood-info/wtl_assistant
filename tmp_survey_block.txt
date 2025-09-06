@@ -1,0 +1,31 @@
+            {/* Survey connections section - hidden until requested unless existing connections present */}
+            {user?.role === 'teacher' && (showSurveySection || (surveyData?.length || 0) > 0) && (
+              <div className="mt-6 border-t pt-4">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-gray-700">
+                    {primarySurveyTitle ? (
+                      <>Ankieta: <span className="font-semibold">{primarySurveyTitle}</span></>
+                    ) : (
+                      'Ankiety'
+                    )}
+                  </h2>
+                  {(surveyData?.length || 0) > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setSurveyCollapsed(v => !v)}
+                      className="inline-flex items-center gap-2 text-xs text-gray-600 hover:text-gray-800"
+                      aria-expanded={!surveyCollapsed}
+                      aria-controls="survey-section"
+                    >
+                      <svg
+                        className={`w-4 h-4 transition-transform ${surveyCollapsed ? '' : 'rotate-180'}`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+                      </svg>
+                      {surveyCollapsed ? 'Rozwiń' : 'Zwiń'}
+                    </button>
+                  )}
+                </div>

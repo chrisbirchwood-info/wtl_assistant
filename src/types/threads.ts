@@ -16,6 +16,11 @@ import type {
   ThreadSurveyData,
   Lesson,
 } from './thread-core'
+import type {
+  ThreadNote,
+  CreateThreadNoteRequest,
+  UpdateThreadNoteRequest,
+} from './thread-notes'
 
 export type Thread = Note
 export type ThreadWithConnections = NoteWithConnections
@@ -30,5 +35,12 @@ export type {
   SurveyForm,
   SurveyAnswer,
   ThreadSurveyData,
-  Lesson 
-}
+  Lesson, 
+  ThreadNote,
+  CreateThreadNoteRequest,
+  UpdateThreadNoteRequest,
+} 
+
+// Optional visibility metadata for survey connections
+// (returned by our API layer when available)
+export type SurveyVisibility = 'public' | 'private'

@@ -95,15 +95,33 @@ export async function GET(request: NextRequest) {
     const responseId = searchParams.get('response_id')
     
     if (threadId) {
-      // Get survey data for a specific thread
+      // Get survey data for a specific thread (connection_id included)
       const { data, error } = await supabase
         .rpc('get_thread_survey_data', { p_thread_id: threadId })
-      
-      if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+      const rows = data || []
+      const ids = rows.map((row: any) => row.connection_id).filter(Boolean)
+      let visMap = new Map<string, string>()
+      if (ids.length > 0) {
+        const { data: visRows } = await supabase
+          .from('thread_survey_connections')
+          .select('id, visibility')
+          .in('id', ids)
+        if (visRows) visMap = new Map<string, string>(visRows.map((r: any) => [r.id, r.visibility || 'public']))
       }
-      
-      return NextResponse.json({ survey_data: data })
+
+      // Attach visibility to each row for the UI
+      const withVis = rows.map((row: any) => ({ ...row, visibility: visMap.get(row.connection_id) || 'public' }))
+
+      // Optionally filter by visibility for student viewers
+      const visibilityFor = request.nextUrl.searchParams.get('visibility_for') || 'teacher'
+      if (visibilityFor === 'student') {
+        const filtered = withVis.filter((row: any) => row.visibility === 'public')
+        return NextResponse.json({ survey_data: filtered })
+      }
+
+      return NextResponse.json({ survey_data: withVis })
     } else if (responseId) {
       // Get thread connected to a specific survey response
       const { data: connectionData, error } = await supabase
@@ -132,6 +150,30 @@ export async function GET(request: NextRequest) {
     }
   } catch (error: any) {
     console.error('Error in survey connections GET API:', error)
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
+  }
+}
+
+// Update visibility of a connection (teacher only assumed; auth handled at higher layer)
+export async function PUT(request: NextRequest) {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json({ error: 'Missing Supabase configuration' }, { status: 500 })
+    }
+    const supabase = createClient(supabaseUrl, serviceRoleKey)
+    const body = await request.json() as { connection_id?: string; visibility?: 'public' | 'private' }
+    if (!body.connection_id || !body.visibility) {
+      return NextResponse.json({ error: 'Missing connection_id or visibility' }, { status: 400 })
+    }
+    const { error } = await supabase
+      .from('thread_survey_connections')
+      .update({ visibility: body.visibility })
+      .eq('id', body.connection_id)
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,0 +1,76 @@
+"use client"
+
+import { useEffect, useRef, useState } from 'react'
+
+interface RichTextEditorProps {
+  value: string
+  onChange: (html: string) => void
+  placeholder?: string
+  className?: string
+  toolbarClassName?: string
+}
+
+export default function RichTextEditor({ value, onChange, placeholder, className = '', toolbarClassName = '' }: RichTextEditorProps) {
+  const [html, setHtml] = useState<string>(value || '')
+  const editorRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    setHtml(value || '')
+  }, [value])
+
+  const exec = (command: string, value?: string) => {
+    document.execCommand(command, false, value)
+    handleInput()
+  }
+
+  const handleInput = () => {
+    const newHtml = editorRef.current?.innerHTML || ''
+    setHtml(newHtml)
+    onChange(newHtml)
+  }
+
+  const setBlock = (tag: 'P' | 'H1' | 'H2' | 'H3') => {
+    exec('formatBlock', tag)
+  }
+
+  const insertLink = () => {
+    const url = prompt('Wprowadź URL')
+    if (url) exec('createLink', url)
+  }
+
+  const clearFormatting = () => {
+    exec('removeFormat')
+  }
+
+  return (
+    <div className={`border rounded-md ${className}`}>
+      <div className={`flex flex-wrap items-center gap-1 border-b px-2 py-1 bg-gray-50 ${toolbarClassName}`}>
+        <button type="button" onClick={() => setBlock('P')} className="px-2 py-1 text-xs hover:bg-gray-100 rounded">P</button>
+        <button type="button" onClick={() => setBlock('H1')} className="px-2 py-1 text-xs hover:bg-gray-100 rounded">H1</button>
+        <button type="button" onClick={() => setBlock('H2')} className="px-2 py-1 text-xs hover:bg-gray-100 rounded">H2</button>
+        <button type="button" onClick={() => setBlock('H3')} className="px-2 py-1 text-xs hover:bg-gray-100 rounded">H3</button>
+        <span className="mx-1 h-4 w-px bg-gray-300" />
+        <button type="button" onClick={() => exec('bold')} className="px-2 py-1 text-xs hover:bg-gray-100 rounded font-semibold">B</button>
+        <button type="button" onClick={() => exec('italic')} className="px-2 py-1 text-xs hover:bg-gray-100 rounded italic">I</button>
+        <button type="button" onClick={() => exec('underline')} className="px-2 py-1 text-xs hover:bg-gray-100 rounded underline">U</button>
+        <span className="mx-1 h-4 w-px bg-gray-300" />
+        <button type="button" onClick={() => exec('insertUnorderedList')} className="px-2 py-1 text-xs hover:bg-gray-100 rounded">• Lista</button>
+        <button type="button" onClick={() => exec('insertOrderedList')} className="px-2 py-1 text-xs hover:bg-gray-100 rounded">1. Lista</button>
+        <span className="mx-1 h-4 w-px bg-gray-300" />
+        <button type="button" onClick={insertLink} className="px-2 py-1 text-xs hover:bg-gray-100 rounded">Link</button>
+        <button type="button" onClick={clearFormatting} className="px-2 py-1 text-xs hover:bg-gray-100 rounded">Wyczyść</button>
+      </div>
+      <div
+        ref={editorRef}
+        className="min-h-[120px] p-3 focus:outline-none prose max-w-none"
+        contentEditable
+        onInput={handleInput}
+        onBlur={handleInput}
+        data-placeholder={placeholder}
+        suppressContentEditableWarning
+        dangerouslySetInnerHTML={{ __html: html || '' }}
+      />
+    </div>
+  )
+}
+

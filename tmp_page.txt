@@ -8,7 +8,6 @@ import ThreadSurveyLinker from '@/components/threads/ThreadSurveyLinker'
 import ThreadNotesSection from '@/components/threads/ThreadNotesSection'
 import ThreadNoteComposer from '@/components/threads/ThreadNoteComposer'
 import { ThreadSurveyData } from '@/types/threads'
-import CollapseHeader from '@/components/ui/CollapseHeader'
 
 interface ThreadConnection {
   id: string
@@ -48,13 +47,12 @@ export default function ThreadDetailsPage() {
   const [error, setError] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [showSurveySection, setShowSurveySection] = useState(false)
-  const [surveyCollapsed, setSurveyCollapsed] = useState(true)
+  const [surveyCollapsed, setSurveyCollapsed] = useState(false)
   const [forceOpenSelector, setForceOpenSelector] = useState(false)
-  const [showNotesSection, setShowNotesSection] = useState(true)
+  const [showNotesSection, setShowNotesSection] = useState(false)
   const [notesCollapsed, setNotesCollapsed] = useState(false)
   const [noteComposerOpen, setNoteComposerOpen] = useState(false)
   const [notesRefresh, setNotesRefresh] = useState(0)
-  const [notesCount, setNotesCount] = useState(0)
 
   // Derive a primary survey title (first connection) if any
   const primarySurveyTitle = (surveyData && surveyData.length > 0)
@@ -107,8 +105,7 @@ export default function ThreadDetailsPage() {
       }
       
       // Fetch survey data for this thread
-      const visibilityFor = (user?.role === 'student') ? 'student' : 'teacher'
-      const surveyResponse = await fetch(`/api/threads/survey-connections?thread_id=${threadId}&visibility_for=${visibilityFor}`, { cache: 'no-store' })
+      const surveyResponse = await fetch(`/api/threads/survey-connections?thread_id=${threadId}`, { cache: 'no-store' })
       if (surveyResponse.ok) {
         const surveyJson = await surveyResponse.json()
         setSurveyData(surveyJson.survey_data || [])
@@ -266,14 +263,7 @@ export default function ThreadDetailsPage() {
             {/* Notes section */}
             {user?.role === 'teacher' && showNotesSection && (
               <div className="mt-6 border-t pt-4">
-                <CollapseHeader
-                  title="Notatki"
-                  collapsed={notesCollapsed}
-                  onToggle={() => setNotesCollapsed(v => !v)}
-                  ariaControls="notes-section"
-                  className="mb-4 hidden"
-                />
-                <div className="mb-4 flex items-center justify-between hidden">
+                <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-sm font-semibold text-gray-700">Notatki</h2>
                   <button
                     type="button"
@@ -285,7 +275,7 @@ export default function ThreadDetailsPage() {
                   </button>
                 </div>
                 {!notesCollapsed && (
-                  <div id="notes-section" className="space-y-4">
+                  <div className="space-y-4">
                     {noteComposerOpen && (
                       <ThreadNoteComposer
                         threadId={threadId}
@@ -300,11 +290,6 @@ export default function ThreadDetailsPage() {
                       defaultOpen={false}
                       hideComposerControls
                       externalRefreshTrigger={notesRefresh}
-                      onNotesCountChange={(c) => setNotesCount(c)}
-                      hideHeader
-                      teacherId={teacherId}
-                      studentId={studentId}
-                      viewerRole={(user as any)?.role as any}
                     />
                   </div>
                 )}
@@ -314,56 +299,7 @@ export default function ThreadDetailsPage() {
             {/* Survey connections section - hidden until requested unless existing connections present */}
             {user?.role === 'teacher' && (showSurveySection || (surveyData?.length || 0) > 0) && (
               <div className="mt-6 border-t pt-4">
-                <CollapseHeader
-                  title={primarySurveyTitle ? (
-                    <>Ankieta: <span className="font-semibold">{primarySurveyTitle}</span></>
-                  ) : (
-                    'Ankiety'
-                  )}
-                  collapsed={surveyCollapsed}
-                  onToggle={() => setSurveyCollapsed(v => !v)}
-                  ariaControls="survey-section"
-                  className="mb-4"
-                  rightContent={
-                    (user as any)?.role !== 'student' && (surveyData?.length || 0) > 0 ? (
-                      (() => {
-                        const allPrivate = (surveyData || []).length > 0 && (surveyData || []).every((c: any) => (c as any).visibility === 'private')
-                        const next = allPrivate ? 'public' : 'private'
-                        return (
-                          <button
-                            type="button"
-                            onClick={async (e) => {
-                              e.stopPropagation()
-                              try {
-                                await Promise.all(
-                                  (surveyData || []).map((c: any) =>
-                                    fetch('/api/threads/survey-connections', {
-                                      method: 'PUT',
-                                      headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ connection_id: c.connection_id, visibility: next })
-                                    })
-                                  )
-                                )
-                                // optimistic update
-                                setSurveyData((arr: any) => (arr || []).map((c: any) => ({ ...c, visibility: next })))
-                              } catch {}
-                            }}
-                              className={`inline-flex items-center p-1 rounded ${allPrivate ? 'text-red-600 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'}`}
-                              title={allPrivate ? 'Prywatna (tylko mentor)' : 'Widoczna dla wszystkich'}
-                              aria-label={allPrivate ? 'Prywatna' : 'Publiczna'}
-                          >
-                            {allPrivate ? (
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4"><path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v2H5a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1v-7a1 1 0 00-1-1h-1V6a4 4 0 00-4-4zm2 6V6a2 2 0 10-4 0v2h4z" clipRule="evenodd"/></svg>
-                            ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4"><path fillRule="evenodd" d="M5 8a5 5 0 0110 0v1h1a1 1 0 011 1v7a1 1 0 01-1 1H4a1 1 0 01-1-1V10a1 1 0 011-1h1V8zm2 1V8a3 3 0 016 0v1H7z" clipRule="evenodd"/></svg>
-                            )}
-                          </button>
-                        )
-                      })()
-                    ) : null
-                  }
-                />
-                <div className="mb-4 flex items-center justify-between hidden">
+                <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-sm font-semibold text-gray-700">
                     {primarySurveyTitle ? (
                       <>Ankieta: <span className="font-semibold">{primarySurveyTitle}</span></>
@@ -400,7 +336,6 @@ export default function ThreadDetailsPage() {
                       existingConnections={surveyData}
                       defaultOpen={showSurveySection && (surveyData?.length || 0) === 0}
                       forceOpen={forceOpenSelector}
-                      viewerRole={user?.role as any}
                       onCancel={() => {
                         if ((surveyData?.length || 0) > 0) {
                           setSurveyCollapsed(true)
@@ -425,5 +360,6 @@ export default function ThreadDetailsPage() {
     </ProtectedRoute>
   )
 }
+
 
 
