@@ -8,6 +8,7 @@ import ThreadSurveyLinker from '@/components/threads/ThreadSurveyLinker'
 import ThreadNotesSection from '@/components/threads/ThreadNotesSection'
 import ThreadTasksSection from '@/components/threads/ThreadTasksSection'
 import ThreadNoteComposer from '@/components/threads/ThreadNoteComposer'
+import ThreadChecklistSection from '@/components/threads/ThreadChecklistSection'
 import { ThreadSurveyData } from '@/types/threads'
 import CollapseHeader from '@/components/ui/CollapseHeader'
 
@@ -61,6 +62,11 @@ export default function ThreadDetailsPage() {
   const [tasksRefresh, setTasksRefresh] = useState(0)
   const [tasksCount, setTasksCount] = useState(0)
   const [openTaskComposerSignal, setOpenTaskComposerSignal] = useState(0)
+  const [showChecklistSection, setShowChecklistSection] = useState(false)
+  const [checklistCollapsed, setChecklistCollapsed] = useState(false)
+  const [checklistRefresh, setChecklistRefresh] = useState(0)
+  const [openChecklistComposerSignal, setOpenChecklistComposerSignal] = useState(0)
+  const [checklistCount, setChecklistCount] = useState(0)
 
   // Derive a primary survey title (first connection) if any
   const primarySurveyTitle = (surveyData && surveyData.length > 0)
@@ -234,6 +240,17 @@ export default function ThreadDetailsPage() {
                       <button
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         onClick={() => {
+                          setShowChecklistSection(true)
+                          setChecklistCollapsed(false)
+                          setOpenChecklistComposerSignal(v => v + 1)
+                          setMenuOpen(false)
+                        }}
+                      >
+                        Dodaj checklistę
+                      </button>
+                      <button
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => {
                           setShowSurveySection(true)
                           setSurveyCollapsed(false)
                           setForceOpenSelector(true)
@@ -301,6 +318,34 @@ export default function ThreadDetailsPage() {
                         hideHeader={false}
                         viewerRole={(user as any)?.role as any}
                         openComposerSignal={openTaskComposerSignal}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Checklist section inside thread */}
+              {user?.role === 'teacher' && (
+                <div className={`mt-6 border-t pt-4 ${(!showChecklistSection && checklistCount === 0) ? 'hidden' : ''}`}>
+                  <CollapseHeader
+                    title="Checklisty"
+                    collapsed={checklistCollapsed}
+                    onToggle={() => setChecklistCollapsed(v => !v)}
+                    ariaControls="checklist-section"
+                    className="mb-4 hidden"
+                  />
+                  {!checklistCollapsed && (
+                    <div id="checklist-section" className="space-y-4">
+                      <ThreadChecklistSection
+                        threadId={threadId}
+                        user={user || undefined}
+                        defaultOpen={false}
+                        externalRefreshTrigger={checklistRefresh}
+                        hideHeader={false}
+                        viewerRole={(user as any)?.role as any}
+                        openComposerSignal={openChecklistComposerSignal}
+                        onChecklistsCountChange={(c) => setChecklistCount(c)}
+                        onCancelNew={() => setShowChecklistSection(false)}
                       />
                     </div>
                   )}

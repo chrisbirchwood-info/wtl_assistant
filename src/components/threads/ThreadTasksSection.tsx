@@ -84,6 +84,10 @@ export default function ThreadTasksSection({
   useEffect(() => { onTasksCountChange?.(tasks.length) }, [tasks.length])
   // Ensure composer visibility follows the one-task-per-thread rule, but only after loading finishes
   useEffect(() => { if (!loading) setComposerOpen(tasks.length === 0) }, [tasks.length, loading])
+  // Collapse by default when an existing task is present; expand when none
+  useEffect(() => {
+    if (!loading) setCollapsed(tasks.length > 0)
+  }, [tasks.length, loading])
 
   const handleCreate = async () => {
     const plain = newContent.replace(/<[^>]*>/g, '').trim()
