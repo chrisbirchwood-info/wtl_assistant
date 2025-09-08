@@ -6,6 +6,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { useAuthStore } from '@/store/auth-store'
 import ThreadSurveyLinker from '@/components/threads/ThreadSurveyLinker'
 import ThreadNotesSection from '@/components/threads/ThreadNotesSection'
+import ThreadTasksSection from '@/components/threads/ThreadTasksSection'
 import ThreadNoteComposer from '@/components/threads/ThreadNoteComposer'
 import { ThreadSurveyData } from '@/types/threads'
 import CollapseHeader from '@/components/ui/CollapseHeader'
@@ -55,6 +56,11 @@ export default function ThreadDetailsPage() {
   const [noteComposerOpen, setNoteComposerOpen] = useState(false)
   const [notesRefresh, setNotesRefresh] = useState(0)
   const [notesCount, setNotesCount] = useState(0)
+  const [showTasksSection, setShowTasksSection] = useState(false)
+  const [tasksCollapsed, setTasksCollapsed] = useState(false)
+  const [tasksRefresh, setTasksRefresh] = useState(0)
+  const [tasksCount, setTasksCount] = useState(0)
+  const [openTaskComposerSignal, setOpenTaskComposerSignal] = useState(0)
 
   // Derive a primary survey title (first connection) if any
   const primarySurveyTitle = (surveyData && surveyData.length > 0)
@@ -217,6 +223,17 @@ export default function ThreadDetailsPage() {
                       <button
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         onClick={() => {
+                          setShowTasksSection(true)
+                          setTasksCollapsed(false)
+                          setOpenTaskComposerSignal(v => v + 1)
+                          setMenuOpen(false)
+                        }}
+                      >
+                        Dodaj zadanie
+                      </button>
+                      <button
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => {
                           setShowSurveySection(true)
                           setSurveyCollapsed(false)
                           setForceOpenSelector(true)
@@ -261,9 +278,39 @@ export default function ThreadDetailsPage() {
               ) : (
                 <p className="text-sm text-gray-500">Brak powiązań — luźny wątek.</p>
               )}
-            </div>
+              </div>
 
-            {/* Notes section */}
+              {/* Tasks section inside thread */}
+              {user?.role === 'teacher' && (
+                <div className="mt-6 border-t pt-4">
+                  <CollapseHeader
+                    title="Zadania"
+                    collapsed={tasksCollapsed}
+                    onToggle={() => setTasksCollapsed(v => !v)}
+                    ariaControls="tasks-section"
+                    className="mb-4 hidden"
+                  />
+                  {!tasksCollapsed && (
+                    <div id="tasks-section" className="space-y-4">
+                      <ThreadTasksSection
+                        threadId={threadId}
+                        user={user || undefined}
+                        defaultOpen={false}
+                        externalRefreshTrigger={tasksRefresh}
+                        onTasksCountChange={(c) => setTasksCount(c)}
+                        hideHeader={false}
+                        viewerRole={(user as any)?.role as any}
+                        openComposerSignal={openTaskComposerSignal}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              
+              {/* (Removed duplicate) Tasks section – kept only one instance above */}
+
+              {/* Notes section */}
             {user?.role === 'teacher' && showNotesSection && (
               <div className="mt-6 border-t pt-4">
                 <CollapseHeader
