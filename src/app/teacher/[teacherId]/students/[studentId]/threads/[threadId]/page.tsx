@@ -67,11 +67,17 @@ export default function ThreadDetailsPage() {
   const [checklistRefresh, setChecklistRefresh] = useState(0)
   const [openChecklistComposerSignal, setOpenChecklistComposerSignal] = useState(0)
   const [checklistCount, setChecklistCount] = useState(0)
+  const [tasksReady, setTasksReady] = useState(false)
+  const [checklistReady, setChecklistReady] = useState(false)
+  const [notesReady, setNotesReady] = useState(false)
 
   // Derive a primary survey title (first connection) if any
   const primarySurveyTitle = (surveyData && surveyData.length > 0)
     ? (surveyData[0].form_title || `Ankieta ${surveyData[0].form_id}`)
     : null
+
+  const isTeacher = (user as any)?.role === 'teacher'
+  const allSectionsReady = !isLoading && (!isTeacher || (tasksReady && checklistReady && notesReady))
 
   useEffect(() => { initialize() }, [initialize])
 
@@ -297,9 +303,18 @@ export default function ThreadDetailsPage() {
               )}
               </div>
 
+              {/* Unified sections skeleton while loading */}
+              {user?.role === 'teacher' && !allSectionsReady && (
+                <div className="mt-6 border-t pt-4 animate-pulse space-y-4">
+                  <div className="h-5 bg-gray-100 rounded w-24"></div>
+                  <div className="h-5 bg-gray-100 rounded w-24"></div>
+                  <div className="h-5 bg-gray-100 rounded w-24"></div>
+                </div>
+              )}
+
               {/* Tasks section inside thread */}
               {user?.role === 'teacher' && (
-                <div className="mt-6 border-t pt-4">
+                <div className={`mt-6 border-t pt-4 ${!allSectionsReady ? 'hidden' : ''}`}>
                   <CollapseHeader
                     title="Zadania"
                     collapsed={tasksCollapsed}
@@ -318,6 +333,7 @@ export default function ThreadDetailsPage() {
                         hideHeader={false}
                         viewerRole={(user as any)?.role as any}
                         openComposerSignal={openTaskComposerSignal}
+                        onLoaded={() => setTasksReady(true)}
                       />
                     </div>
                   )}
@@ -326,7 +342,7 @@ export default function ThreadDetailsPage() {
 
               {/* Checklist section inside thread */}
               {user?.role === 'teacher' && (
-                <div className={`mt-6 border-t pt-4 ${(!showChecklistSection && checklistCount === 0) ? 'hidden' : ''}`}>
+                <div className={`mt-6 border-t pt-4 ${(!showChecklistSection && checklistCount === 0) || !allSectionsReady ? 'hidden' : ''}`}>
                   <CollapseHeader
                     title="Checklisty"
                     collapsed={checklistCollapsed}
@@ -346,6 +362,7 @@ export default function ThreadDetailsPage() {
                         openComposerSignal={openChecklistComposerSignal}
                         onChecklistsCountChange={(c) => setChecklistCount(c)}
                         onCancelNew={() => setShowChecklistSection(false)}
+                        onLoaded={() => setChecklistReady(true)}
                       />
                     </div>
                   )}
@@ -357,7 +374,7 @@ export default function ThreadDetailsPage() {
 
               {/* Notes section */}
             {user?.role === 'teacher' && showNotesSection && (
-              <div className="mt-6 border-t pt-4">
+              <div className={`mt-6 border-t pt-4 ${!allSectionsReady ? 'hidden' : ''}`}>
                 <CollapseHeader
                   title="Notatki"
                   collapsed={notesCollapsed}
@@ -397,6 +414,7 @@ export default function ThreadDetailsPage() {
                       teacherId={teacherId}
                       studentId={studentId}
                       viewerRole={(user as any)?.role as any}
+                      onLoaded={() => setNotesReady(true)}
                     />
                   </div>
                 )}

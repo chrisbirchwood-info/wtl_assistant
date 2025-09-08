@@ -17,6 +17,7 @@ interface ThreadNotesSectionProps {
   teacherId?: string
   studentId?: string
   viewerRole?: 'teacher' | 'student' | 'admin' | 'superadmin'
+  onLoaded?: () => void
 }
 
 export default function ThreadNotesSection({
@@ -31,6 +32,7 @@ export default function ThreadNotesSection({
   teacherId,
   studentId,
   viewerRole,
+  onLoaded,
 }: ThreadNotesSectionProps) {
   const [notes, setNotes] = useState<ThreadNote[]>([])
   const [loading, setLoading] = useState(true)
@@ -73,6 +75,15 @@ export default function ThreadNotesSection({
     onNotesCountChange?.(notes.length)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notes.length])
+
+  // Notify loaded once
+  const [loadedNotified, setLoadedNotified] = useState(false)
+  useEffect(() => {
+    if (!loading && !loadedNotified) {
+      onLoaded?.()
+      setLoadedNotified(true)
+    }
+  }, [loading, loadedNotified, onLoaded])
 
   const handleCreate = async () => {
     if (!newContent || newContent.replace(/<[^>]*>/g, '').trim().length === 0) {

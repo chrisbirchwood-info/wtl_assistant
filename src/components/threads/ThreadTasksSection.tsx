@@ -16,6 +16,7 @@ interface ThreadTasksSectionProps {
   hideHeader?: boolean
   viewerRole?: ViewerRole
   openComposerSignal?: number
+  onLoaded?: () => void
 }
 
 export default function ThreadTasksSection({
@@ -27,6 +28,7 @@ export default function ThreadTasksSection({
   hideHeader = false,
   viewerRole,
   openComposerSignal,
+  onLoaded,
 }: ThreadTasksSectionProps) {
   const [tasks, setTasks] = useState<ThreadTask[]>([])
   const [loading, setLoading] = useState(true)
@@ -82,6 +84,14 @@ export default function ThreadTasksSection({
 
   useEffect(() => { void fetchTasks() }, [threadId, externalRefreshTrigger])
   useEffect(() => { onTasksCountChange?.(tasks.length) }, [tasks.length])
+  // notify parent once initial load finished
+  const [loadedNotified, setLoadedNotified] = useState(false)
+  useEffect(() => {
+    if (!loading && !loadedNotified) {
+      onLoaded?.()
+      setLoadedNotified(true)
+    }
+  }, [loading, loadedNotified, onLoaded])
   // Ensure composer visibility follows the one-task-per-thread rule, but only after loading finishes
   useEffect(() => { if (!loading) setComposerOpen(tasks.length === 0) }, [tasks.length, loading])
   // Collapse by default when an existing task is present; expand when none

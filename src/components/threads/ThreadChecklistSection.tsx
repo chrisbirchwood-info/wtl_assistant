@@ -16,6 +16,7 @@ interface ThreadChecklistSectionProps {
   viewerRole?: ViewerRole
   openComposerSignal?: number
   onCancelNew?: () => void
+  onLoaded?: () => void
 }
 
 export default function ThreadChecklistSection({
@@ -28,6 +29,7 @@ export default function ThreadChecklistSection({
   viewerRole,
   openComposerSignal,
   onCancelNew,
+  onLoaded,
 }: ThreadChecklistSectionProps) {
   const [checklists, setChecklists] = useState<ThreadChecklist[]>([])
   const [loading, setLoading] = useState(true)
@@ -91,6 +93,14 @@ export default function ThreadChecklistSection({
     void fetchChecklists()
   }, [threadId, externalRefreshTrigger, composerOpen])
   useEffect(() => { onChecklistsCountChange?.(checklists.length) }, [checklists.length])
+  // notify parent once initial load finished
+  const [loadedNotified, setLoadedNotified] = useState(false)
+  useEffect(() => {
+    if (!loading && !loadedNotified) {
+      onLoaded?.()
+      setLoadedNotified(true)
+    }
+  }, [loading, loadedNotified, onLoaded])
   // Set default collapsed once after first load
   const [collapseInitialized, setCollapseInitialized] = useState(false)
   useEffect(() => {
